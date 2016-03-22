@@ -1,44 +1,172 @@
 package com.example.sarthak.profilepage_travey;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.dexafree.materialList.card.Card;
+import com.dexafree.materialList.card.CardProvider;
+import com.dexafree.materialList.card.OnActionClickListener;
+import com.dexafree.materialList.card.action.WelcomeButtonAction;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private ListView listView;
-    private Profile_ListViewAdapter adapter;
+    private RecyclerView recyclerView;
+    private Profile_RecyclerViewAdapter adapter;
     private ArrayList<ProfileClass> profile;
     private Toolbar toolbar;
-    private int userInfoIcons[] = {R.drawable.ic_call_black_24dp, R.drawable.ic_mail_black_24dp, R.drawable.ic_star_half_black_24dp, R.drawable.ic_location_on_black_24dp, R.drawable.ic_location_on_black_24dp};
-    private String userInfoTitle[] = {"Phone", "Mail", "Rating", "Location Shared Status","Temp"};
-    private String userInfoDescription[] = {"8758964908", "khandekarsarthak@gmail.com", "4.5", "Shared","Temp"};
+    private int profilePicture;
+    private int userInfoIcons[] = {R.drawable.ic_call_black_24dp, R.drawable.ic_mail_black_24dp, R.drawable.ic_star_half_black_24dp, R.drawable.ic_location_on_black_24dp};
+    private String userInfoTitle[] = {"Phone", "Mail", "Rating", "Location Shared Status"};
+    private String userInfoDescription[] = {"1233456789", "123456@gmail.com", "4.5", "Shared"};
     private CollapsingToolbarLayout collapsingToolbar;
+    private FloatingActionButton floatingActionButton;
+    private static int RESULT_LOAD_IMG = 1;
+    private Intent galleryIntent;
+    private ImageView profilePictureImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_ProfilePage);
         collapsingToolbar.setTitle("Sarthak");
         setSupportActionBar(toolbar);
-        ImageView header = (ImageView) findViewById(R.id.imageView_UserImage);
-        listView = (ListView) findViewById(R.id.listView_userDetails);
+
+        profilePictureImageView=(ImageView)findViewById(R.id.imageView_UserImage);
         initialiseProfile();
-        adapter = new Profile_ListViewAdapter(profile, MainActivity.this);
-        listView.setAdapter(adapter);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView_userDetails);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new Profile_RecyclerViewAdapter(profile, MainActivity.this);
+        recyclerView.setAdapter(adapter);
+        profilePicture = R.drawable.header;
+        colorToolbars();
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(MainActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        // TODO Handle item click
+                        if (profile.get(position).getTitle().equals("Rating")) {
+                            Toast.makeText(MainActivity.this, "Can not edit Ratings", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, EditProfile.class);
+                            intent.putExtra("Title", profile.get(position).getTitle());
+                            intent.putExtra("Description", profile.get(position).getDescription());
+                            startActivity(intent);
+                        }
+                    }
+                })
+        );
+
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_EditProfile);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*Open Gallery*/
+                galleryIntent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                // Start the Intent
+                startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+            }
+        });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+            // When an Image is picked
+            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+                    && null != data) {
+                Uri selectedImageUri = data.getData();
+                String selectedImagePath = getPath(selectedImageUri);
+                System.out.println("Image Path : " + selectedImagePath);
+                profilePictureImageView.setImageURI(selectedImageUri);
+
+                /*To write a general method*/
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+                        int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+                /*Set color for status bar*/
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Window window = getWindow();
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            window.setStatusBarColor(mutedColor);
+                        }
+                /*Set Collapsible toolbar color*/
+                        collapsingToolbar.setContentScrimColor(mutedColor);
+                    }
+                });
+            }
+    }
+
+    /*initialise the profile attributes*/
     private void initialiseProfile() {
         profile = new ArrayList<ProfileClass>();
         for (int i = 0; i < userInfoDescription.length; i++) {
             profile.add(new ProfileClass(userInfoIcons[i], userInfoTitle[i], userInfoDescription[i]));
         }
+    }
+
+    /*To get path of image from gallery*/
+    public String getPath(Uri uri) {
+        String res = null;
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+        if(cursor.moveToFirst()){;
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
+    }
+
+    /*Color toolbars*/
+    private void colorToolbars(){
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
+                profilePicture);
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+                int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+                /*Set color for status bar*/
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Window window = getWindow();
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    window.setStatusBarColor(mutedColor);
+                }
+                /*Set Collapsible toolbar color*/
+                collapsingToolbar.setContentScrimColor(mutedColor);
+            }
+        });
     }
 }
