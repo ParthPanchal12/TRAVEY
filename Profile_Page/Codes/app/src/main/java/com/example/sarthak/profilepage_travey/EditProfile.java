@@ -38,7 +38,7 @@ public class EditProfile extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         title_toolbar=intent.getExtras().getString("Title");
         userInfo=intent.getExtras().getString("Description");
-        toolbar.setTitle(title_toolbar);
+        setTitle(title_toolbar);
         editTextDescription=(EditText)findViewById(R.id.editText_UserInfoEdit);
         editTextDescription.setText(userInfo);
     }

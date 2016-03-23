@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,10 +44,13 @@ public class MainActivity extends AppCompatActivity {
     private String userInfoTitle[] = {"Phone", "Mail", "Rating", "Location Shared Status"};
     private String userInfoDescription[] = {"1233456789", "123456@gmail.com", "4.5", "Shared"};
     private CollapsingToolbarLayout collapsingToolbar;
-    private FloatingActionButton floatingActionButton;
+    private String nameOfUser = "Sarthak";
+    private FloatingActionButton floatingActionButton, floatingActionButtonChangeName, floatingActionButtonChangePhoto;
     private static int RESULT_LOAD_IMG = 1;
     private Intent galleryIntent;
     private ImageView profilePictureImageView;
+    private Animation fab_open, fab_close;
+    private Boolean isFabOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +59,10 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_ProfilePage);
-        collapsingToolbar.setTitle("Sarthak");
+        collapsingToolbar.setTitle(nameOfUser);
         setSupportActionBar(toolbar);
 
-        profilePictureImageView=(ImageView)findViewById(R.id.imageView_UserImage);
+        profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
         initialiseProfile();
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView_userDetails);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -75,57 +80,120 @@ public class MainActivity extends AppCompatActivity {
                         if (profile.get(position).getTitle().equals("Rating")) {
                             Toast.makeText(MainActivity.this, "Can not edit Ratings", Toast.LENGTH_SHORT).show();
                         } else {
-                            Intent intent = new Intent(MainActivity.this, EditProfile.class);
-                            intent.putExtra("Title", profile.get(position).getTitle());
-                            intent.putExtra("Description", profile.get(position).getDescription());
-                            startActivity(intent);
+                            if (isFabOpen == true) {
+                                isFabOpen = false;
+                                animateFAB();
+                            }
+                            if (profile.get(position).getTitle().equals("Location Shared Status")) {
+
+                                if (profile.get(position).getDescription().equals("Shared"))
+                                    profile.get(position).setDescription("Not Shared");
+                                else {
+                                    profile.get(position).setDescription("Shared");
+                                }
+                                adapter.notifyDataSetChanged();
+                            } else {
+                                Intent intent = new Intent(MainActivity.this, EditProfile.class);
+                                intent.putExtra("Title", profile.get(position).getTitle());
+                                intent.putExtra("Description", profile.get(position).getDescription());
+                                startActivity(intent);
+                            }
                         }
                     }
                 })
         );
 
+
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_EditProfile);
+        floatingActionButtonChangeName = (FloatingActionButton) findViewById(R.id.fab_ChangeName);
+        floatingActionButtonChangePhoto = (FloatingActionButton) findViewById(R.id.fab_ChangePhoto);
+
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animateFAB();
+            }
+        });
+
+        floatingActionButtonChangeName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EditProfile.class);
+                if (isFabOpen == true) {
+                    isFabOpen = false;
+                    animateFAB();
+                }
+                intent.putExtra("Title", "Name");
+                intent.putExtra("Description", nameOfUser);
+                startActivity(intent);
+            }
+        });
+        floatingActionButtonChangePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 /*Open Gallery*/
                 galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 // Start the Intent
+                if (isFabOpen == true) {
+                    isFabOpen = false;
+                    animateFAB();
+                }
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
             }
         });
+
+    }
+
+    private void animateFAB() {
+        if (isFabOpen) {
+            floatingActionButton.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_edit_white_24dp));
+            floatingActionButtonChangeName.startAnimation(fab_close);
+            floatingActionButtonChangePhoto.startAnimation(fab_close);
+            floatingActionButtonChangeName.setClickable(false);
+            floatingActionButtonChangePhoto.setClickable(false);
+            isFabOpen = false;
+        } else {
+            floatingActionButton.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_clear_white_24dp));
+            floatingActionButtonChangeName.startAnimation(fab_open);
+            floatingActionButtonChangePhoto.startAnimation(fab_open);
+            floatingActionButtonChangeName.setClickable(true);
+            floatingActionButtonChangePhoto.setClickable(true);
+            isFabOpen = true;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-                    && null != data) {
-                Uri selectedImageUri = data.getData();
-                String selectedImagePath = getPath(selectedImageUri);
-                System.out.println("Image Path : " + selectedImagePath);
-                profilePictureImageView.setImageURI(selectedImageUri);
+        // When an Image is picked
+        if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+                && null != data) {
+            Uri selectedImageUri = data.getData();
+            String selectedImagePath = getPath(selectedImageUri);
+            System.out.println("Image Path : " + selectedImagePath);
+            profilePictureImageView.setImageURI(selectedImageUri);
 
-                /*To write a general method*/
-                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
-                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-                        int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+            /*To write a general method*/
+            Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+                    int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
                 /*Set color for status bar*/
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Window window = getWindow();
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            window.setStatusBarColor(mutedColor);
-                        }
-                /*Set Collapsible toolbar color*/
-                        collapsingToolbar.setContentScrimColor(mutedColor);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Window window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        window.setStatusBarColor(mutedColor);
                     }
-                });
-            }
+                /*Set Collapsible toolbar color*/
+                    collapsingToolbar.setContentScrimColor(mutedColor);
+                }
+            });
+        }
     }
 
     /*initialise the profile attributes*/
@@ -139,9 +207,10 @@ public class MainActivity extends AppCompatActivity {
     /*To get path of image from gallery*/
     public String getPath(Uri uri) {
         String res = null;
-        String[] proj = { MediaStore.Images.Media.DATA };
+        String[] proj = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-        if(cursor.moveToFirst()){;
+        if (cursor.moveToFirst()) {
+            ;
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             res = cursor.getString(column_index);
         }
@@ -150,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*Color toolbars*/
-    private void colorToolbars(){
+    private void colorToolbars() {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                 profilePicture);
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
