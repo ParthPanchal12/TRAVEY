@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
+    private String selectedImagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +63,18 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_ProfilePage);
         collapsingToolbar.setTitle(nameOfUser);
         setSupportActionBar(toolbar);
-
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout_profilePage);
+        appBarLayout.setExpanded(true);
+        appBarLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFabOpen == true)
+                    animateFAB();
+                Intent intent = new Intent(MainActivity.this, ViewProfileImage.class);
+                intent.putExtra("Path_of_Image", selectedImagePath);
+                startActivity(intent);
+            }
+        });
         profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
         initialiseProfile();
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView_userDetails);
@@ -81,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Can not edit Ratings", Toast.LENGTH_SHORT).show();
                         } else {
                             if (isFabOpen == true) {
-                                isFabOpen = false;
                                 animateFAB();
                             }
                             if (profile.get(position).getTitle().equals("Location Shared Status")) {
@@ -121,10 +133,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, EditProfile.class);
-                if (isFabOpen == true) {
-                    isFabOpen = false;
-                    animateFAB();
-                }
+                animateFAB();
                 intent.putExtra("Title", "Name");
                 intent.putExtra("Description", nameOfUser);
                 startActivity(intent);
@@ -133,20 +142,18 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButtonChangePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                animateFAB();
                 /*Open Gallery*/
                 galleryIntent = new Intent(Intent.ACTION_PICK,
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 // Start the Intent
-                if (isFabOpen == true) {
-                    isFabOpen = false;
-                    animateFAB();
-                }
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
             }
         });
 
     }
 
+    /*Toggle between open and closed*/
     private void animateFAB() {
         if (isFabOpen) {
             floatingActionButton.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_edit_white_24dp));
@@ -172,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
                 && null != data) {
             Uri selectedImageUri = data.getData();
-            String selectedImagePath = getPath(selectedImageUri);
+            selectedImagePath = getPath(selectedImageUri);
             System.out.println("Image Path : " + selectedImagePath);
             profilePictureImageView.setImageURI(selectedImageUri);
 

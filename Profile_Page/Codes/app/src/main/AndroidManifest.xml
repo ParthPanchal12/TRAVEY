@@ -24,6 +24,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.sarthak.profilepage_travey.MainActivity" />
         </activity>
+        <activity
+            android:name=".ViewProfileImage"
+            android:label="@string/title_view_profile_photo"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.sarthak.profilepage_travey.MainActivity" />
+        </activity>
+
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
