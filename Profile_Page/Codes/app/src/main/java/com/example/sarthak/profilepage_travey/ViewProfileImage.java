@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -15,11 +16,14 @@ import android.widget.Toast;
 public class ViewProfileImage extends AppCompatActivity {
     private Intent intent;
     private ImageView imageViewProfilePictureComplete;
-
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_profile_picture);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_ViewFullPhoto);
+        setSupportActionBar(toolbar);
+        setTitle("Photo");
         intent = getIntent();
         if (intent != null) {
             String pathOfImage = intent.getExtras().getString("Path_of_Image");
@@ -40,5 +44,10 @@ public class ViewProfileImage extends AppCompatActivity {
                 onDestroy();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
