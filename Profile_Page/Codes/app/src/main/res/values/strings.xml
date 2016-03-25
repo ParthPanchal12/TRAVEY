@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ProfilePage_Travey</string>
+    <string name="title_activity_edit_profile">EditProfile</string>
+    <string name="title_view_profile_photo">Photo</string>
+</resources>
