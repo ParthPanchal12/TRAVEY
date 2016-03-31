@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "mystical-vial-126618",
+    "project_number": "442606802103",
+    "name": "My Project"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442606802103:android:5a1858ab1e3fdd2d",
+        "client_id": "android:com.example.sarthak.placepicker_sarthak_travey",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.sarthak.placepicker_sarthak_travey",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "442606802103-vkm2gg677u279l0u4a7kb2nf0otbko57.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sarthak.placepicker_sarthak_travey",
+            "certificate_hash": "97936F904655590D9F93CD7A4FF6595BC4FC2BB0"
+          }
+        },
+        {
+          "client_id": "442606802103-adels7hkfcbit2kcrqpknri97mi8hnlp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
