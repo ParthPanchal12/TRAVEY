@@ -1,15 +1,20 @@
 package com.softpro.sen.mapdisplay;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -38,7 +43,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
     private CardView cardView_Source;
@@ -50,12 +55,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PlaceAutocompleteFragment autocompleteFragmentSource;
     private PlaceAutocompleteFragment autocompleteFragmentDestination;
     public Marker destinationMarker = null;
-    private Location currentLocation;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private Location lastKnowncurrentLocation;
+    private final int INTENT_GPS_PROVIDER = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+
+        FloatingActionButton fab_getMyCurrentLocation = (FloatingActionButton) findViewById(R.id.fab_myCurrentLocation);
+        fab_getMyCurrentLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkGPSEnabled() == false) {
+                    Toast.makeText(MapsActivity.this, "Please Enable GPS", Toast.LENGTH_LONG).show();
+                    createGPSEnableDialog();
+                }
+                if (lastKnowncurrentLocation != null) {
+                    LatLng latLng = new LatLng(lastKnowncurrentLocation.getLatitude(), lastKnowncurrentLocation.getLongitude());
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+                    mMap.animateCamera(cameraUpdate);
+                    if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    mMap.setMyLocationEnabled(true);
+                    locationManager.removeUpdates(MapsActivity.this);
+                }
+            }
+        });
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -169,10 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
     }
-
-
 
 
     /**
@@ -202,11 +228,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+
+        //disabled my location button
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        //currentLocation=location;
+        lastKnowncurrentLocation = location;
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
         mMap.animateCamera(cameraUpdate);
@@ -232,14 +261,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == INTENT_GPS_PROVIDER) {
+            if (checkGPSEnabled() == false) {
+                Toast.makeText(MapsActivity.this, "Please Enable GPS", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
     public void onProviderEnabled(String provider) {
 
     }
 
     @Override
     public void onProviderDisabled(String provider) {
+        Toast.makeText(MapsActivity.this, "Enable Provider", Toast.LENGTH_SHORT).show();
+        createGPSEnableDialog();
 
     }
 
+    private boolean checkGPSEnabled() {
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void createGPSEnableDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+        builder.setMessage("Please Enable the GPS")
+                .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent gpsOptionsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(gpsOptionsIntent);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                        dialog.dismiss();
+                        if (checkGPSEnabled() == true) {
+                            Toast.makeText(MapsActivity.this, "GPS Enabled", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(MapsActivity.this, "Please Enable GPS", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+        builder.create().show();
+    }
 
 }
