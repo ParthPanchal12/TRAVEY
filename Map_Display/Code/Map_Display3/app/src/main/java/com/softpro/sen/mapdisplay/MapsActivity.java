@@ -12,8 +12,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -23,7 +27,6 @@ import android.content.Context;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.app.ActionBar;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -57,12 +60,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Marker destinationMarker = null;
     private Location lastKnowncurrentLocation;
     private final int INTENT_GPS_PROVIDER = 1;
-
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        //Setting up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_MapsActivity_Main);
+        if (toolbar == null) {
+            toolbar.setTitle("TRAVEY");
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        //Setting up drawer
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_MapsActivity_Main);
+        if (drawerLayout != null) {
+
+        }
+
+        //Setting up Navigation Drawer
+//        navigationView = (NavigationView) findViewById(R.id.navigation_view_MapsActivity_Main);
+//        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(MenuItem menuItem) {
+//                menuItem.setChecked(true);
+//                drawerLayout.closeDrawers();
+//                Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+//                return true;
+//            }
+//        });
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -312,4 +343,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         builder.create().show();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.drawer_maps_home_screen,menu);
+        return true;
+    }
 }
