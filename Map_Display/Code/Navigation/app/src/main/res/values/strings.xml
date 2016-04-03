@@ -2,10 +2,11 @@
     <string name="app_name">NavigationDrawer</string>
     <string name="action_settings">Settings</string>
     <string name="drawer_header_text">Options</string>
-    <string name="nav_item_attachment">Attachment</string>
-    <string name="nav_item_images">Images</string>
-    <string name="nav_item_location">Location</string>
-    <string name="nav_sub_menu">SubMenu</string>
-    <string name="nav_sub_menu_item01">Item1</string>
-    <string name="nav_sub_menu_item02">Item2</string>
+    <string name="action_bring_back_source_and_destination">Cancel</string>
+    <string name="nav_item_Profile">Profile</string>
+    <string name="nav_item_places_to_visit">Places</string>
+    <string name="nav_sub_menu_item_Friends_Near_Me">Friends near me</string>
+    <string name="nav_sub_menu_item_Track_a_friend">Track a friend</string>
+    <string name="nav_sub_menu_Find_Friends">Find Friends</string>
+    <string name="nav_item_logout">Logout</string>
 </resources>

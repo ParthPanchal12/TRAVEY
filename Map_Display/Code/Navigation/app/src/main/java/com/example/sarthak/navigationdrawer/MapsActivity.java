@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -55,6 +56,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int INTENT_GPS_PROVIDER = 1;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
+    private MenuItem cancel_source_and_destination;
+    private Menu menu;
+    private final int PERMISSION_CHECK = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return true;
             }
         });
-
+        enablePermissions();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -113,6 +117,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //                                          int[] grantResults)
                         // to handle the case where the user grants the permission. See the documentation
                         // for ActivityCompat#requestPermissions for more details.
+                        //enablePermissions();
+                        Toast.makeText(MapsActivity.this, "Enable Permissions", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     mMap.setMyLocationEnabled(true);
@@ -130,6 +136,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            //enablePermissions();
+            Toast.makeText(MapsActivity.this, "Enable Permissions", Toast.LENGTH_SHORT).show();
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
@@ -172,6 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom));
 
                 }
+                cardView_Destination.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -184,6 +193,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         autocompleteFragmentDestination = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment_destination);
         autocompleteFragmentDestination.setHint("Select Destination");
+        cardView_Destination.setVisibility(View.GONE);
         autocompleteFragmentDestination.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
@@ -208,6 +218,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mMap.animateCamera(cu);
                     cardView_Destination.setVisibility(View.GONE);
                     cardView_Source.setVisibility(View.GONE);
+                    if (cancel_source_and_destination != null)
+                        cancel_source_and_destination.setVisible(true);
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom - 0.5f));
 
                 }
@@ -248,6 +260,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            //enablePermissions();
+            Toast.makeText(MapsActivity.this, "Enable Permissions", Toast.LENGTH_SHORT).show();
             return;
         }
         mMap.setMyLocationEnabled(true);
@@ -273,6 +287,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            //enablePermissions();
+            Toast.makeText(MapsActivity.this, "Enable Permissions", Toast.LENGTH_SHORT).show();
             return;
         }
         locationManager.removeUpdates(this);
@@ -336,6 +352,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        cancel_source_and_destination = (MenuItem) menu.findItem(R.id.action_cancel_souce_and_destination);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -343,9 +367,76 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_cancel_souce_and_destination:
+                cancel_source_and_destination.setVisible(false);
+                cardView_Source.setVisibility(View.VISIBLE);
+                cardView_Destination.setVisibility(View.VISIBLE);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /*Enable Permissions if not granted*/
+    private void enablePermissions() {
+        //To see this code many threads running simultaneously requesting permissions
+        /*
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK);
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CHECK);
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+            }
+        }*/
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        /*
+        switch (requestCode) {
+            case PERMISSION_CHECK: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    return;
+
+                } else {
+                    enablePermissions();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+        */
     }
 
 }
