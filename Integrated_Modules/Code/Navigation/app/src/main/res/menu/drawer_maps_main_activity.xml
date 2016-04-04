@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_item_Profile"
+            android:checked="true"
+            android:title="@string/nav_item_Profile" />
+        <item
+            android:id="@+id/navigation_item_Places"
+            android:title="@string/nav_item_places_to_visit" />
+
+        <item
+            android:id="@+id/navigation_item_track_a_friend"
+            android:title="@string/nav_sub_menu_item_Track_a_friend" />
+
+        <item
+            android:id="@+id/navigation_item_friends_near_me"
+            android:title="@string/nav_sub_menu_item_Friends_Near_Me" />
+
+        <item
+            android:id="@+id/id_navigation_item_logout"
+            android:title="@string/nav_item_logout" />
+
+    </group>
+
+</menu>
