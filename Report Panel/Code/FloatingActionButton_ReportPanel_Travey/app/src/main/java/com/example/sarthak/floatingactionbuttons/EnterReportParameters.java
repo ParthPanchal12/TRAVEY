@@ -12,25 +12,37 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+
 public class EnterReportParameters extends Dialog {
 
     private String title;
     private String location;
     private int hours = 2;
+    private String selectedPlaceName;
+    private double selectedPlaceLatitude;
+    private double selectedPlaceLongitude;
     private int minutes = 0;
     private String description = "";
     private EditText editText_Location;
     private EditText editText_description;
     private EditText editText_hour;
     private EditText editText_minute;
+    private  PlaceAutocompleteFragment autocompleteFragmentSource;
+    private Context ctx;
 
     public EnterReportParameters(Context context) {
         super(context);
+        this.ctx=context;
     }
 
-    public EnterReportParameters(Context context, String title) {
+    public EnterReportParameters(Context context, String title,String selectedPlaceName,double selectedPlaceLatitude,double selectedPlaceLongitude) {
         super(context);
+        this.ctx=context;
         this.title = title;
+        this.selectedPlaceName=selectedPlaceName;
+        this.selectedPlaceLatitude=selectedPlaceLatitude;
+        this.selectedPlaceLongitude=selectedPlaceLongitude;
     }
 
     @Override
@@ -50,6 +62,15 @@ public class EnterReportParameters extends Dialog {
                 dismiss();
             }
         });
+
+        editText_description = (EditText) findViewById(R.id.editText_description_report);
+        editText_Location = (EditText) findViewById(R.id.editText_location_report);
+        editText_hour = (EditText) findViewById(R.id.hours_picked);
+        editText_minute = (EditText) findViewById(R.id.minutes_picked);
+
+        editText_Location.setText(selectedPlaceName);
+
+
 
         ImageView currentLocation = (ImageView) findViewById(R.id.imageView_my_current_location);
 
@@ -89,10 +110,7 @@ public class EnterReportParameters extends Dialog {
 
     private void getFilledDetails() {
         /*Initialise all the editTexts*/
-        editText_description = (EditText) findViewById(R.id.editText_description_report);
-        editText_Location = (EditText) findViewById(R.id.editText_location_report);
-        editText_hour = (EditText) findViewById(R.id.hours_picked);
-        editText_minute = (EditText) findViewById(R.id.minutes_picked);
+
 
 
         /*Get the data from the editTexts*/
