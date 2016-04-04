@@ -10,7 +10,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -29,9 +28,15 @@ import android.widget.Toast;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -66,6 +71,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int PERMISSION_CHECK = 2;
     private FloatingActionsMenu fab_menu_report_panel;
     private String typeOfReport = "";
+    private GoogleApiClient mGoogleApiClient;
+    private int PLACE_PICKER_REQUEST = 3;
+    private int places_id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Setting up drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_MapsActivity_Main);
 
+        /*Creating instance of place Picker*/
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(MapsActivity.this)
+                .enableAutoManage(MapsActivity.this, places_id, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Toast.makeText(MapsActivity.this, "Connection Error!\nPlease try again after some time", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+
+                    }
+                })
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(ConnectionResult connectionResult) {
+                        Log.e("Connection failed", connectionResult.getErrorMessage());
+                    }
+                })
+                .build();
+
 
         //Setting up Navigation Drawer
         navigationView = (NavigationView) findViewById(R.id.navigation_view_MapsActivity_Main);
@@ -93,14 +131,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
-                if(menuItem.getTitle().equals("Profile")){
-                    Intent intent =new Intent(MapsActivity.this, MainActivity_ProfilePage.class);
+                if (menuItem.getTitle().equals("Profile")) {
+                    Intent intent = new Intent(MapsActivity.this, MainActivity_ProfilePage.class);
                     startActivity(intent);
+                } else if (menuItem.getTitle().equals("Places")) {
+                    if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+                        if (mGoogleApiClient == null)
+                            Toast.makeText(MapsActivity.this, "Could not create Google Api Client Instance", Toast.LENGTH_SHORT).show();
+                        else if (!mGoogleApiClient.isConnected()) {
+                            Toast.makeText(MapsActivity.this, "Could not connect to the Google Apis", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                        try {
+                            startActivityForResult(builder.build(MapsActivity.this), PLACE_PICKER_REQUEST);
+                        } catch (GooglePlayServicesRepairableException e) {
+                            Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
+                        } catch (GooglePlayServicesNotAvailableException e) {
+                            Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
+                        }
+                    }
+                }else{
+                    Toast.makeText(MapsActivity.this,menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
         });
+
+        /*To do enable permission code*/
         enablePermissions();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -265,21 +325,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case 0:
-                        if(lastSelectedLocationName!=null && !lastSelectedLocationName.isEmpty() && lastSelectedLatLng!=null){
+                        if (lastSelectedLocationName != null && !lastSelectedLocationName.isEmpty() && lastSelectedLatLng != null) {
                             // call the dialog box
                             /*Completed*/
-                            new EnterReportParameters(MapsActivity.this,typeOfReport,lastSelectedLocationName,lastSelectedLatLng.latitude,lastSelectedLatLng.longitude).show();
-                        }else{
+                            new EnterReportParameters(MapsActivity.this, typeOfReport, lastSelectedLocationName, lastSelectedLatLng.latitude, lastSelectedLatLng.longitude).show();
+                        } else {
                             Toast.makeText(MapsActivity.this, "Please fill the source box", Toast.LENGTH_SHORT).show();
                         }
                         return;
                     case 1:
-                        if(checkGPSEnabled()){
+                        if (checkGPSEnabled()) {
                             // use lastknownlocation
-                            new EnterReportParameters(MapsActivity.this,typeOfReport,"My current Location",lastKnowncurrentLocation.getLatitude(),lastKnowncurrentLocation.getLongitude()).show();
-                        }else{
+                            new EnterReportParameters(MapsActivity.this, typeOfReport, "My current Location", lastKnowncurrentLocation.getLatitude(), lastKnowncurrentLocation.getLongitude()).show();
+                        } else {
                             Toast.makeText(MapsActivity.this, "Enable the GPS", Toast.LENGTH_SHORT).show();
                         }
                         return;
