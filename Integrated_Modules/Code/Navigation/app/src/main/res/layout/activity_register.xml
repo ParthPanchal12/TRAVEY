@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:inputType="text"
+        android:ems="10"
+        android:hint="user_name"
+        android:numeric="decimal"
+        android:textSize="20dp"
+        android:id="@+id/register_user_name"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:hint="phone number"
+        android:ems="10"
+        android:id="@+id/register_phone_number"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:hint="Email id"
+        android:ems="10"
+        android:id="@+id/register_email"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:hint="password"
+        android:ems="10"
+        android:id="@+id/register_password"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:hint="confirm password"
+        android:ems="10"
+        android:id="@+id/register_confirm__password"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:paddingTop="20dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/register_register"
+        android:layout_gravity="center_horizontal" />
+
+</LinearLayout>

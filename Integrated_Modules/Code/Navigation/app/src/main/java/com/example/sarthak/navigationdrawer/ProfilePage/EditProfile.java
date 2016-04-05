@@ -34,6 +34,7 @@ public class EditProfile extends AppCompatActivity {
         setTitle(title_toolbar);
         editTextDescription=(EditText)findViewById(R.id.editText_UserInfoEdit);
         editTextDescription.setText(userInfo);
+
     }
 
     @Override

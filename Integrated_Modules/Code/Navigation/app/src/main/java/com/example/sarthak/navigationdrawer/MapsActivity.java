@@ -25,6 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -47,6 +49,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
@@ -89,6 +98,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+
+        /*Add labels for all reports*/
+        addLabelsForAllReports();
+
 
         //Setting up drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_MapsActivity_Main);
@@ -316,6 +330,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     }
+
+    private void addLabelsForAllReports(){
+        ArrayList<NameValuePair> params=new ArrayList<>();
+        params.add(new BasicNameValuePair("phone_number",""+123456789));
+        ServerRequest sr = new ServerRequest();
+        JSONObject json = sr.getJSON(Config.ip+"/allRepots",params);
+        Log.d("here", "params sent");
+        if(json != null){
+            try{
+                String jsonstr = json.getString("response");
+                String sue = json.getString("use");
+
+                Toast.makeText(MapsActivity.this,jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+                Log.d("Hello", jsonstr);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 
     private void getLocatioinForReport() {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"Use latest selected position from source box", "Use my current location", "Pick a location on the map"};
