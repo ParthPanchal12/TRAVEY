@@ -101,7 +101,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         /*Add labels for all reports*/
-        addLabelsForAllReports();
+        //addLabelsForAllReports();
 
 
         //Setting up drawer

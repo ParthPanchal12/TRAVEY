@@ -19,7 +19,11 @@ android {
         }
     }
 }
-
+repositories {
+    maven {
+        url "http://dl.bintray.com/rakshitsoni02/Android-Libs"
+    }
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'

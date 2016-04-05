@@ -16,11 +16,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -142,6 +146,26 @@ public class EnterReportParameters extends Dialog {
         parametersDatabase.add(new BasicNameValuePair("end_time", "lalal"));
         parametersDatabase.add(new BasicNameValuePair("lat", String.valueOf(selectedPlaceLatitude)));
         parametersDatabase.add(new BasicNameValuePair("long", String.valueOf(selectedPlaceLongitude)));
+
+        ServerRequest sr = new ServerRequest();
+        Log.d("here", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONObject json = sr.getJSON(Config.ip+"/reportAdd",parametersDatabase);
+        Log.d("here", "json received");
+        if(json != null){
+            try{
+                String jsonstr = json.getString("response");
+                String sue = json.getString("use");
+
+                Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+
+                Log.d("Hello", jsonstr);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
 
     }
 
