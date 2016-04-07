@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
@@ -174,13 +175,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (menuItem.getTitle().equals("Leaderboard")) {
                     Intent intent = new Intent(MapsActivity.this, MainActivity_Leaderboard.class);
                     startActivity(intent);
-                }else if(menuItem.getTitle().equals("Logout")){
+                } else if (menuItem.getTitle().equals("History")) {
+                    Intent intent = new Intent(MapsActivity.this, MainActivity_History.class);
+                    startActivity(intent);
+                } else if (menuItem.getTitle().equals("Logout")) {
                     edit.clear();
                     edit.commit();
                     startActivity(new Intent(MapsActivity.this, LoginRegister.class));
                     Toast.makeText(MapsActivity.this, "Logged Out !", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
                 return true;

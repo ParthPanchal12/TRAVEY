@@ -20,6 +20,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -64,26 +65,28 @@ public class MainActivity_History extends AppCompatActivity {
         ServerRequest sr = new ServerRequest();
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-        JSONArray json = sr.getJSONArray(Config.ip + "/history", params);
+        JSONObject json = sr.getJSON(Config.ip + "/history", params);
         Log.d("here", "json received");
         if (json != null) {
             try {
                 Log.d("JsonLeaderBoard", "" + json);
-                for (int i = 0; i < json.length(); i++) {
+                JSONArray historyArray = json.getJSONArray(Config.history);
+                for (int i = 0; i < historyArray.length(); i++) {
                     Gson gson = new Gson();
-                    User user = gson.fromJson(json.getString(i), new TypeToken<User>() {}.getType());
-                    histories=user.history;
-
+                    History newHistory = gson.fromJson(historyArray.getString(i), new TypeToken<History>() {
+                    }.getType());
+                    histories.add(newHistory);
                 }
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        histories.add(new History("askdj","sad","afd"));
-        histories.add(new History("askdj","sad","afd"));
-        histories.add(new History("askdj","sad","afd"));
+        histories.add(new History("askdj", "sad", "afd"));
+        histories.add(new History("askdj", "sad", "afd"));
+        histories.add(new History("askdj", "sad", "afd"));
 
     }
 
