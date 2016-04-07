@@ -11,6 +11,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ public class ServerRequest {
 
     static InputStream is = null;
     static JSONObject jObj = null;
+    static JSONArray jArray = null;
     static String json = "";
 
 
@@ -80,13 +82,62 @@ public class ServerRequest {
         return jObj;
 
     }
+
+    public JSONArray getJSONArrayFromUrl(String url, List<NameValuePair> params) {
+
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost(url);
+            httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            HttpEntity httpEntity = httpResponse.getEntity();
+            is = httpEntity.getContent();
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    is, "iso-8859-1"), 8);
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+            is.close();
+            json = sb.toString();
+            Log.e("JSON", json);
+        } catch (Exception e) {
+            Log.e("Buffer Error", "Error converting result " + e.toString());
+        }
+
+
+        try {
+            jArray = new JSONArray(json);
+        } catch (JSONException e) {
+            Log.e("JSON Parser", "Error parsing data " + e.toString());
+        }
+
+
+        return jArray;
+
+    }
+
     JSONObject jobj;
     public JSONObject getJSON(String url, List<NameValuePair> params) {
 
         Params param = new Params(url,params);
         Request myTask = new Request();
         try{
-         jobj= myTask.execute(param).get();
+            jobj= myTask.execute(param).get();
         }catch (InterruptedException e) {
             e.printStackTrace();
         }catch (ExecutionException e){
@@ -95,6 +146,20 @@ public class ServerRequest {
         return jobj;
     }
 
+    JSONArray jarray;
+    public JSONArray getJSONArray(String url, List<NameValuePair> params) {
+
+        Params param = new Params(url,params);
+        RequestArray myTask = new RequestArray();
+        try{
+            jarray= myTask.execute(param).get();
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        }catch (ExecutionException e){
+            e.printStackTrace();
+        }
+        return jarray;
+    }
 
     private static class Params {
         String url;
@@ -110,7 +175,7 @@ public class ServerRequest {
 
     private class Request extends AsyncTask<Params, String, JSONObject> {
 
-            @Override
+        @Override
         protected JSONObject doInBackground(Params... args) {
 
             ServerRequest request = new ServerRequest();
@@ -127,4 +192,25 @@ public class ServerRequest {
         }
 
     }
+
+    private class RequestArray extends AsyncTask<Params, String, JSONArray> {
+
+        @Override
+        protected JSONArray doInBackground(Params... args) {
+
+            ServerRequest request = new ServerRequest();
+            JSONArray json = request.getJSONArrayFromUrl(args[0].url, args[0].params);
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray json) {
+
+            super.onPostExecute(json);
+
+        }
+
     }
+
+}
