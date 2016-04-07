@@ -1,7 +1,9 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
 import com.msg91.sendotp.library.Config;
 import com.msg91.sendotp.library.SendOtpVerification;
@@ -33,6 +36,8 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     private static final String TAG = Verification.class.getSimpleName();
     private Verification mVerification;
     TextView resend_timer;
+    SharedPreferences pref;
+    String phone_number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +55,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
         }
 
 
-
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         resend_timer = (TextView) findViewById(R.id.resend_timer);
         resend_timer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +69,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     }
 
     void createVerification(String phoneNumber, boolean skipPermissionCheck, String countryCode) {
+        phone_number = phoneNumber;
         Config config = SendOtpVerification.config().context(getApplicationContext())
                 .build();
         if (!skipPermissionCheck && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) ==
@@ -180,6 +186,10 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
         Log.d(TAG, "Verified!\n" + response);
         hideProgressBarAndShowMessage(R.string.verified);
         showCompleted();
+        SharedPreferences.Editor edit = pref.edit();
+        edit.putString("phone_number", phone_number);
+        startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
+
     }
 
     @Override

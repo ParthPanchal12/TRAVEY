@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
@@ -84,6 +86,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private int PLACE_PICKER_REQUEST = 3;
     private int places_id = 0;
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +103,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-
+        //getting shared preferrences
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        final SharedPreferences.Editor edit = pref.edit();
         /*Add labels for all reports*/
         //addLabelsForAllReports();
 
@@ -169,7 +174,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (menuItem.getTitle().equals("Leaderboard")) {
                     Intent intent = new Intent(MapsActivity.this, MainActivity_Leaderboard.class);
                     startActivity(intent);
-                } else {
+                }else if(menuItem.getTitle().equals("Logout")){
+                    edit.clear();
+                    edit.commit();
+                    startActivity(new Intent(MapsActivity.this, LoginRegister.class));
+                    Toast.makeText(MapsActivity.this, "Logged Out !", Toast.LENGTH_SHORT).show();
+                }
+                else {
                     Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
                 return true;

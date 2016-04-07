@@ -55,7 +55,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    private String selectedImagePath;
+    private String selectedImagePath,imgDecodableString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -251,41 +251,123 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    //    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        // When an Image is picked
+//        if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+//                && null != data) {
+//            /*Extract path from the image selected*/
+//            Uri selectedImageUri = data.getData();
+//            selectedImagePath = getPath(selectedImageUri);
+//            System.out.println("Image Path : " + selectedImagePath);
+//            profilePictureImageView.setImageURI(selectedImageUri);
+//
+//            /*Extract colors from the image selected*/
+//            /*To write a general method*/
+//            Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+//            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+//                @Override
+//                public void onGenerated(Palette palette) {
+//                    int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+//                    int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+//
+//                    /*Set color for status bar*/
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        Window window = getWindow();
+//                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                        window.setStatusBarColor(mutedColor);
+//                    }
+//
+//                    /*Set Collapsible toolbar color*/
+//                    collapsingToolbar.setContentScrimColor(mutedColor);
+//                }
+//            });
+//        }
+//    }
+         @Override
+         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // When an Image is picked
-        if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-                && null != data) {
-            /*Extract path from the image selected*/
-            Uri selectedImageUri = data.getData();
-            selectedImagePath = getPath(selectedImageUri);
-            System.out.println("Image Path : " + selectedImagePath);
-            profilePictureImageView.setImageURI(selectedImageUri);
+        try {
+            // When an Image is picked
+            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+                    && null != data) {
+                // Get the Image from data
+
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+                // Get the cursor
+                Cursor cursor = getContentResolver().query(selectedImage,
+                        filePathColumn, null, null, null);
+                // Move to first row
+                cursor.moveToFirst();
+
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                imgDecodableString = cursor.getString(columnIndex);
+
+                Bitmap bm = BitmapFactory.decodeFile(imgDecodableString);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                byte[] b = baos.toByteArray();
+
+                String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+                cursor.close();
+                // Set the Image in ImageView after decoding the String
+                profilePictureImageView.setImageBitmap(BitmapFactory
+                        .decodeFile(imgDecodableString));
+
+                ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("phone_number", ));
+                params.add(new BasicNameValuePair("image", imgDecodableString));
+                ServerRequest sr=new ServerRequest();
+                JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
+                //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+
+                if (json != null) {
+                    try {
+
+                        String jsonstr = json.getString("response");
+                        Toast.makeText(MainActivity_ProfilePage.this, ""+jsonstr, Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+
+
 
             /*Extract colors from the image selected*/
             /*To write a general method*/
-            Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
-            //savePhotoToDatabase(BitMapToString(bitmap));
-            bitmap=StringToBitMap(BitMapToString(bitmap));
-            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-                    int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+                        int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
 
                     /*Set color for status bar*/
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Window window = getWindow();
-                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                        window.setStatusBarColor(mutedColor);
-                    }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Window window = getWindow();
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            window.setStatusBarColor(mutedColor);
+                        }
 
                     /*Set Collapsible toolbar color*/
-                    collapsingToolbar.setContentScrimColor(mutedColor);
-                }
-            });
+                        collapsingToolbar.setContentScrimColor(mutedColor);
+                    }
+                });
+
+            } else {
+                Toast.makeText(this, "You haven't picked Image",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
         }
+
     }
 
     /*initialise the profile attributes*/

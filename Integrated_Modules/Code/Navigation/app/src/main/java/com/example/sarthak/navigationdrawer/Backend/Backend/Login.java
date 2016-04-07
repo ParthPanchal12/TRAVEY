@@ -1,11 +1,13 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Login extends Fragment {
-    EditText phone_number,password;
-    Button login;
+    EditText phone_number,password,res_email,code,newpass;
+    Button login,cont,cancel,cancel1,cont_code;
     TextView forgot_password;
     String phone_number_txt,password_txt,email_res_txt,code_txt,npass_txt;
-    List<NameValuePair> params,params_history;
+    List<NameValuePair> params,params_history,params_req_send;
     SharedPreferences pref;
     ServerRequest sr;
+    Dialog reset;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -46,6 +49,8 @@ public class Login extends Fragment {
         login = (Button)view.findViewById(R.id.login_login);
         forgot_password = (TextView)view.findViewById(R.id.login_forgot_password);
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+
+
 
         login.setOnClickListener(new View.OnClickListener() {
 
@@ -62,8 +67,8 @@ public class Login extends Fragment {
                 if((ph_1=='+' && ph2==9 && ph3==1 && phone_number_txt.length()==13) || (ph1==0 && phone_number_txt.length()==11) || (phone_number_txt.length()==10)){
 
                     params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                    params.add(new BasicNameValuePair(Config.password, password_txt));
+                    params.add(new BasicNameValuePair("phone_number", phone_number_txt));
+                    params.add(new BasicNameValuePair("password", password_txt));
 
                     ServerRequest sr = new ServerRequest();
                     JSONObject json = sr.getJSON(Config.ip+"/login",params);
@@ -91,9 +96,17 @@ public class Login extends Fragment {
                                 String s = gson.toJson(h);
 
                                 params_history = new ArrayList<NameValuePair>();
-                                params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                params_history.add(new BasicNameValuePair(Config.history, s));
-                                //JSONObject json1 = sr.getJSON("http://192.168.69.1:8080/reportAdd",params_history);
+                                params_history.add(new BasicNameValuePair("phone_number", phone_number_txt));
+                                params_history.add(new BasicNameValuePair("history", s));
+                                //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
+
+
+                                params_req_send = new ArrayList<NameValuePair>();
+                                params_req_send.add(new BasicNameValuePair("fromn","from__n"));
+                                params_req_send.add(new BasicNameValuePair("fromu","from__u"));
+                                params_req_send.add(new BasicNameValuePair("to","to__"));
+                                params_req_send.add(new BasicNameValuePair("ttle","title__"));
+                                //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
 
                                 Intent profactivity = new Intent(getContext(),MapsActivity.class);
 
@@ -114,28 +127,22 @@ public class Login extends Fragment {
             }
         });
 
-        return view;
-    }
 
-
-
-        /**/
-
-        /*forpass.setOnClickListener(new View.OnClickListener(){
+        forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset = new Dialog(Login.this);
+                reset = new Dialog(getContext());
                 reset.setTitle("Reset Password");
                 reset.setContentView(R.layout.reset_pass_init);
-                cont = (Button)reset.findViewById(R.id.resbtn);
-                cancel = (Button)reset.findViewById(R.id.cancelbtn);
+                cont = (Button) reset.findViewById(R.id.resbtn);
+                cancel = (Button) reset.findViewById(R.id.cancelbtn);
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         reset.dismiss();
                     }
                 });
-                res_email = (EditText)reset.findViewById(R.id.email);
+                res_email = (EditText) reset.findViewById(R.id.email);
 
                 cont.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -145,63 +152,63 @@ public class Login extends Fragment {
                         params = new ArrayList<NameValuePair>();
                         params.add(new BasicNameValuePair("email", email_res_txt));
 
-                      //  JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass", params);
-                        JSONObject json = sr.getJSON("http://10.0.2.2:8080/api/resetpass", params);
+                        //  JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass", params);
+                        JSONObject json = sr.getJSON(Config.ip+"/api/resetpass", params);
 
                         if (json != null) {
                             try {
                                 String jsonstr = json.getString("response");
-                                if(json.getBoolean("res")){
-                                Log.e("JSON", jsonstr);
-                                Toast.makeText(getApplication(), jsonstr, Toast.LENGTH_LONG).show();
-                                reset.setContentView(R.layout.reset_pass_code);
-                                cont_code = (Button)reset.findViewById(R.id.conbtn);
-                                code = (EditText)reset.findViewById(R.id.code);
-                                newpass = (EditText)reset.findViewById(R.id.npass);
-                                cancel1 = (Button)reset.findViewById(R.id.cancel);
-                                cancel1.setOnClickListener(new View.OnClickListener() {
+                                if (json.getBoolean("res")) {
+                                    Log.e("JSON", jsonstr);
+                                    Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+                                    reset.setContentView(R.layout.reset_pass_code);
+                                    cont_code = (Button) reset.findViewById(R.id.conbtn);
+                                    code = (EditText) reset.findViewById(R.id.code);
+                                    newpass = (EditText) reset.findViewById(R.id.npass);
+                                    cancel1 = (Button) reset.findViewById(R.id.cancel);
+                                    cancel1.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
                                             reset.dismiss();
                                         }
                                     });
-                                cont_code.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        code_txt = code.getText().toString();
-                                        npass_txt = newpass.getText().toString();
-                                        Log.e("Code",code_txt);
-                                        Log.e("New pass",npass_txt);
-                                        params = new ArrayList<NameValuePair>();
-                                        params.add(new BasicNameValuePair("email", email_res_txt));
-                                        params.add(new BasicNameValuePair("code", code_txt));
-                                        params.add(new BasicNameValuePair("newpass", npass_txt));
+                                    cont_code.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            code_txt = code.getText().toString();
+                                            npass_txt = newpass.getText().toString();
+                                            Log.e("Code", code_txt);
+                                            Log.e("New pass", npass_txt);
+                                            params = new ArrayList<NameValuePair>();
+                                            params.add(new BasicNameValuePair("email", email_res_txt));
+                                            params.add(new BasicNameValuePair("code", code_txt));
+                                            params.add(new BasicNameValuePair("newpass", npass_txt));
 
-                                        JSONObject json = sr.getJSON("http://10.0.2.2:8080/api/resetpass/chg", params);
-                                     //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+                                            JSONObject json = sr.getJSON(Config.ip + "/api/resetpass/chg", params);
+                                            //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
-                                        if (json != null) {
-                                            try {
+                                            if (json != null) {
+                                                try {
 
-                                                String jsonstr = json.getString("response");
-                                                if(json.getBoolean("res")){
-                                                reset.dismiss();
-                                                Toast.makeText(getApplication(),jsonstr,Toast.LENGTH_LONG).show();
+                                                    String jsonstr = json.getString("response");
+                                                    if (json.getBoolean("res")) {
+                                                        reset.dismiss();
+                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
 
-                                                }else{
-                                                    Toast.makeText(getApplication(),jsonstr,Toast.LENGTH_LONG).show();
+                                                    } else {
+                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
 
+                                                    }
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
                                                 }
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
                                             }
-                                        }
 
                                         }
-                                });
-                                }else{
+                                    });
+                                } else {
 
-                                    Toast.makeText(getApplication(),jsonstr,Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
 
                                 }
                             } catch (JSONException e) {
@@ -215,8 +222,13 @@ public class Login extends Fragment {
 
                 reset.show();
             }
-        });*/
+        });
+
+
+        return view;
     }
+
+}
 
 
 

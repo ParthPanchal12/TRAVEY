@@ -1,6 +1,8 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -31,6 +33,7 @@ public class Register extends Fragment {
     ArrayList<History> history = new ArrayList<>();
     public static final String INTENT_PHONENUMBER = "phonenumber";
     public static final String INTENT_COUNTRY_CODE = "code";
+    SharedPreferences pref;
 
     private void openActivity(String phoneNumber) {
         Intent verification = new Intent(getContext(), VerificationActivity.class);
@@ -56,6 +59,7 @@ public class Register extends Fragment {
         password = (EditText)view.findViewById(R.id.register_password);
         confirm_password = (EditText)view.findViewById(R.id.register_confirm__password);
         register = (Button)view.findViewById(R.id.register_register);
+        pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
 
         register.setOnClickListener(new View.OnClickListener() {
 
