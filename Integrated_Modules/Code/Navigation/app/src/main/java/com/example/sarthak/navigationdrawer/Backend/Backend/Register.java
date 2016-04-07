@@ -29,7 +29,7 @@ public class Register extends Fragment {
     EditText user_name, phone_number, email, password, confirm_password;
     Button register;
     String user_name_txt, email_txt, password_txt, confirm_password_txt,phone_number_txt;
-    List<NameValuePair> params;
+    static List<NameValuePair> params;
     ArrayList<History> history = new ArrayList<>();
     public static final String INTENT_PHONENUMBER = "phonenumber";
     public static final String INTENT_COUNTRY_CODE = "code";
@@ -130,17 +130,17 @@ public class Register extends Fragment {
                             ServerRequest sr = new ServerRequest();
                             Log.d("here", "params sent");
                             //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                            JSONObject json = sr.getJSON(Config.ip+"/register",params);
+                            JSONObject json = sr.getJSON(Config.ip+"/ckeckExistNumber",params);
                             Log.d("here", "json received");
                             if(json != null){
                                 try{
                                     String jsonstr = json.getString("response");
-                                    String sue = json.getString("use");
-
-                                    Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
-
-                                    openActivity(getE164Number());
-
+                                    if(jsonstr.equals("yes")){
+                                        openActivity(getE164Number());
+                                    }
+                                    else{
+                                        Toast.makeText(getContext(), "Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                    }
                                     Log.d("Hello", jsonstr);
                                 }catch (JSONException e) {
                                     e.printStackTrace();

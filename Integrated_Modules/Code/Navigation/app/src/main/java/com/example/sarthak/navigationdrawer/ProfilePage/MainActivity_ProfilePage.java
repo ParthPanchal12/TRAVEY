@@ -1,6 +1,8 @@
 package com.example.sarthak.navigationdrawer.ProfilePage;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,6 +58,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
     private String selectedImagePath,imgDecodableString;
+    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,8 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         setSupportActionBar(toolbar);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout_profilePage);
         appBarLayout.setExpanded(true);
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+
 
         /*If clicked on Profile Pic then show the photo*/
         appBarLayout.setOnClickListener(new View.OnClickListener() {
@@ -317,8 +322,9 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 profilePictureImageView.setImageBitmap(BitmapFactory
                         .decodeFile(imgDecodableString));
 
+                String phone_number = pref.getString("phone_number","");
                 ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("phone_number", "1234"));
+                params.add(new BasicNameValuePair("phone_number", phone_number));
                 params.add(new BasicNameValuePair("image", imgDecodableString));
                 ServerRequest sr=new ServerRequest();
                 JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);

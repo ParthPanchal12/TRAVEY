@@ -30,6 +30,9 @@ import com.msg91.sendotp.library.SendOtpVerification;
 import com.msg91.sendotp.library.Verification;
 import com.msg91.sendotp.library.VerificationListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class VerificationActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, VerificationListener {
 
@@ -38,6 +41,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     TextView resend_timer;
     SharedPreferences pref;
     String phone_number;
+    ServerRequest sr = new ServerRequest();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,10 +190,20 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
         Log.d(TAG, "Verified!\n" + response);
         hideProgressBarAndShowMessage(R.string.verified);
         showCompleted();
-        SharedPreferences.Editor edit = pref.edit();
-        edit.putString("phone_number", phone_number);
-        startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
 
+        JSONObject json = sr.getJSON(com.example.sarthak.navigationdrawer.Backend.Backend.Config.ip+"/register",Register.params);
+        if(json != null) {
+            try {
+                String jsonstr = json.getString("response");
+                Toast.makeText(VerificationActivity.this, jsonstr, Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString("phone_number", phone_number);
+                startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
+                Log.d("Hello", jsonstr);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -202,7 +216,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     private void startTimer() {
         resend_timer.setClickable(false);
         resend_timer.setTextColor(ContextCompat.getColor(VerificationActivity.this, R.color.sendotp_grey));
-        new CountDownTimer(15000, 1000) {
+        new CountDownTimer(60000, 1000) {
             int secondsLeft = 0;
 
             public void onTick(long ms) {

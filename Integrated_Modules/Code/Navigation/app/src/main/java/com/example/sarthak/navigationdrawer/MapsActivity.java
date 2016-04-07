@@ -175,15 +175,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else if (menuItem.getTitle().equals("Leaderboard")) {
                     Intent intent = new Intent(MapsActivity.this, MainActivity_Leaderboard.class);
                     startActivity(intent);
-                } else if (menuItem.getTitle().equals("History")) {
+                }else if (menuItem.getTitle().equals("History")) {
                     Intent intent = new Intent(MapsActivity.this, MainActivity_History.class);
                     startActivity(intent);
-                } else if (menuItem.getTitle().equals("Logout")) {
+                }else if(menuItem.getTitle().equals("Logout")){
                     edit.clear();
                     edit.commit();
                     startActivity(new Intent(MapsActivity.this, LoginRegister.class));
                     Toast.makeText(MapsActivity.this, "Logged Out !", Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                else {
                     Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
                 return true;

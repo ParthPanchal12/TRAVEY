@@ -88,7 +88,7 @@ public class ProfileActivity extends Activity {
                         params.add(new BasicNameValuePair("id", token));
                         ServerRequest sr = new ServerRequest();
                         //    JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/chgpass",params);
-                        JSONObject json = sr.getJSON("http://192.168.0.107:8080/api/chgpass",params);
+                        JSONObject json = sr.getJSON(Config.ip+"/api/chgpass",params);
                         if(json != null){
                             try{
                                 String jsonstr = json.getString("response");
