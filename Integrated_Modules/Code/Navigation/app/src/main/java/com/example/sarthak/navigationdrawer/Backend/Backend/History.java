@@ -5,6 +5,15 @@ public class History {
     String source;
     String destination;
 
+    public History() {
+    }
+
+    public History(String date, String source, String destination) {
+        this.date = date;
+        this.source = source;
+        this.destination = destination;
+    }
+
     public String getDate() {
         return date;
     }

@@ -318,7 +318,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                         .decodeFile(imgDecodableString));
 
                 ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("phone_number", ));
+                params.add(new BasicNameValuePair("phone_number", "1234"));
                 params.add(new BasicNameValuePair("image", imgDecodableString));
                 ServerRequest sr=new ServerRequest();
                 JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);

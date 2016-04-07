@@ -11,6 +11,7 @@ import android.view.View;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.History;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -59,7 +60,7 @@ public class MainActivity_History extends AppCompatActivity {
     private void getHistory() {
 
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "1234567891"));
+        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
         ServerRequest sr = new ServerRequest();
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
@@ -70,10 +71,9 @@ public class MainActivity_History extends AppCompatActivity {
                 Log.d("JsonLeaderBoard", "" + json);
                 for (int i = 0; i < json.length(); i++) {
                     Gson gson = new Gson();
-                    History newHistory = gson.fromJson(json.getString(i), new TypeToken<History>() {
-                    }.getType());
+                    User user = gson.fromJson(json.getString(i), new TypeToken<User>() {}.getType());
+                    histories=user.history;
 
-                    histories.add(newHistory);
                 }
 
             } catch (JSONException e) {

@@ -1,5 +1,9 @@
 package com.example.sarthak.navigationdrawer.LeaderBoard;
 
+import com.example.sarthak.navigationdrawer.Backend.Backend.History;
+
+import java.util.ArrayList;
+
 /**
  * Created by sarthak on 7/4/16.
  */
@@ -7,6 +11,7 @@ public class User {
     private String user_name;
     private int upvotes;
     private int downvotes;
+    public ArrayList<History> history;
 
     public User(String name, int upvote, int downvote) {
         this.user_name = name;
