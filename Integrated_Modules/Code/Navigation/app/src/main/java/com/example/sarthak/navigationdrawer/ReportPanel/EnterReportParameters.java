@@ -126,7 +126,7 @@ public class EnterReportParameters extends Dialog {
         parametersDatabase=new ArrayList<NameValuePair>();
 
         /*To do*/
-        parametersDatabase.add(new BasicNameValuePair("phone_number", "lalal"));
+        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, "lalal"));
 
         /*Time format*/
         /*July 22, 2013 14:00:00*/
@@ -140,12 +140,13 @@ public class EnterReportParameters extends Dialog {
         String monthString=getMonthFormatted(month);
         int seconds=0;
         String finalStartDate=getFormattedDate(monthString,day,year,hours,minutes,seconds);
-        parametersDatabase.add(new BasicNameValuePair("detail", description));
-        parametersDatabase.add(new BasicNameValuePair("tag",title));
-        parametersDatabase.add(new BasicNameValuePair("start_time", finalStartDate));
-        parametersDatabase.add(new BasicNameValuePair("end_time", "lalal"));
-        parametersDatabase.add(new BasicNameValuePair("lat", String.valueOf(selectedPlaceLatitude)));
-        parametersDatabase.add(new BasicNameValuePair("long", String.valueOf(selectedPlaceLongitude)));
+        String finalEndDate=getFormattedDate(monthString,day,year,hours,minutes+5,seconds);
+        parametersDatabase.add(new BasicNameValuePair(Config.detail, description));
+        parametersDatabase.add(new BasicNameValuePair(Config.tag,title));
+        parametersDatabase.add(new BasicNameValuePair(Config.start_time, finalStartDate));
+        parametersDatabase.add(new BasicNameValuePair(Config.end_time, finalEndDate));
+        parametersDatabase.add(new BasicNameValuePair(Config.latitude, String.valueOf(selectedPlaceLatitude)));
+        parametersDatabase.add(new BasicNameValuePair(Config.longitude, String.valueOf(selectedPlaceLongitude)));
 
         ServerRequest sr = new ServerRequest();
         Log.d("here", "params sent");

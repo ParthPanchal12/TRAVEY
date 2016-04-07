@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -165,8 +166,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
                         }
                     }
-                }else{
-                    Toast.makeText(MapsActivity.this,menuItem.getTitle(), Toast.LENGTH_SHORT).show();
+                } else if (menuItem.getTitle().equals("Leaderboard")) {
+                    Intent intent = new Intent(MapsActivity.this, MainActivity_Leaderboard.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -331,20 +335,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void addLabelsForAllReports(){
-        ArrayList<NameValuePair> params=new ArrayList<>();
-        params.add(new BasicNameValuePair("phone_number",""+123456789));
+    private void addLabelsForAllReports() {
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("phone_number", "" + 123456789));
         ServerRequest sr = new ServerRequest();
-        JSONObject json = sr.getJSON(Config.ip+"/allRepots",params);
+        JSONObject json = sr.getJSON(Config.ip + "/allRepots", params);
         Log.d("here", "params sent");
-        if(json != null){
-            try{
+        if (json != null) {
+            try {
                 String jsonstr = json.getString("response");
                 String sue = json.getString("use");
 
-                Toast.makeText(MapsActivity.this,jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this, jsonstr + "     " + sue, Toast.LENGTH_LONG).show();
                 Log.d("Hello", jsonstr);
-            }catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }

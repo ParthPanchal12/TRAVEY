@@ -62,8 +62,8 @@ public class Login extends Fragment {
                 if((ph_1=='+' && ph2==9 && ph3==1 && phone_number_txt.length()==13) || (ph1==0 && phone_number_txt.length()==11) || (phone_number_txt.length()==10)){
 
                     params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair("phone_number", phone_number_txt));
-                    params.add(new BasicNameValuePair("password", password_txt));
+                    params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                    params.add(new BasicNameValuePair(Config.password, password_txt));
 
                     ServerRequest sr = new ServerRequest();
                     JSONObject json = sr.getJSON(Config.ip+"/login",params);
@@ -91,8 +91,8 @@ public class Login extends Fragment {
                                 String s = gson.toJson(h);
 
                                 params_history = new ArrayList<NameValuePair>();
-                                params_history.add(new BasicNameValuePair("phone_number", phone_number_txt));
-                                params_history.add(new BasicNameValuePair("history", s));
+                                params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                                params_history.add(new BasicNameValuePair(Config.history, s));
                                 //JSONObject json1 = sr.getJSON("http://192.168.69.1:8080/reportAdd",params_history);
 
                                 Intent profactivity = new Intent(getContext(),MapsActivity.class);

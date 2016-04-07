@@ -109,18 +109,18 @@ public class Register extends Fragment {
                             String s = gson.toJson(history);
 
                             params = new ArrayList<NameValuePair>();
-                            params.add(new BasicNameValuePair("user_name", user_name_txt));
-                            params.add(new BasicNameValuePair("phone_number", phone_number_txt));
-                            params.add(new BasicNameValuePair("email", email_txt));
-                            params.add(new BasicNameValuePair("password", password_txt));
-                            params.add(new BasicNameValuePair("history", s));
-                            params.add(new BasicNameValuePair("lat",lat));
-                            params.add(new BasicNameValuePair("long",long_));
+                            params.add(new BasicNameValuePair(Config.user_name, user_name_txt));
+                            params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                            params.add(new BasicNameValuePair(Config.email, email_txt));
+                            params.add(new BasicNameValuePair(Config.password, password_txt));
+                            params.add(new BasicNameValuePair(Config.history, s));
+                            params.add(new BasicNameValuePair(Config.latitude,lat));
+                            params.add(new BasicNameValuePair(Config.longitude,long_));
 
-                            Log.d("user_name", user_name_txt);
-                            Log.d("phone_number", phone_number_txt);
-                            Log.d("email", email_txt);
-                            Log.d("password", password_txt);
+                            Log.d(Config.user_name, user_name_txt);
+                            Log.d(Config.phone_number, phone_number_txt);
+                            Log.d(Config.email, email_txt);
+                            Log.d(Config.password, password_txt);
 
                             Log.d("history", s);
                             ServerRequest sr = new ServerRequest();

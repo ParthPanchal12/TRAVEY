@@ -16,6 +16,8 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,8 +26,16 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.R;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class MainActivity_ProfilePage extends AppCompatActivity {
@@ -114,6 +124,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                                 }
                                 /*notify that the dataset has changed*/
                                 adapter.notifyDataSetChanged();
+                                saveLocationSharedToDatabase();
                             } else {
                                 /*Call the EditProfile class to let the user edit his/her detail*/
                                 Intent intent = new Intent(MainActivity_ProfilePage.this, EditProfile.class);
@@ -172,6 +183,36 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
 
     }
 
+    /*To add*/
+    private void savePhotoToDatabase(String photo){
+        ArrayList<NameValuePair> parameters=new ArrayList<>();
+        parameters.add(new BasicNameValuePair(Config.photo,photo));
+        parameters.add(new BasicNameValuePair(Config.phone_number,"8758964908"));
+
+        ServerRequest sr = new ServerRequest();
+        Log.d("here", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONObject json = sr.getJSON(Config.ip+"/register",parameters);
+        Log.d("here", "json received");
+        if(json != null){
+            try{
+                String jsonstr = json.getString("response");
+                String sue = json.getString("use");
+
+                Toast.makeText(MainActivity_ProfilePage.this,jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+
+                Log.d("Hello", jsonstr);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*To add*/
+    private void saveLocationSharedToDatabase(){
+
+    }
+
     /*Toggle between open and closed FAB states*/
     private void animateFAB() {
         if (isFabOpen) {
@@ -191,6 +232,25 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         }
     }
 
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
+    }
+
+    public Bitmap StringToBitMap(String encodedString){
+        try {
+            byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch(Exception e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -206,6 +266,8 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             /*Extract colors from the image selected*/
             /*To write a general method*/
             Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+            //savePhotoToDatabase(BitMapToString(bitmap));
+            bitmap=StringToBitMap(BitMapToString(bitmap));
             Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {

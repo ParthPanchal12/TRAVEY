@@ -12,11 +12,21 @@
 
         <item
             android:id="@+id/navigation_item_track_a_friend"
-            android:title="@string/nav_sub_menu_item_Track_a_friend" />
+            android:title="@string/nav_item_Track_a_friend" />
 
         <item
             android:id="@+id/navigation_item_friends_near_me"
-            android:title="@string/nav_sub_menu_item_Friends_Near_Me" />
+            android:title="@string/nav_item_Friends_Near_Me" />
+
+
+        <item
+            android:id="@+id/navigation_item_leaderBoard"
+            android:title="@string/nav_item_LeaderBoard" />
+
+        <item
+            android:id="@+id/navigation_item_history"
+            android:title="@string/nav_item_History" />
+
 
         <item
             android:id="@+id/id_navigation_item_logout"

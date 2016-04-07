@@ -22,4 +22,8 @@
     <string name="title_activity_verification">Login</string>
     <string name="title_activity_login_register">TRAVEY</string>
     <string name="title_activity_pic_uploader">picUploader</string>
+    <string name="nav_item_Track_a_friend">Track a Friend</string>
+    <string name="nav_item_Friends_Near_Me">Friends Near Me</string>
+    <string name="nav_item_LeaderBoard">Leaderboard</string>
+    <string name="nav_item_History">History</string>
 </resources>
