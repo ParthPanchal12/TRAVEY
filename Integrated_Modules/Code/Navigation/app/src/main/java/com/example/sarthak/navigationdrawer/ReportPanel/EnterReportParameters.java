@@ -163,9 +163,9 @@ public class EnterReportParameters extends Dialog {
         if(json != null){
             try{
                 String jsonstr = json.getString("response");
-                String sue = json.getString("use");
+                //String sue = json.getString("use");
 
-                Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
 
                 Log.d("Hello", jsonstr);
             }catch (JSONException e) {
