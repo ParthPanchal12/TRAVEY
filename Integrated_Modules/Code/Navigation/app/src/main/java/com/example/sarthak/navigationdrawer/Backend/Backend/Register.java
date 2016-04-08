@@ -44,7 +44,7 @@ public class Register extends Fragment {
     }
 
     private String getE164Number() {
-        return phone_number.getText().toString().replaceAll("\\D", "").trim();
+        return phone_number_txt.replaceAll("\\D", "").trim();
         // return PhoneNumberUtils.formatNumberToE164(mPhoneNumber.getText().toString(), mCountryIso);
     }
 

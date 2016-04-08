@@ -208,6 +208,7 @@ public class EnterReportParameters extends Dialog {
         number = editText_minute.getText().toString().trim();
         if (!number.isEmpty())
             minutes = Integer.parseInt(number);
+
     }
 
 }
