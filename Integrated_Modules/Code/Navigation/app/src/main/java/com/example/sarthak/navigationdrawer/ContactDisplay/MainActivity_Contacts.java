@@ -48,7 +48,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private ArrayList<Friends> actualFriends;
     private int inProgress = 0;
     private ProgressDialog progressBar;
-    private Handler progressBarHandler = new Handler();
     private Button retryButton;
     private RelativeLayout retryRelativeLayout;
     private SearchView searchView;
@@ -277,7 +276,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 actualFriends.add(friends.get(i));
             }
         }
-        
+
 
     }
 

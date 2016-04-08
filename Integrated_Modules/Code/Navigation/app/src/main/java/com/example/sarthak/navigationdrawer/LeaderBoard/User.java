@@ -13,6 +13,8 @@ public class User {
     private int downvotes;
     public ArrayList<History> history;
     private String phone_number;
+    private double latitude;
+    private double longitude;
 
     public String getPhone_number() {
         return phone_number;
@@ -29,6 +31,22 @@ public class User {
         this.user_name = name;
         this.upvotes = upvote;
         this.downvotes = downvote;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public String getName() {
