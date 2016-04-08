@@ -76,6 +76,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + position, Toast.LENGTH_SHORT).show();
+
                     }
                 })
         );

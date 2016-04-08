@@ -28,10 +28,12 @@ import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
+import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
+import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -50,13 +52,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -109,7 +115,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
         /*Add labels for all reports*/
-        //addLabelsForAllReports();
+        addLabelsForAllReports();
 
 
         //Setting up drawer
@@ -355,17 +361,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void addLabelsForAllReports() {
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("phone_number", "" + 123456789));
+        params.add(new BasicNameValuePair(Config.phone_number, "1234567891"));
         ServerRequest sr = new ServerRequest();
-        JSONObject json = sr.getJSON(Config.ip + "/allRepots", params);
+        final ArrayList<Reports> reports=new ArrayList<Reports>();
         Log.d("here", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONArray json = sr.getJSONArray(Config.ip + "/allReports", params);
+        Log.d("here", "json received");
         if (json != null) {
             try {
-                String jsonstr = json.getString("response");
-                String sue = json.getString("use");
+                Log.d("JsonAllReports", "" + json);
+                for (int i = 0; i < json.length(); i++) {
+                    Gson gson = new Gson();
+                    Reports report = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
+                    }.getType());
+                    reports.add(report);
 
-                Toast.makeText(MapsActivity.this, jsonstr + "     " + sue, Toast.LENGTH_LONG).show();
-                Log.d("Hello", jsonstr);
+                    double[] ar=report.getLocation();
+                    LatLng place=new LatLng(ar[0],ar[1]);
+
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+                            for(int i=0;i<reports.size();i++){
+                                double loc[]=reports.get(i).getLocation();
+                                LatLng loc1=new LatLng(loc[0],loc[1]);
+                                if(loc1.latitude==marker.getPosition().latitude && loc1.longitude==marker.getPosition().longitude){
+
+                                    getDetailsForReport(reports.get(i).getDetail(),reports.get(i).getTag(),(reports.get(i).getUpvotes()),reports.get(i).getDownvotes(),reports.get(i).get_id());
+                                }
+                            }
+                            return false;
+                        }
+                    });
+
+
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -410,6 +445,44 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id) {
+        CharSequence methodsToTakeSource[] = new CharSequence[]{""+detail, "Upvotes : "+upvote, "Downvotes : "+downvote};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+
+                        return;
+                    case 1:
+                        ArrayList<NameValuePair> params1 = new ArrayList<>();
+                        params1.add(new BasicNameValuePair("_id",id));
+                        ServerRequest sr1 = new ServerRequest();
+                        Log.d("here", "params sent");
+                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                        JSONArray json1 = sr1.getJSONArray(Config.ip + "/upvote", params1);
+                        Log.d("here", "json received");
+                        Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                        return;
+                    case 2:
+                        ArrayList<NameValuePair> params2 = new ArrayList<>();
+                        params2.add(new BasicNameValuePair("_id",id));
+                        ServerRequest sr2 = new ServerRequest();
+                        Log.d("here", "params sent");
+                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                        JSONArray json2 = sr2.getJSONArray(Config.ip + "/downvote", params2);
+                        Log.d("here", "json received");
+                        Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                        return;
+                }
+            }
+        });
+        builder.show();
+
+    }
 
     /**
      * Manipulates the map once available.
