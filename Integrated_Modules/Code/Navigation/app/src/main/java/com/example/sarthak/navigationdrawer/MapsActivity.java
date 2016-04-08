@@ -384,18 +384,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double[] ar = report.getLocation();
                     LatLng place = new LatLng(ar[0], ar[1]);
 
-                    mMap.addMarker(new MarkerOptions()
-                            .position(place).flat(true)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    if(report.getTag().equals("Traffic")){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    }else if(report.getTag().equals("Roadblock")){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                    }else if(report.getTag().equals("Accident")){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    }else if(report.getTag().equals("Event")){
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    }else{
+                        mMap.addMarker(new MarkerOptions()
+                                .position(place).flat(true)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    }
+
                     mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-                            for (int i = 0; i < reports.size(); i++) {
-                                double loc[] = reports.get(i).getLocation();
+                            for (int j = 0; j < reports.size(); j++) {
+                                double loc[] = reports.get(j).getLocation();
                                 LatLng loc1 = new LatLng(loc[0], loc[1]);
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(i).getDetail(), reports.get(i).getTag(), (reports.get(i).getUpvotes()), reports.get(i).getDownvotes(), reports.get(i).get_id());
+                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id());
                                 }
                             }
                             return false;
@@ -463,21 +482,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return;
                     case 1:
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
-                        params1.add(new BasicNameValuePair("_id", id));
+                        params1.add(new BasicNameValuePair(Config.reportId, id));
                         ServerRequest sr1 = new ServerRequest();
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONArray json1 = sr1.getJSONArray(Config.ip + "/upvote", params1);
+                        JSONArray json1 = sr1.getJSONArray(Config.ip + "/reportUpVote", params1);
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
                         return;
                     case 2:
                         ArrayList<NameValuePair> params2 = new ArrayList<>();
-                        params2.add(new BasicNameValuePair("_id", id));
+                        params2.add(new BasicNameValuePair(Config.reportId, id));
                         ServerRequest sr2 = new ServerRequest();
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONArray json2 = sr2.getJSONArray(Config.ip + "/downvote", params2);
+                        JSONArray json2 = sr2.getJSONArray(Config.ip + "/reportDownVote", params2);
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
                         return;

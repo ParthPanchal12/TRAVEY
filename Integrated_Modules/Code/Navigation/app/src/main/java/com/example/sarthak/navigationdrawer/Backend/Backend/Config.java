@@ -4,7 +4,7 @@ package com.example.sarthak.navigationdrawer.Backend.Backend;
  * Created by sarthak on 5/4/16.
  */
 public interface Config {
-    public final String ip="http://192.168.137.69:8080";
+    public final String ip="http://192.168.1.34:8080";
     public final String phone_number="phone_number";
     public final String name="name";
     public final String start_time="start_time";
@@ -18,5 +18,6 @@ public interface Config {
     public final String password="password";
     public final String history="history";
     public final String user_name="user_name";
+    public final String reportId="reportId";
 
 }
