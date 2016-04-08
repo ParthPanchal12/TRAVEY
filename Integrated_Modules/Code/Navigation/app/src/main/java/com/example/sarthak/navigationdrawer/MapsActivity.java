@@ -115,7 +115,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
         /*Add labels for all reports*/
-        addLabelsForAllReports();
+
 
 
         //Setting up drawer
@@ -357,13 +357,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
+        //adding labels for map
+        addLabelsForAllReports();
+
+
     }
 
     private void addLabelsForAllReports() {
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, "1234567891"));
         ServerRequest sr = new ServerRequest();
-        final ArrayList<Reports> reports=new ArrayList<Reports>();
+        final ArrayList<Reports> reports = new ArrayList<Reports>();
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/allReports", params);
@@ -377,21 +381,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }.getType());
                     reports.add(report);
 
-                    double[] ar=report.getLocation();
-                    LatLng place=new LatLng(ar[0],ar[1]);
+                    double[] ar = report.getLocation();
+                    LatLng place = new LatLng(ar[0], ar[1]);
 
-                        mMap.addMarker(new MarkerOptions()
-                                .position(place).flat(true)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    mMap.addMarker(new MarkerOptions()
+                            .position(place).flat(true)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-                            for(int i=0;i<reports.size();i++){
-                                double loc[]=reports.get(i).getLocation();
-                                LatLng loc1=new LatLng(loc[0],loc[1]);
-                                if(loc1.latitude==marker.getPosition().latitude && loc1.longitude==marker.getPosition().longitude){
+                            for (int i = 0; i < reports.size(); i++) {
+                                double loc[] = reports.get(i).getLocation();
+                                LatLng loc1 = new LatLng(loc[0], loc[1]);
+                                if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(i).getDetail(),reports.get(i).getTag(),(reports.get(i).getUpvotes()),reports.get(i).getDownvotes(),reports.get(i).get_id());
+                                    getDetailsForReport(reports.get(i).getDetail(), reports.get(i).getTag(), (reports.get(i).getUpvotes()), reports.get(i).getDownvotes(), reports.get(i).get_id());
                                 }
                             }
                             return false;
@@ -446,7 +450,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id) {
-        CharSequence methodsToTakeSource[] = new CharSequence[]{""+detail, "Upvotes : "+upvote, "Downvotes : "+downvote};
+        CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
@@ -459,7 +463,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return;
                     case 1:
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
-                        params1.add(new BasicNameValuePair("_id",id));
+                        params1.add(new BasicNameValuePair("_id", id));
                         ServerRequest sr1 = new ServerRequest();
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
@@ -469,7 +473,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return;
                     case 2:
                         ArrayList<NameValuePair> params2 = new ArrayList<>();
-                        params2.add(new BasicNameValuePair("_id",id));
+                        params2.add(new BasicNameValuePair("_id", id));
                         ServerRequest sr2 = new ServerRequest();
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
