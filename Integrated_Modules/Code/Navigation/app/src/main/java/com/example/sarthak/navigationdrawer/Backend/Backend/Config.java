@@ -19,5 +19,6 @@ public interface Config {
     public final String history="history";
     public final String user_name="user_name";
     public final String reportId="reportId";
+    public final String location="location";
 
 }
