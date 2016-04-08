@@ -126,7 +126,7 @@ public class EnterReportParameters extends Dialog {
         parametersDatabase=new ArrayList<NameValuePair>();
 
         /*To do*/
-        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, "lalal"));
+        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
 
         /*Time format*/
         /*July 22, 2013 14:00:00*/

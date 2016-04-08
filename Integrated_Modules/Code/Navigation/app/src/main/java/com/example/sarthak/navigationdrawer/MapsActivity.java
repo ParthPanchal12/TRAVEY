@@ -357,15 +357,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-        //adding labels for map
-        addLabelsForAllReports();
+
 
 
     }
 
     private void addLabelsForAllReports() {
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "1234567891"));
+        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
         ServerRequest sr = new ServerRequest();
         final ArrayList<Reports> reports = new ArrayList<Reports>();
         Log.d("here", "params sent");
@@ -484,7 +483,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
                         params1.add(new BasicNameValuePair(Config.reportId, id));
                         ServerRequest sr1 = new ServerRequest();
-                        Log.d("here", "params sent");
+                        Log.d("here", "params sent"+id);
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                         JSONArray json1 = sr1.getJSONArray(Config.ip + "/reportUpVote", params1);
                         Log.d("here", "json received");
@@ -539,6 +538,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //disabled my location button
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        //adding labels for map
+        addLabelsForAllReports();
     }
 
     @Override
