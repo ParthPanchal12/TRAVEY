@@ -39,7 +39,7 @@
                 android:paddingLeft="10dp"
                 android:text="Name"
                 android:textColor="@color/cardview_dark_background"
-                android:textSize="30sp" />
+                android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:background="@drawable/ic_thumb_up_black_24dp" />
 
                 <TextView
@@ -69,7 +69,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:background="@drawable/ic_thumb_down_black_24dp" />
 
                 <TextView

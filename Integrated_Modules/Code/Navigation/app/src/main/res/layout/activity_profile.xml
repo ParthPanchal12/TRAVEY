@@ -18,7 +18,7 @@
         android:layout_marginTop="30px"
         android:layout_height="80px"
         android:id="@+id/chgbtn"
-        android:background="@drawable/btn_back"
+        android:background="@color/colorPrimaryDark"
         android:textColor="#ffffff"
         android:textAlignment="center"
         android:text="Change Password"/>
@@ -28,7 +28,7 @@
         android:layout_marginTop="10px"
         android:layout_height="80px"
         android:id="@+id/logout"
-        android:background="@drawable/btn_blue_back"
+        android:background="@android:color/holo_blue_dark"
         android:textColor="#ffffff"
         android:textAlignment="center"
         android:text="Logout"/>

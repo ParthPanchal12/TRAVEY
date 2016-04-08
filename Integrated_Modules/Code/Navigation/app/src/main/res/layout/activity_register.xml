@@ -5,29 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:inputType="text"
         android:ems="10"
-        android:hint="user_name"
+        android:hint="User name"
         android:numeric="decimal"
         android:textSize="20dp"
         android:id="@+id/register_user_name"
         android:layout_gravity="center_horizontal" />
-
+</android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:inputType="number"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
-        android:hint="phone number"
+        android:hint="Phone Number"
         android:ems="10"
         android:id="@+id/register_phone_number"
         android:layout_gravity="center_horizontal" />
+</android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -38,37 +51,48 @@
         android:ems="10"
         android:id="@+id/register_email"
         android:layout_gravity="center_horizontal" />
+</android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
-        android:hint="password"
+        android:hint="Password"
         android:ems="10"
         android:id="@+id/register_password"
         android:layout_gravity="center_horizontal" />
+</android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/input_layout_password_confrm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
-        android:hint="confirm password"
+        android:hint="Confirm Password"
         android:ems="10"
         android:id="@+id/register_confirm__password"
         android:layout_gravity="center_horizontal" />
-
+</android.support.design.widget.TextInputLayout>
     <Button
 
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
         android:text="Register"
-        android:paddingTop="20dp"
-        android:layout_marginTop="20dp"
         android:id="@+id/register_register"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@android:color/black"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
