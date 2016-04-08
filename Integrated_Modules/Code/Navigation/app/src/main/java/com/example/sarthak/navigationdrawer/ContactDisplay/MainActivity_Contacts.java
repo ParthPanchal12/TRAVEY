@@ -2,6 +2,8 @@ package com.example.sarthak.navigationdrawer.ContactDisplay;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +24,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.R;
+import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,6 +42,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private Button retryButton;
     private RelativeLayout retryRelativeLayout;
     private SearchView searchView;
+    private String selectedFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +81,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + position, Toast.LENGTH_SHORT).show();
-
+                        selectTypeForFriend();
                     }
                 })
         );
@@ -147,7 +152,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 if (Integer
                         .parseInt(cur.getString(cur
                                 .getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                    System.out.println("name : " + name + ", ID : " + id);
+
                     friend.setName(name);
                     sb.append("\n Contact Name:" + name);
                     Cursor pCur = cr.query(
@@ -161,7 +166,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
                                         .getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         sb.append("\n Phone number:" + phone);
                         friend.setPhone(phone);
-                        System.out.println("phone" + phone);
                     }
                     pCur.close();
                     friends.add(friend);
@@ -180,8 +184,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
                                 .getString(emailCur
                                         .getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE));
                         sb.append("\nEmail:" + emailContact + "Email type:" + emailType);
-                        System.out.println("Email " + emailContact
-                                + " Email Type : " + emailType);
 
                     }
 
@@ -189,13 +191,12 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 }
 
                 if (image_uri != null) {
-                    System.out.println(Uri.parse(image_uri));
                     try {
                         bitmap = MediaStore.Images.Media
                                 .getBitmap(this.getContentResolver(),
                                         Uri.parse(image_uri));
                         sb.append("\n Image in Bitmap:" + bitmap);
-                        System.out.println(bitmap);
+
 
                     } catch (FileNotFoundException e) {
                         // TODO Auto-generated catch block
@@ -214,7 +215,11 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
 
         alphabeticalSorting();
+        saveAllToSharedPreferences();
         inProgress = 1;
+    }
+    private void saveAllToSharedPreferences(){
+
     }
 
     class GetContactsAsync extends AsyncTask<Void, Void, Void> {
@@ -254,6 +259,31 @@ public class MainActivity_Contacts extends AppCompatActivity {
         if (progressBar != null) {
             progressBar.dismiss();
         }
+    }
+
+
+
+    private void selectTypeForFriend() {
+        CharSequence methodsToTakeSource[] = new CharSequence[]{"Share your location", "Get his location"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pick an option");
+        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        //do something
+                        return;
+                    case 1:
+                        Intent intent=new Intent(MainActivity_Contacts.this,DisplayFriendsOnMap.class);
+                        startActivity(intent);
+                        return;
+                }
+            }
+        });
+        builder.show();
+
     }
 }
 
