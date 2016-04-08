@@ -27,8 +27,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -93,9 +95,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
 
-        if (getLocationOfFriend()) {
-            displayFriend();
-        }
+
     }
 
     @Override
@@ -114,8 +114,12 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
             return;
         }
         mMap.setMyLocationEnabled(true);
-        myPosition=new LatLng(mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude());
+        myPosition=new LatLng(23.187699,72.6275614);
         //disabled my location button
+        Toast.makeText(DisplayFriendsOnMap.this, ""+myPosition, Toast.LENGTH_SHORT).show();
+        if (getLocationOfFriend()) {
+            displayFriend();
+        }
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
 
@@ -125,6 +129,9 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
             builder.include(myPosition);
             builder.include(friendPosition);
             LatLngBounds bounds = builder.build();
+            mMap.addMarker(new MarkerOptions()
+                    .position(friendPosition).flat(true)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
             int padding = 310; // offset from edges of the map in pixels
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
             mMap.animateCamera(cu);

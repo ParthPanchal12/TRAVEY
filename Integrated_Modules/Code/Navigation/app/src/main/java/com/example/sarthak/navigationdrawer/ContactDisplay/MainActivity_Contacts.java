@@ -23,8 +23,17 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
-import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,6 +45,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private RecycleViewAdapter adapter;
     private RecyclerView recyclerView;
     private ArrayList<Friends> friends;
+    private ArrayList<Friends> actualFriends;
     private int inProgress = 0;
     private ProgressDialog progressBar;
     private Handler progressBarHandler = new Handler();
@@ -43,6 +53,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private RelativeLayout retryRelativeLayout;
     private SearchView searchView;
     private String selectedFriend;
+    private ArrayList<User> allDatabaseUsers;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +70,10 @@ public class MainActivity_Contacts extends AppCompatActivity {
         progressBar.setCanceledOnTouchOutside(false);
         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
+        actualFriends=new ArrayList<>();
+
+        allDatabaseUsers=new ArrayList<>();
+        getDatabaseContacts();
 
         retryRelativeLayout = (RelativeLayout) findViewById(R.id.layout_retry_contact_display);
         retryButton = (Button) findViewById(R.id.button_retry);
@@ -66,7 +81,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
         new GetContactsAsync().execute();
 
 
-        adapter = new RecycleViewAdapter(MainActivity_Contacts.this, friends);
+        adapter = new RecycleViewAdapter(MainActivity_Contacts.this, actualFriends);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_all_contacts);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity_Contacts.this);
@@ -95,7 +110,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
 
         /*Search View*/
-        searchView=(SearchView) findViewById(R.id.search_Contacts);
+        searchView = (SearchView) findViewById(R.id.search_Contacts);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -108,8 +123,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 return false;
             }
         });
-
-
 
 
     }
@@ -214,11 +227,57 @@ public class MainActivity_Contacts extends AppCompatActivity {
             //Toast.makeText(MainActivity_Contacts.this, sb, Toast.LENGTH_SHORT).show();
         }
 
+
+        getCommonContacts();
         alphabeticalSorting();
         saveAllToSharedPreferences();
         inProgress = 1;
     }
-    private void saveAllToSharedPreferences(){
+
+    private void saveAllToSharedPreferences() {
+
+    }
+
+    private void getDatabaseContacts() {
+
+        /*Take all the users from the database*/
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        ServerRequest sr = new ServerRequest();
+        Log.d("Contacts", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONArray json = sr.getJSONArray(Config.ip + "/allContacts", params);
+        Log.d("here", "json received1" + json);
+        if (json != null) {
+            try {
+                Log.d("JsonAllContacts", "" + json);
+                for (int i = 0; i < json.length(); i++) {
+                    Gson gson = new Gson();
+                    User user = gson.fromJson(json.getString(i), new TypeToken<User>() {
+                    }.getType());
+                    allDatabaseUsers.add(user);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+
+            }
+        }
+    }
+
+    private void getCommonContacts(){
+
+        for(int i=0;i<friends.size();i++){
+            int flag=0;
+            for(int j=0;j<allDatabaseUsers.size();j++){
+                if(friends.get(i).getPhone().contains(allDatabaseUsers.get(j).getPhone_number())){
+                    flag=1;
+                }
+            }
+            if(flag==1){
+                actualFriends.add(friends.get(i));
+            }
+        }
+        
 
     }
 
@@ -262,7 +321,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
     }
 
 
-
     private void selectTypeForFriend() {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"Share your location", "Get his location"};
 
@@ -276,7 +334,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         //do something
                         return;
                     case 1:
-                        Intent intent=new Intent(MainActivity_Contacts.this,DisplayFriendsOnMap.class);
+                        Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
                         startActivity(intent);
                         return;
                 }
