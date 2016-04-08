@@ -33,7 +33,6 @@ import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
-import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -64,37 +63,36 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
+    private final int INTENT_GPS_PROVIDER = 1;
+    private final int PERMISSION_CHECK = 2;
+    public Marker sourceMarker = null;
+    public Marker destinationMarker = null;
+    SharedPreferences pref;
     private GoogleMap mMap;
     private CardView cardView_Source;
     private CardView cardView_Destination;
     private LocationManager locationManager;
-    private static final long MIN_TIME = 400;
-    private static final float MIN_DISTANCE = 1000;
-    public Marker sourceMarker = null;
     private PlaceAutocompleteFragment autocompleteFragmentSource;
     private PlaceAutocompleteFragment autocompleteFragmentDestination;
-    public Marker destinationMarker = null;
     private Location lastKnowncurrentLocation;
     private String lastSelectedLocationName;
     private LatLng lastSelectedLatLng;
-    private final int INTENT_GPS_PROVIDER = 1;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private MenuItem cancel_source_and_destination;
     private Menu menu;
-    private final int PERMISSION_CHECK = 2;
     private FloatingActionsMenu fab_menu_report_panel;
     private String typeOfReport = "";
     private GoogleApiClient mGoogleApiClient;
     private int PLACE_PICKER_REQUEST = 3;
     private int places_id = 0;
-    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +112,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //getting shared preferrences
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
-        /*Add labels for all reports*/
+
 
 
 
@@ -448,6 +446,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } else {
                             Toast.makeText(MapsActivity.this, "Please fill the source box", Toast.LENGTH_SHORT).show();
                         }
+                        addLabelsForAllReports();
                         return;
                     case 1:
                         if (checkGPSEnabled()) {
@@ -456,9 +455,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } else {
                             Toast.makeText(MapsActivity.this, "Enable the GPS", Toast.LENGTH_SHORT).show();
                         }
+                        addLabelsForAllReports();
                         return;
                     case 2:
                         //start the place picker activity
+                        addLabelsForAllReports();
                         return;
                 }
             }
@@ -470,7 +471,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id) {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title);
         builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
             @Override
@@ -488,6 +489,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         JSONArray json1 = sr1.getJSONArray(Config.ip + "/reportUpVote", params1);
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+
+
                         return;
                     case 2:
                         ArrayList<NameValuePair> params2 = new ArrayList<>();

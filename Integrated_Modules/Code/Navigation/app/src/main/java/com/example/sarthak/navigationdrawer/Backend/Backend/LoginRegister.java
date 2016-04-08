@@ -3,15 +3,12 @@ package com.example.sarthak.navigationdrawer.Backend.Backend;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
@@ -30,6 +27,7 @@ public class LoginRegister extends AppCompatActivity {
 
         if(token != "") {
             startActivity(new Intent(LoginRegister.this, MapsActivity.class));
+            finish();
         }
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 //        setSupportActionBar(myToolbar);

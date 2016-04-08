@@ -2,11 +2,8 @@ package com.example.sarthak.navigationdrawer.ReportPanel;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -140,7 +137,17 @@ public class EnterReportParameters extends Dialog {
         String monthString=getMonthFormatted(month);
         int seconds=0;
         String finalStartDate=getFormattedDate(monthString,day,year,hours,minutes,seconds);
-        String finalEndDate=getFormattedDate(monthString,day,year,hours,minutes+5,seconds);
+        int dayNew = 0, hourNew = 0, minuteNew = 0;
+        if (minutes + Integer.parseInt(editText_minute.getText().toString()) >= 60) {
+            minuteNew += (minutes + Integer.parseInt(editText_minute.getText().toString())) % 60;
+            hourNew++;
+        }
+        if (hourNew + hours + Integer.parseInt(editText_hour.getText().toString()) >= 24) {
+            hourNew += (hours + Integer.parseInt(editText_hour.getText().toString())) % 24;
+            dayNew++;
+        }
+        dayNew += day;
+        String finalEndDate = getFormattedDate(monthString, dayNew, year, hourNew, minuteNew, seconds);
         parametersDatabase.add(new BasicNameValuePair(Config.detail, description));
         parametersDatabase.add(new BasicNameValuePair(Config.tag,title));
         parametersDatabase.add(new BasicNameValuePair(Config.start_time, finalStartDate));
