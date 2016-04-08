@@ -148,6 +148,7 @@ public class EnterReportParameters extends Dialog {
         }
         dayNew += day;
         String finalEndDate = getFormattedDate(monthString, dayNew, year, hourNew, minuteNew, seconds);
+        Log.d("enddate",finalEndDate);
         parametersDatabase.add(new BasicNameValuePair(Config.detail, description));
         parametersDatabase.add(new BasicNameValuePair(Config.tag,title));
         parametersDatabase.add(new BasicNameValuePair(Config.start_time, finalStartDate));

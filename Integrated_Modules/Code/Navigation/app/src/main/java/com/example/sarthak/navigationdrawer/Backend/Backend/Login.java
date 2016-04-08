@@ -109,7 +109,7 @@ public class Login extends Fragment {
                                 //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
 
                                 Intent profactivity = new Intent(getContext(),MapsActivity.class);
-
+                                edit.putString("phone_number", phone_number_txt);
                                 startActivity(profactivity);
                                 ((Activity)getContext()).finish();
                             }

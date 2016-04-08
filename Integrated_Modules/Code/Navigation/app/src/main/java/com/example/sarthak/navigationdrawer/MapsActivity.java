@@ -63,6 +63,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -75,6 +76,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Marker sourceMarker = null;
     public Marker destinationMarker = null;
     SharedPreferences pref;
+    String phone_number;
     private GoogleMap mMap;
     private CardView cardView_Source;
     private CardView cardView_Destination;
@@ -94,6 +96,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int PLACE_PICKER_REQUEST = 3;
     private int places_id = 0;
 
+    Reports report;
+    ArrayList<Reports> reports;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +117,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //getting shared preferrences
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
+        phone_number  = pref.getString(Config.phone_number,"");
 
 
 
@@ -362,9 +368,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void addLabelsForAllReports() {
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        params.add(new BasicNameValuePair(Config.phone_number, phone_number));
         ServerRequest sr = new ServerRequest();
-        final ArrayList<Reports> reports = new ArrayList<Reports>();
+        reports = new ArrayList<Reports>();
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/allReports", params);
@@ -374,7 +380,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("JsonAllReports", "" + json);
                 for (int i = 0; i < json.length(); i++) {
                     Gson gson = new Gson();
-                    Reports report = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
+                    report  = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
                     }.getType());
                     reports.add(report);
 
@@ -411,9 +417,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 LatLng loc1 = new LatLng(loc[0], loc[1]);
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id());
+                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j);
+                                    Log.d("checkVote", "After one iteration"+reports.size());
+                                    break;
                                 }
                             }
+
                             return false;
                         }
                     });
@@ -468,7 +477,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id) {
+    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos) {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -484,11 +493,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
                         params1.add(new BasicNameValuePair(Config.reportId, id));
                         ServerRequest sr1 = new ServerRequest();
-                        Log.d("here", "params sent"+id);
+                        Log.d("here", "params sent" + id);
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONArray json1 = sr1.getJSONArray(Config.ip + "/reportUpVote", params1);
+                        JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                        Reports rep = reports.get(pos);
+                        rep.setUpvotes(rep.getUpvotes()+1);
+                        reports.set(pos,rep);
 
 
                         return;
@@ -501,6 +513,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         JSONArray json2 = sr2.getJSONArray(Config.ip + "/reportDownVote", params2);
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                        Reports rep1 = reports.get(pos);
+                        rep1.setDownvotes(rep1.getDownvotes() + 1);
+                        reports.set(pos, rep1);
                         return;
                 }
             }
