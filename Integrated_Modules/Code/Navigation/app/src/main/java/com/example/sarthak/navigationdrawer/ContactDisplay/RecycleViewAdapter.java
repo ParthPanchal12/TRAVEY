@@ -42,7 +42,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.friends_information_display_adapter, parent, false);
+        View view = inflater.inflate(R.layout.adapter_friends_information_display, parent, false);
         CustomViewHolder customViewHolder = new CustomViewHolder(view);
         return customViewHolder;
     }
@@ -152,7 +152,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
                 int friends_size = all_friends.size();
                 Log.d("here","here");
                 for (int i = 0; i < friends_size; i++) {
-                    if (all_friends.get(i).getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                    if (all_friends.get(i).getName().contains(constraint)) {
                         filtered_adapter_results.add(all_friends.get(i));
                     }
                 }
