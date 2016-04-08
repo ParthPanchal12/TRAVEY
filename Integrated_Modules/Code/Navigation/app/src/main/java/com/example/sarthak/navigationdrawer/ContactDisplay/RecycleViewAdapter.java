@@ -152,7 +152,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
                 int friends_size = all_friends.size();
                 Log.d("here","here");
                 for (int i = 0; i < friends_size; i++) {
-                    if (all_friends.get(i).getName().contains(constraint)) {
+                    if (all_friends.get(i).getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
                         filtered_adapter_results.add(all_friends.get(i));
                     }
                 }
