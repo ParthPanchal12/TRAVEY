@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.Contacts;
 import com.example.sarthak.navigationdrawer.ContactDisplay.Friends;
@@ -33,10 +34,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+<<<<<<< HEAD
+=======
+import com.google.gson.reflect.TypeToken;
+>>>>>>> caf886a2a766ff70355ae35dd89fd8c80672f3e0
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +90,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
 
          /*Progress Bar*/
         progressBar = new ProgressDialog(FriendsNearMe.this);
-        progressBar.setMessage("Getting Contact List ...");
+        progressBar.setMessage("Getting Friends near you");
         progressBar.setCancelable(false);
         progressBar.setCanceledOnTouchOutside(false);
         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -106,26 +113,39 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
 
         progressBar.show();
+
+        friendsNearMe=new ArrayList<>();
         getFriendsNearMe();
 
     }
 
     private void getFriendsNearMe() {
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        params.add(new BasicNameValuePair(Config.latitude, "" + 23.187699));
+        params.add(new BasicNameValuePair(Config.longitude, "" + 72.6275614));
         ServerRequest sr = new ServerRequest();
         Log.d("FriendsNearMe", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-        JSONArray json = sr.getJSONArray(Config.ip + "/getLocation", params);
+        JSONArray json = sr.getJSONArray(Config.ip + "/friendsNearBy", params);
         Log.d("FriendsNearMe", "json received" + json);
+
         if (json != null) {
-//            try {
-//                Log.d("JsonFriend", "" + json);
-//                success=1;
-//                addMarkerForFriends();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+
+            Log.d("JsonAllReports", "" + json);
+            for (int i = 0; i < json.length(); i++) {
+                Gson gson = new Gson();
+                try {
+                    User user = gson.fromJson(json.getString(i), new TypeToken<User>() {
+                    }.getType());
+                    Log.d("UserLat",""+user.getLatitude());
+                    friendsNearMe.add(user);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            success = 1;
+            addMarkerForFriends();
+
         }
         if (success == 1) {
             if (pref.contains("actualFriends")) {
@@ -142,11 +162,18 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void addMarkerForFriends() {
+
         for (int i = 0; i < friendsNearMe.size(); i++) {
+            Log.d("MarkerPosition",""+friendsNearMe.get(i).getLatitude()+","+friendsNearMe.get(i).getLongitude());
             mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(friendsNearMe.get(i).getLatitude(),friendsNearMe.get(i).getLongitude())).flat(true)
+                    .position(new LatLng(friendsNearMe.get(i).getLatitude(), friendsNearMe.get(i).getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
         }
+        animateCameraToShowNearMeArea();
+    }
+
+    private void animateCameraToShowNearMeArea(){
+
     }
 
     @Override
