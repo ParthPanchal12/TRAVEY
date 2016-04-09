@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.LocationService;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
@@ -78,6 +79,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Marker destinationMarker = null;
     SharedPreferences pref;
     String phone_number;
+    Reports report;
+    ArrayList<Reports> reports;
     private GoogleMap mMap;
     private CardView cardView_Source;
     private CardView cardView_Destination;
@@ -96,9 +99,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private int PLACE_PICKER_REQUEST = 3;
     private int places_id = 0;
-
-    Reports report;
-    ArrayList<Reports> reports;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -361,6 +361,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLocatioinForReport();
             }
         });
+        startService(new Intent(this, LocationService.class));//Start the location refresh service
 
 
     }
