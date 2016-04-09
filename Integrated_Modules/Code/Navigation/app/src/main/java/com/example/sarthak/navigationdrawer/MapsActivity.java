@@ -31,6 +31,7 @@ import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts;
+import com.example.sarthak.navigationdrawer.FriendsNearMe.FriendsNearMe;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
@@ -117,9 +118,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //getting shared preferrences
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
-        phone_number  = pref.getString(Config.phone_number,"");
-
-
+        phone_number = pref.getString(Config.phone_number, "");
 
 
         //Setting up drawer
@@ -191,6 +190,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     startActivity(intent);
                 } else if (menuItem.getTitle().equals("Track a Friend")) {
                     Intent intent = new Intent(MapsActivity.this, MainActivity_Contacts.class);
+                    startActivity(intent);
+                } else if (menuItem.getTitle().equals("Friends Near Me")) {
+                    Intent intent = new Intent(MapsActivity.this, FriendsNearMe.class);
                     startActivity(intent);
                 } else if (menuItem.getTitle().equals("Logout")) {
                     edit.clear();
@@ -361,9 +363,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
-
     }
 
     private void addLabelsForAllReports() {
@@ -380,30 +379,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("JsonAllReports", "" + json);
                 for (int i = 0; i < json.length(); i++) {
                     Gson gson = new Gson();
-                    report  = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
+                    report = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
                     }.getType());
                     reports.add(report);
 
                     double[] ar = report.getLocation();
                     LatLng place = new LatLng(ar[0], ar[1]);
 
-                    if(report.getTag().equals("Traffic")){
+                    if (report.getTag().equals("Traffic")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    }else if(report.getTag().equals("Roadblock")){
+                    } else if (report.getTag().equals("Roadblock")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-                    }else if(report.getTag().equals("Accident")){
+                    } else if (report.getTag().equals("Accident")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                    }else if(report.getTag().equals("Event")){
+                    } else if (report.getTag().equals("Event")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-                    }else{
+                    } else {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
@@ -418,7 +417,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
                                     getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j);
-                                    Log.d("checkVote", "After one iteration"+reports.size());
+                                    Log.d("checkVote", "After one iteration" + reports.size());
                                     break;
                                 }
                             }
@@ -499,8 +498,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.d("here", "json received");
                         Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
                         Reports rep = reports.get(pos);
-                        rep.setUpvotes(rep.getUpvotes()+1);
-                        reports.set(pos,rep);
+                        rep.setUpvotes(rep.getUpvotes() + 1);
+                        reports.set(pos, rep);
 
 
                         return;

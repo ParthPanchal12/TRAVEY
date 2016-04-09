@@ -13,8 +13,8 @@ public class User {
     private int downvotes;
     public ArrayList<History> history;
     private String phone_number;
-    private double latitude;
-    private double longitude;
+    private double lat;
+    private double longitude=72.6275615;
 
     public String getPhone_number() {
         return phone_number;
@@ -27,6 +27,12 @@ public class User {
     public User() {
     }
 
+    public User(String user_name, double latitude, double longitude) {
+        this.user_name = user_name;
+        this.lat = latitude;
+        this.longitude = longitude;
+    }
+
     public User(String name, int upvote, int downvote) {
         this.user_name = name;
         this.upvotes = upvote;
@@ -34,11 +40,11 @@ public class User {
     }
 
     public double getLatitude() {
-        return latitude;
+        return lat;
     }
 
     public void setLatitude(double latitude) {
-        this.latitude = latitude;
+        this.lat = latitude;
     }
 
     public double getLongitude() {

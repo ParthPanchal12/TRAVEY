@@ -125,6 +125,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MapsActivity" />
         </activity>
+        <activity
+            android:name=".FriendsNearMe.FriendsNearMe"
+            android:parentActivityName=".MapsActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MapsActivity" />
+        </activity>
+
 
         <receiver
             android:name=".GCM.GCMBroadcastReceiver"
