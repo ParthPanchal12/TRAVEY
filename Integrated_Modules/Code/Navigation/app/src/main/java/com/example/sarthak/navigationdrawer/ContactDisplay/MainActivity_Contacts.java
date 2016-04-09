@@ -2,8 +2,10 @@ package com.example.sarthak.navigationdrawer.ContactDisplay;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -53,11 +55,17 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private SearchView searchView;
     private String selectedFriend;
     private ArrayList<User> allDatabaseUsers;
+    SharedPreferences pref;
+    SharedPreferences.Editor edit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_display_contacts);
         friends = new ArrayList<>();
+
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        edit = pref.edit();
 
 
         /*To add menu item refresh icon*/
@@ -69,9 +77,9 @@ public class MainActivity_Contacts extends AppCompatActivity {
         progressBar.setCanceledOnTouchOutside(false);
         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
-        actualFriends=new ArrayList<>();
+        actualFriends = new ArrayList<>();
 
-        allDatabaseUsers=new ArrayList<>();
+        allDatabaseUsers = new ArrayList<>();
         getDatabaseContacts();
 
         retryRelativeLayout = (RelativeLayout) findViewById(R.id.layout_retry_contact_display);
@@ -233,8 +241,11 @@ public class MainActivity_Contacts extends AppCompatActivity {
         inProgress = 1;
     }
 
-    private void saveAllToSharedPreferences() {
-
+    public void saveAllToSharedPreferences() {
+        Gson gson = new Gson();
+        String jsonactualFriends = gson.toJson(actualFriends);
+        edit.putString("actualFriends", jsonactualFriends);
+        edit.commit();
     }
 
     private void getDatabaseContacts() {
@@ -263,16 +274,16 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
     }
 
-    private void getCommonContacts(){
+    private void getCommonContacts() {
 
-        for(int i=0;i<friends.size();i++){
-            int flag=0;
-            for(int j=0;j<allDatabaseUsers.size();j++){
-                if(friends.get(i).getPhone().contains(allDatabaseUsers.get(j).getPhone_number())){
-                    flag=1;
+        for (int i = 0; i < friends.size(); i++) {
+            int flag = 0;
+            for (int j = 0; j < allDatabaseUsers.size(); j++) {
+                if (friends.get(i).getPhone().contains(allDatabaseUsers.get(j).getPhone_number())) {
+                    flag = 1;
                 }
             }
-            if(flag==1){
+            if (flag == 1) {
                 actualFriends.add(friends.get(i));
             }
         }

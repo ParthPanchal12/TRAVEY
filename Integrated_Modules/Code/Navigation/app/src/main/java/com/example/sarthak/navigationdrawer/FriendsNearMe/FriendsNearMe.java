@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.ContactDisplay.Contacts;
+import com.example.sarthak.navigationdrawer.ContactDisplay.Friends;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,12 +32,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by sarthak on 9/4/16.
@@ -48,6 +54,9 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     private ProgressDialog progressBar;
     private int success = 0;
     private ArrayList<User> friendsNearMe;
+    SharedPreferences pref;
+    SharedPreferences.Editor edit;
+    ArrayList<Friends> actualFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +77,9 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
                 .findFragmentById(R.id.map_friends);
         mapFragment.getMapAsync(this);
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_friends)).getMap();
+
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        edit = pref.edit();
 
          /*Progress Bar*/
         progressBar = new ProgressDialog(FriendsNearMe.this);
@@ -116,6 +128,15 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
 //            }
         }
         if (success == 1) {
+            if (pref.contains("actualFriends")) {
+                List actualFriend;
+                String jsonactualFriends = pref.getString("actualFriends", null);
+                Gson gson = new Gson();
+                Contacts[] favoriteItems = gson.fromJson(jsonactualFriends,Contacts[].class);
+                actualFriend = Arrays.asList(favoriteItems);
+                actualFriends = new ArrayList(actualFriend);
+            } else
+                Toast.makeText(FriendsNearMe.this, "Shared preference does not contain", Toast.LENGTH_SHORT).show();;
             progressBar.hide();
         }
     }

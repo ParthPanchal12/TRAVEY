@@ -30,111 +30,116 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Login extends Fragment {
-    EditText phone_number,password,res_email,code,newpass;
-    Button login,cont,cancel,cancel1,cont_code;
+    EditText phone_number, password, res_email, code, newpass;
+    Button login, cont, cancel, cancel1, cont_code;
     TextView forgot_password;
-    String phone_number_txt,password_txt,email_res_txt,code_txt,npass_txt;
-    List<NameValuePair> params,params_history,params_req_send;
+    String phone_number_txt, password_txt, email_res_txt, code_txt, npass_txt;
+    List<NameValuePair> params, params_history, params_req_send;
     SharedPreferences pref;
     ServerRequest sr;
     Dialog reset;
     private String regId;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.activity_login, container, false);
 
         sr = new ServerRequest();
-        phone_number = (EditText)view.findViewById(R.id.login_phone_number);
-        password = (EditText)view.findViewById(R.id.login_password);
-        login = (Button)view.findViewById(R.id.login_login);
-        forgot_password = (TextView)view.findViewById(R.id.login_forgot_password);
+        phone_number = (EditText) view.findViewById(R.id.login_phone_number);
+        password = (EditText) view.findViewById(R.id.login_password);
+        login = (Button) view.findViewById(R.id.login_login);
+        forgot_password = (TextView) view.findViewById(R.id.login_forgot_password);
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-
 
 
         login.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
                 phone_number_txt = phone_number.getText().toString();
                 password_txt = password.getText().toString();
 
-                char ph_1 = phone_number_txt.charAt(0);
-                int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));
-                int ph2 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(1)));
-                int ph3 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(2)));
-
-                if((ph_1=='+' && ph2==9 && ph3==1 && phone_number_txt.length()==13) || (ph1==0 && phone_number_txt.length()==11) || (phone_number_txt.length()==10)){
+                if (phone_number_txt.isEmpty() || password_txt.isEmpty()) {
+                    Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
+                } else {
 
 
+                    char ph_1 = phone_number_txt.charAt(0);
+                    int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));
+                    int ph2 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(1)));
+                    int ph3 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(2)));
 
-                    params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                    params.add(new BasicNameValuePair(Config.password, password_txt));
-                    GCM gcm=new GCM(getContext());
-
-                    regId=gcm.getRegId();
-                    if(regId==null && regId.isEmpty()){
-                        Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
-                    }else{
-                        params.add(new BasicNameValuePair(Config.gcmId,regId));
-                    }
-
-                    ServerRequest sr = new ServerRequest();
-                    JSONObject json = sr.getJSON(Config.ip+"/login",params);
-                    if(json != null){
-                        try{
-                            String jsonstr = json.getString("response");
-                            if(json.getBoolean("res")){
-                                String token = json.getString("token");
-                                String grav = json.getString("grav");
-                                SharedPreferences.Editor edit = pref.edit();
-                                //Storing Data using SharedPreferences
-                                edit.putString("token", token);
-                                edit.putString("grav", grav);
-                                edit.commit();
+                    if ((ph_1 == '+' && ph2 == 9 && ph3 == 1 && phone_number_txt.length() == 13) || (ph1 == 0 && phone_number_txt.length() == 11) || (phone_number_txt.length() == 10)) {
 
 
-                                History h = new History();
-                                h.date = "19/2/96";
-                                h.source = "Gandhinagar";
-                                h.destination = "Ahmedabad";
+                        params = new ArrayList<NameValuePair>();
+                        params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                        params.add(new BasicNameValuePair(Config.password, password_txt));
+                        GCM gcm = new GCM(getContext());
 
-                                Gson gson = new Gson();
-                                String s = gson.toJson(h);
-
-                                params_history = new ArrayList<NameValuePair>();
-                                params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                params_history.add(new BasicNameValuePair(Config.history, s));
-                                //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
-
-
-
-                                params_req_send = new ArrayList<NameValuePair>();
-                                params_req_send.add(new BasicNameValuePair("fromn","from__n"));
-                                params_req_send.add(new BasicNameValuePair("fromu","from__u"));
-                                params_req_send.add(new BasicNameValuePair("to","to__"));
-                                params_req_send.add(new BasicNameValuePair("ttle","title__"));
-                                //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
-
-                                Intent profactivity = new Intent(getContext(),MapsActivity.class);
-                                edit.putString("phone_number", phone_number_txt);
-                                startActivity(profactivity);
-                                ((Activity)getContext()).finish();
-                            }
-
-                            Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-
-                        }catch (JSONException e) {
-                            e.printStackTrace();
+                        regId = gcm.getRegId();
+                        if (regId == null && regId.isEmpty()) {
+                            Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
+                        } else {
+                            params.add(new BasicNameValuePair(Config.gcmId, regId));
                         }
+
+                        ServerRequest sr = new ServerRequest();
+                        JSONObject json = sr.getJSON(Config.ip + "/login", params);
+                        if (json != null) {
+                            try {
+                                String jsonstr = json.getString("response");
+                                if (json.getBoolean("res")) {
+                                    String token = json.getString("token");
+                                    String grav = json.getString("grav");
+                                    SharedPreferences.Editor edit = pref.edit();
+                                    //Storing Data using SharedPreferences
+                                    edit.putString("token", token);
+                                    edit.putString("grav", grav);
+
+
+                                    History h = new History();
+                                    h.date = "19/2/96";
+                                    h.source = "Gandhinagar";
+                                    h.destination = "Ahmedabad";
+
+                                    Gson gson = new Gson();
+                                    String s = gson.toJson(h);
+
+                                    params_history = new ArrayList<NameValuePair>();
+                                    params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                                    params_history.add(new BasicNameValuePair(Config.history, s));
+                                    //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
+
+
+                                    params_req_send = new ArrayList<NameValuePair>();
+                                    params_req_send.add(new BasicNameValuePair("fromn", "from__n"));
+                                    params_req_send.add(new BasicNameValuePair("fromu", "from__u"));
+                                    params_req_send.add(new BasicNameValuePair("to", "to__"));
+                                    params_req_send.add(new BasicNameValuePair("ttle", "title__"));
+                                    //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
+
+                                    Intent profactivity = new Intent(getContext(), MapsActivity.class);
+                                    edit.putString("phone_number", phone_number_txt);
+                                    edit.commit();
+                                    startActivity(profactivity);
+                                    ((Activity) getContext()).finish();
+                                }
+
+                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                     }
                 }
-                else{
-                    Toast.makeText(getContext(), "Phone number not valid !" ,Toast.LENGTH_LONG).show();
-                }
+
+
             }
         });
 
@@ -164,7 +169,7 @@ public class Login extends Fragment {
                         params.add(new BasicNameValuePair("email", email_res_txt));
 
                         //  JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass", params);
-                        JSONObject json = sr.getJSON(Config.ip+"/api/resetpass", params);
+                        JSONObject json = sr.getJSON(Config.ip + "/api/resetpass", params);
 
                         if (json != null) {
                             try {
