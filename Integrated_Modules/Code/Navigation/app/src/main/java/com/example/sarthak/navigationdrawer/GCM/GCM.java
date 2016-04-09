@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,21 +18,22 @@ public class GCM {
     private GoogleCloudMessaging gcm;
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-    private String TAG=GCM.class.getSimpleName();
+    private String TAG = GCM.class.getSimpleName();
+    private boolean isRegistrationIdChanged = true;
 
     public GCM(Context context) {
         this.context = context;
-    }
-
-    protected void onCreate(Bundle savedInstanceState) {
-
         gcm = GoogleCloudMessaging.getInstance(context);
         regId = getRegistrationId(context);
 
         if (regId.isEmpty()) {
             registerInBackground();
         }
-        Log.d("reg",regId);
+        Log.d("reg", regId);
+    }
+
+    public String getRegId() {
+        return this.regId;
     }
 
     /*Returns already registered GCM registration token stored in shared preferences*/
@@ -51,7 +51,7 @@ public class GCM {
             Log.i(TAG, "App version changed.");
             return "";
         }
-        Toast.makeText(context,regId,Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, regId, Toast.LENGTH_SHORT).show();
         return regId;
     }
 
@@ -100,12 +100,13 @@ public class GCM {
 
             @Override
             protected void onPostExecute(String msg) {
-                Log.d("regid",msg);
+                Log.d("regid", msg);
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }.execute(null, null, null);
     }
-    private void storeRegistrationId(Context context,String id){
+
+    private void storeRegistrationId(Context context, String id) {
         final SharedPreferences prefs = getPreferenceGCM(context);
         int appVersion = getAppVersion(context);
         Log.i(TAG, "Saving regId on app version " + appVersion);

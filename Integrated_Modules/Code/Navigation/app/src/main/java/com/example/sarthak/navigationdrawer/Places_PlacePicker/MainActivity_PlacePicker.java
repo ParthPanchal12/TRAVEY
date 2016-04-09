@@ -2,7 +2,9 @@ package com.example.sarthak.navigationdrawer.Places_PlacePicker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +31,7 @@ public class MainActivity_PlacePicker extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_place_picker);
 
-        mTextView=(TextView)findViewById(R.id.textview_PlacePicked);
+
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .enableAutoManage(this, 0, new GoogleApiClient.OnConnectionFailedListener() {
@@ -58,13 +60,7 @@ public class MainActivity_PlacePicker extends AppCompatActivity {
                     }
                 })
                 .build();
-        Button button=(Button)findViewById(R.id.button_PickPlace);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                displayPlacePicker();
-            }
-        });;
+        displayPlacePicker();
     }
 
     private void displayPlacePicker() {
@@ -120,5 +116,11 @@ public class MainActivity_PlacePicker extends AppCompatActivity {
             mGoogleApiClient.disconnect();
         }
         super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

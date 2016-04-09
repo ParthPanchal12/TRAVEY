@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
@@ -34,7 +33,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 
