@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">CustomDialog</string>
-    <string name="signalStrength">Signal strength</string>
-    <string name="excellent">Excellent</string>
-    <string name="security">Security</string>
-    <string name="securityType">802.1x EAP</string>
-    <string name="password">Password</string>
-    <string name="showPassword">Show password</string>
-    <string name="ssid">SSID</string>
-    <string name="ssidLit">Material Dialogs</string>
+    <string name="addLocationToReport">Location</string>
+    <string name="descriptionReport">Description</string>
+    <string name="Duration">Duration</string>
+    <string name="daysDuration">days</string>
+    <string name="hoursDuration">hours</string>
+    <string name="minutesDuration">minutes</string>
+    <string name="selectLocationForReport">Select Location</string>
+    <string name="addDescriptionReport">Add Description</string>
 </resources>

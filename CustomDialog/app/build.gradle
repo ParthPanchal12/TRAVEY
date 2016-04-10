@@ -26,4 +26,5 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') {
         transitive = true
     }
+    compile 'info.hoang8f:fbutton:1.0.5'
 }

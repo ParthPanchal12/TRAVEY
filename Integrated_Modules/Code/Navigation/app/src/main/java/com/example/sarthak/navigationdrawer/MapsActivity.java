@@ -335,7 +335,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Accident";
-                getLocatioinForReport();
+                getDialogReportAdd();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_roadblock = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_roadblock);
@@ -344,7 +344,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Roadblock";
-                getLocatioinForReport();
+                getDialogReportAdd();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_event = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_event);
@@ -353,7 +353,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Event";
-                getLocatioinForReport();
+                getDialogReportAdd();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_traffic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_traffic);
@@ -362,7 +362,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Traffic";
-                getLocatioinForReport();
+                getDialogReportAdd();
             }
         });
         startService(new Intent(this, LocationService.class));//Start the location refresh service
@@ -442,55 +442,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    private void getLocatioinForReport() {
-        CharSequence methodsToTakeSource[] = new CharSequence[]{"Use latest selected position from source box", "Use my current location", "Pick a location on the map"};
+    private void getDialogReportAdd() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick a location");
-        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        if (lastSelectedLocationName != null && !lastSelectedLocationName.isEmpty() && lastSelectedLatLng != null) {
-                            // call the dialog box
-                            /*Completed*/
-                            new EnterReportParameters(MapsActivity.this, typeOfReport, lastSelectedLocationName, lastSelectedLatLng.latitude, lastSelectedLatLng.longitude).show();
-                        } else {
-                            Toast.makeText(MapsActivity.this, "Please fill the source box", Toast.LENGTH_SHORT).show();
-                        }
-                        return;
-                    case 1:
-                        if (checkGPSEnabled()) {
-                            // use lastknownlocation
-                            new EnterReportParameters(MapsActivity.this, typeOfReport, "My current Location", lastKnowncurrentLocation.getLatitude(), lastKnowncurrentLocation.getLongitude()).show();
-                        } else {
-                            Toast.makeText(MapsActivity.this, "Enable the GPS", Toast.LENGTH_SHORT).show();
-                        }
-                        return;
-                    case 2:
-                        //start the place picker activity
-                        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
-                            if (mGoogleApiClient == null)
-                                Toast.makeText(MapsActivity.this, "Could not create Google Api Client Instance", Toast.LENGTH_SHORT).show();
-                            else if (!mGoogleApiClient.isConnected()) {
-                                Toast.makeText(MapsActivity.this, "Could not connect to the Google Apis", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                            try {
-                                startActivityForResult(builder.build(MapsActivity.this), PICK_A_RANDOM_PLACE_ON_MAP);
-                            } catch (GooglePlayServicesRepairableException e) {
-                                Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
-                            } catch (GooglePlayServicesNotAvailableException e) {
-                                Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
-                            }
-                        }
-                        return;
-                }
-            }
-        });
-        builder.show();
 
     }
 
