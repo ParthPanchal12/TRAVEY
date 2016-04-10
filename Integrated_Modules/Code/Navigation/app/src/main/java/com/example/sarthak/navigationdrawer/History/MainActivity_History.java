@@ -84,10 +84,6 @@ public class MainActivity_History extends AppCompatActivity {
             }
         }
 
-        histories.add(new History("askdj", "sad", "afd"));
-        histories.add(new History("askdj", "sad", "afd"));
-        histories.add(new History("askdj", "sad", "afd"));
-
     }
 
     @Override
