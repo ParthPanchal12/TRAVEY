@@ -21,11 +21,12 @@ public class LoginRegister extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_register);
 
+
         String token;
         SharedPreferences pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         token = pref.getString("token", "");
 
-        if(token != "") {
+        if (token != "") {
             startActivity(new Intent(LoginRegister.this, MapsActivity.class));
             finish();
         }
@@ -38,9 +39,8 @@ public class LoginRegister extends AppCompatActivity {
             toolbar.setTitle("TRAVEY");
             setSupportActionBar(toolbar);
             ActionBar actionBar = getSupportActionBar();
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
-
 
 
         // Get the ViewPager and set it's PagerAdapter so that it can display items

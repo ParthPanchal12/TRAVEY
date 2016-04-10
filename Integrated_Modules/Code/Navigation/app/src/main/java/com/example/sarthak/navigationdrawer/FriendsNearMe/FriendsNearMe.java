@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,10 +35,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
-<<<<<<< HEAD
-=======
 import com.google.gson.reflect.TypeToken;
->>>>>>> caf886a2a766ff70355ae35dd89fd8c80672f3e0
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -49,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by sarthak on 9/4/16.
  */
@@ -58,12 +58,12 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
     private Location myLastKnownLocation;
-    private ProgressDialog progressBar;
     private int success = 0;
     private ArrayList<User> friendsNearMe;
     SharedPreferences pref;
     SharedPreferences.Editor edit;
     ArrayList<Friends> actualFriends;
+    private SweetAlertDialog progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +89,10 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         edit = pref.edit();
 
          /*Progress Bar*/
-        progressBar = new ProgressDialog(FriendsNearMe.this);
-        progressBar.setMessage("Getting Friends near you");
+        progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        progressBar.setTitleText("Getting friends near you..");
         progressBar.setCancelable(false);
-        progressBar.setCanceledOnTouchOutside(false);
-        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 
        /*location manager*/
 

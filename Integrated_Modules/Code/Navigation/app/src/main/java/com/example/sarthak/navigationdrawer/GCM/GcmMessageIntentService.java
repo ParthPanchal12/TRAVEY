@@ -48,7 +48,7 @@ public class GcmMessageIntentService extends IntentService {
 
                 NotificationCompat.Builder mBuilder =
                         (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
-                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setSmallIcon(R.drawable.ic_launcher)
                                 .setContentTitle(message)
                                 .setContentText("Hello World!");
 

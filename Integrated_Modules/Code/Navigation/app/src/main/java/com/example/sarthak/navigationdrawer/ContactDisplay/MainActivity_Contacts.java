@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,13 +44,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class MainActivity_Contacts extends AppCompatActivity {
     private RecycleViewAdapter adapter;
     private RecyclerView recyclerView;
     private ArrayList<Friends> friends;
     private ArrayList<Friends> actualFriends;
     private int inProgress = 0;
-    private ProgressDialog progressBar;
     private Button retryButton;
     private RelativeLayout retryRelativeLayout;
     private SearchView searchView;
@@ -57,6 +59,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     private ArrayList<User> allDatabaseUsers;
     SharedPreferences pref;
     SharedPreferences.Editor edit;
+    private SweetAlertDialog progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,11 +74,11 @@ public class MainActivity_Contacts extends AppCompatActivity {
         /*To add menu item refresh icon*/
 
         /*Progress Bar*/
-        progressBar = new ProgressDialog(MainActivity_Contacts.this);
-        progressBar.setMessage("Getting Contact List ...");
+        progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        progressBar.setTitleText("Getting your contacts");
         progressBar.setCancelable(false);
-        progressBar.setCanceledOnTouchOutside(false);
-        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
 
         actualFriends = new ArrayList<>();
 
@@ -351,6 +354,10 @@ public class MainActivity_Contacts extends AppCompatActivity {
             }
         });
         builder.show();
+
+    }
+
+    private void getContactsFromSharedPref(){
 
     }
 }

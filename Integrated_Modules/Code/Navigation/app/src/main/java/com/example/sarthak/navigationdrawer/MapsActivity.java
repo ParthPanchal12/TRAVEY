@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts
 import com.example.sarthak.navigationdrawer.FriendsNearMe.FriendsNearMe;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
+import com.example.sarthak.navigationdrawer.Places_PlacePicker.MainActivity_PlacePicker;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
 import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -99,6 +101,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private int PLACE_PICKER_REQUEST = 3;
     private int places_id = 0;
+    private final int PICK_A_RANDOM_PLACE_ON_MAP = 4;
+    private LatLng randomPickedPlaceLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -455,7 +459,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } else {
                             Toast.makeText(MapsActivity.this, "Please fill the source box", Toast.LENGTH_SHORT).show();
                         }
-                        addLabelsForAllReports();
                         return;
                     case 1:
                         if (checkGPSEnabled()) {
@@ -464,11 +467,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } else {
                             Toast.makeText(MapsActivity.this, "Enable the GPS", Toast.LENGTH_SHORT).show();
                         }
-                        addLabelsForAllReports();
                         return;
                     case 2:
                         //start the place picker activity
-                        addLabelsForAllReports();
+                        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
+                            if (mGoogleApiClient == null)
+                                Toast.makeText(MapsActivity.this, "Could not create Google Api Client Instance", Toast.LENGTH_SHORT).show();
+                            else if (!mGoogleApiClient.isConnected()) {
+                                Toast.makeText(MapsActivity.this, "Could not connect to the Google Apis", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                            try {
+                                startActivityForResult(builder.build(MapsActivity.this), PICK_A_RANDOM_PLACE_ON_MAP);
+                            } catch (GooglePlayServicesRepairableException e) {
+                                Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
+                            } catch (GooglePlayServicesNotAvailableException e) {
+                                Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
+                            }
+                        }
                         return;
                 }
             }
@@ -595,6 +612,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (checkGPSEnabled() == false) {
                 Toast.makeText(MapsActivity.this, "Please Enable GPS", Toast.LENGTH_LONG).show();
             }
+        }
+        if (requestCode == PICK_A_RANDOM_PLACE_ON_MAP) {
+            if (resultCode == RESULT_OK) {
+                randomPickedPlaceLatLng=getRandomPickedPlaceOnMap(PlacePicker.getPlace(data, this));
+                new EnterReportParameters(MapsActivity.this, typeOfReport, ""+randomPickedPlaceLatLng.latitude+","+randomPickedPlaceLatLng.longitude,randomPickedPlaceLatLng.latitude, randomPickedPlaceLatLng.longitude).show();
+
+            }
+        }
+
+
+    }
+
+    private LatLng getRandomPickedPlaceOnMap(Place place) {
+        if (place == null)
+            return null;
+        else {
+            LatLng latLng = place.getLatLng();
+            return latLng;
         }
     }
 

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -29,6 +30,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class Login extends Fragment {
     EditText phone_number, password, res_email, code, newpass;
     Button login, cont, cancel, cancel1, cont_code;
@@ -39,6 +42,7 @@ public class Login extends Fragment {
     ServerRequest sr;
     Dialog reset;
     private String regId;
+    private SweetAlertDialog pDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,10 +57,17 @@ public class Login extends Fragment {
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
 
 
+        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Logging you in please Wait!");
+        pDialog.setCancelable(false);
+
         login.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
+                //call pdialog
 
                 phone_number_txt = phone_number.getText().toString();
                 password_txt = password.getText().toString();
@@ -138,8 +149,6 @@ public class Login extends Fragment {
                         Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                     }
                 }
-
-
             }
         });
 
