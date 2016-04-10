@@ -38,9 +38,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity_ProfilePage extends AppCompatActivity {
+    private static int PICK_IMAGE_REQUEST = 1;
+    SharedPreferences pref;
     private RecyclerView recyclerView;
     private Profile_RecyclerViewAdapter adapter;
     private ArrayList<ProfileClass> profile;
@@ -52,13 +55,11 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private CollapsingToolbarLayout collapsingToolbar;
     private String nameOfUser = "Sarthak";
     private FloatingActionButton floatingActionButton, floatingActionButtonChangeName, floatingActionButtonChangePhoto;
-    private static int RESULT_LOAD_IMG = 1;
     private Intent galleryIntent;
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
     private String selectedImagePath,imgDecodableString;
-    SharedPreferences pref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,26 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         /*Setting the profile pic*/
         profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
         profilePicture = R.drawable.header;
+        String phone_number = pref.getString("phone_number", "");
+        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+        params.add(new BasicNameValuePair("phone_number", phone_number));
+        ServerRequest sr = new ServerRequest();
+        JSONObject json = sr.getJSON(Config.ip + "/editProfile/getImage", params);// change method url accordingly
+        //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+
+        if (json != null) {
+            try {
+
+                String jsonstr = json.getString("response");
+                Bitmap b = base64ToBitmap(jsonstr);
+
+                profilePictureImageView.setImageBitmap(b);
+                Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         profilePictureImageView.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.header));
         colorToolbars();
 
@@ -178,11 +199,12 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             public void onClick(View v) {
                 /*Close the open FAB*/
                 animateFAB();
-                /*Allow the user to choose his image*/
-                /*Open Gallery*/
-                galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                // Start the Intent
-                startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+                Intent intent = new Intent();
+// Show only images, no videos or anything else
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+// Always show the chooser (if there are multiple options available)
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
             }
         });
 
@@ -237,24 +259,6 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         }
     }
 
-    public String BitMapToString(Bitmap bitmap){
-        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
-        byte [] b=baos.toByteArray();
-        String temp= Base64.encodeToString(b, Base64.DEFAULT);
-        return temp;
-    }
-
-    public Bitmap StringToBitMap(String encodedString){
-        try {
-            byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
-            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        } catch(Exception e) {
-            e.getMessage();
-            return null;
-        }
-    }
 
     //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -290,42 +294,111 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
 //            });
 //        }
 //    }
-         @Override
-         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//         @Override
+//         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        try {
+//            // When an Image is picked
+//            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+//                    && null != data) {
+//                // Get the Image from data
+//
+//                Uri selectedImage = data.getData();
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//
+//                // Get the cursor
+//                Cursor cursor = getContentResolver().query(selectedImage,
+//                        filePathColumn, null, null, null);
+//                // Move to first row
+//                cursor.moveToFirst();
+//
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                imgDecodableString = cursor.getString(columnIndex);
+//
+//                Bitmap bm = BitmapFactory.decodeFile(imgDecodableString);
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+//                byte[] b = baos.toByteArray();
+//
+//                String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+//                cursor.close();
+//                // Set the Image in ImageView after decoding the String
+//                profilePictureImageView.setImageBitmap(BitmapFactory
+//                        .decodeFile(imgDecodableString));
+//
+//                String phone_number = pref.getString("phone_number","");
+//                ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
+//                params.add(new BasicNameValuePair("phone_number", phone_number));
+//                params.add(new BasicNameValuePair("image", imgDecodableString));
+//                ServerRequest sr=new ServerRequest();
+//                JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
+//                //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+//
+//                if (json != null) {
+//                    try {
+//
+//                        String jsonstr = json.getString("response");
+//                        Toast.makeText(MainActivity_ProfilePage.this, ""+jsonstr, Toast.LENGTH_SHORT).show();
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//
+//
+//
+//
+//            /*Extract colors from the image selected*/
+//            /*To write a general method*/
+//                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+//                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+//                    @Override
+//                    public void onGenerated(Palette palette) {
+//                        int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
+//                        int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
+//
+//                    /*Set color for status bar*/
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                            Window window = getWindow();
+//                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                            window.setStatusBarColor(mutedColor);
+//                        }
+//
+//                    /*Set Collapsible toolbar color*/
+//                        collapsingToolbar.setContentScrimColor(mutedColor);
+//                    }
+//                });
+//
+//            } else {
+//                Toast.makeText(this, "You haven't picked Image",
+//                        Toast.LENGTH_LONG).show();
+//            }
+//        } catch (Exception e) {
+//            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+//                    .show();
+//        }
+//
+//    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try {
-            // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-                    && null != data) {
-                // Get the Image from data
 
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
-                // Get the cursor
-                Cursor cursor = getContentResolver().query(selectedImage,
-                        filePathColumn, null, null, null);
-                // Move to first row
-                cursor.moveToFirst();
+            Uri uri = data.getData();
 
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                imgDecodableString = cursor.getString(columnIndex);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                // Log.d(TAG, String.valueOf(bitmap));
 
-                Bitmap bm = BitmapFactory.decodeFile(imgDecodableString);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-                byte[] b = baos.toByteArray();
+                String ss = bitmapToBase64(bitmap);
 
-                String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
-                cursor.close();
-                // Set the Image in ImageView after decoding the String
-                profilePictureImageView.setImageBitmap(BitmapFactory
-                        .decodeFile(imgDecodableString));
-
+                profilePictureImageView.setImageBitmap(base64ToBitmap(ss));
                 String phone_number = pref.getString("phone_number","");
                 ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("phone_number", phone_number));
-                params.add(new BasicNameValuePair("image", imgDecodableString));
+                params.add(new BasicNameValuePair("image", ss));
                 ServerRequest sr=new ServerRequest();
                 JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
                 //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
@@ -340,40 +413,22 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                     }
                 }
 
-
-
-
-
-            /*Extract colors from the image selected*/
-            /*To write a general method*/
-                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
-                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        int mutedColor = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
-                        int darkMutedColor = palette.getDarkVibrantColor(getResources().getColor(R.color.colorPrimaryDark));
-
-                    /*Set color for status bar*/
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Window window = getWindow();
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            window.setStatusBarColor(mutedColor);
-                        }
-
-                    /*Set Collapsible toolbar color*/
-                        collapsingToolbar.setContentScrimColor(mutedColor);
-                    }
-                });
-
-            } else {
-                Toast.makeText(this, "You haven't picked Image",
-                        Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                    .show();
         }
+    }
 
+    private String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+
+    private Bitmap base64ToBitmap(String b64) {
+        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
     }
 
     /*initialise the profile attributes*/
