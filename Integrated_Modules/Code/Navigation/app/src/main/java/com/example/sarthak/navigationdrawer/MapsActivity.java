@@ -1,6 +1,7 @@
 package com.example.sarthak.navigationdrawer;
 
 import android.Manifest;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -20,13 +22,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LocationService;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
@@ -36,9 +41,8 @@ import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts
 import com.example.sarthak.navigationdrawer.FriendsNearMe.FriendsNearMe;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
-import com.example.sarthak.navigationdrawer.Places_PlacePicker.MainActivity_PlacePicker;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
-import com.example.sarthak.navigationdrawer.ReportPanel.EnterReportParameters;
+import com.example.sarthak.navigationdrawer.ReportPanel.DurationPickerDialog;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -70,6 +74,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import info.hoang8f.widget.FButton;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
 
@@ -103,6 +110,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int places_id = 0;
     private final int PICK_A_RANDOM_PLACE_ON_MAP = 4;
     private LatLng randomPickedPlaceLatLng;
+    private EditText location_report;
+    private EditText description;
+    private String descriptionReport;
+    private int hours;
+    private int minutes;
+    private int days;
+    private FButton hour_minute_selector;
+    private FButton day_selector;
+    private double lat_report;
+    private double long_report;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -443,9 +460,138 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void getDialogReportAdd() {
+        boolean wrapInScrollView = true;
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Enter Report Parameters")
+                .customView(R.layout.activity_enter_report_parameters, wrapInScrollView)
+                .positiveText("Add")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //add to database and dismiss dialog
+                        if(lat_report!=0 && long_report!=0){
+                            saveDetailsToDataBase();
+                            lat_report=0;
+                            long_report=0;
+                            addLabelsForAllReports();
+                        }else{
+                            Toast.makeText(MapsActivity.this, "Please enter a location", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .negativeText("Dismiss")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+        description=(EditText)dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
+        descriptionReport=description.getText().toString();
+        location_report=(EditText)dialog.getCustomView().findViewById(R.id.locationReportEditText);
+        location_report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(MapsActivity.this), PICK_A_RANDOM_PLACE_ON_MAP);
+                } catch (GooglePlayServicesRepairableException e) {
+                    Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
+                }
+            }
+        });
+        hour_minute_selector = (FButton) dialog.getCustomView().findViewById(R.id.hour_minute_selectorButton_ReportAdd);
+        hour_minute_selector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DurationPickerDialog durationPickerDialog = new DurationPickerDialog(MapsActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        hours = hourOfDay;
+                        minutes = minute;
+                    }
+                }, 0, 0);
+                durationPickerDialog.show();
+            }
+        });
+
+    }
+
+    private void saveDetailsToDataBase() {
+        ArrayList<NameValuePair> parametersDatabase=new ArrayList<NameValuePair>();
+
+        /*To do*/
+        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+
+        /*Time format*/
+        /*July 22, 2013 14:00:00*/
+
+        Calendar calendar=Calendar.getInstance();
+        int month=calendar.get(Calendar.MONTH);
+        int year=calendar.get(Calendar.YEAR);
+        int day=calendar.get(Calendar.DAY_OF_MONTH);
+        int hours=calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes=calendar.get(Calendar.MINUTE);
+        String monthString=getMonthFormatted(month);
+        int seconds=0;
+        String finalStartDate=getFormattedDate(monthString,day,year,hours,minutes,seconds);
+        int dayNew = 0, hourNew = 0, minuteNew = 0;
+        if (minutes + this.minutes >= 60) {
+            minuteNew += (minutes + this.minutes % 60);
+            hourNew++;
+        }
+        if (hourNew + hours + this.hours >= 24) {
+            hourNew += (hours + this.hours) % 24;
+            dayNew++;
+        }
+        dayNew += day;
+        String finalEndDate = getFormattedDate(monthString, dayNew, year, hourNew, minuteNew, seconds);
+        Log.d("enddate",finalEndDate);
+        parametersDatabase.add(new BasicNameValuePair(Config.detail, descriptionReport));
+        parametersDatabase.add(new BasicNameValuePair(Config.tag,typeOfReport));
+        parametersDatabase.add(new BasicNameValuePair(Config.start_time, finalStartDate));
+        parametersDatabase.add(new BasicNameValuePair(Config.end_time, finalEndDate));
+        parametersDatabase.add(new BasicNameValuePair(Config.latitude, ""+lat_report));
+        parametersDatabase.add(new BasicNameValuePair(Config.longitude, ""+long_report));
+
+        ServerRequest sr = new ServerRequest();
+        Log.d("here", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONObject json = sr.getJSON(Config.ip+"/reportAdd",parametersDatabase);
+        Log.d("here", "json received");
+        if(json != null){
+            try{
+                String jsonstr = json.getString("response");
+                //String sue = json.getString("use");
+
+                //Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+
+                Log.d("Hello", jsonstr);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
 
 
     }
+
+    private String getFormattedDate(String monthString, int day, int year, int hours, int minutes, int seconds) {
+        String formattedDate= monthString+" "+day+", "+year+" "+hours+":"+minutes+":"+seconds;
+        Log.d("FormattedDate",formattedDate);
+        return formattedDate;
+    }
+
+    private String getMonthFormatted(int month){
+        String monthString[]={
+                "January","February","March","April","May","June","July","August","September","October","November","December"
+        };
+        return monthString[month];
+    }
+
 
     private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos) {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
@@ -568,9 +714,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (requestCode == PICK_A_RANDOM_PLACE_ON_MAP) {
             if (resultCode == RESULT_OK) {
-                randomPickedPlaceLatLng=getRandomPickedPlaceOnMap(PlacePicker.getPlace(data, this));
-                new EnterReportParameters(MapsActivity.this, typeOfReport, ""+randomPickedPlaceLatLng.latitude+","+randomPickedPlaceLatLng.longitude,randomPickedPlaceLatLng.latitude, randomPickedPlaceLatLng.longitude).show();
-
+                randomPickedPlaceLatLng = getRandomPickedPlaceOnMap(PlacePicker.getPlace(data, this));
+                //to set the place name in location edit text
+                Place place=PlacePicker.getPlace(data,this);
+                if(place!=null){
+                    location_report.setText(place.getName());
+                }
             }
         }
 
@@ -582,6 +731,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return null;
         else {
             LatLng latLng = place.getLatLng();
+            lat_report=latLng.latitude;
+            long_report=latLng.longitude;
             return latLng;
         }
     }
@@ -745,5 +896,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         */
     }
-
 }

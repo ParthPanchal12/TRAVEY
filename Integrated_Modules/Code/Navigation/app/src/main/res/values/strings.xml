@@ -26,4 +26,13 @@
     <string name="nav_item_Friends_Near_Me">Friends Near Me</string>
     <string name="nav_item_LeaderBoard">Leaderboard</string>
     <string name="nav_item_History">History</string>
+
+    <string name="addLocationToReport">Location</string>
+    <string name="descriptionReport">Description</string>
+    <string name="Duration">Duration</string>
+    <string name="daysDuration">days</string>
+    <string name="hoursDuration">hours</string>
+    <string name="minutesDuration">minutes</string>
+    <string name="selectLocationForReport">Select Location</string>
+    <string name="addDescriptionReport">Add Description</string>
 </resources>

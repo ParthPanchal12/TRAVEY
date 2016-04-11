@@ -13,6 +13,7 @@ public class User {
     private int downvotes;
     public ArrayList<History> history;
     private String phone_number;
+    private double location[]=new double[2];
     private double lat;
     private double longitude=72.6275615;
 
@@ -77,5 +78,10 @@ public class User {
 
     public void setDownvote(int downvote) {
         this.downvotes = downvote;
+    }
+
+    public void getCoordinates(){
+        this.lat=location[0];
+        this.longitude=location[1];
     }
 }

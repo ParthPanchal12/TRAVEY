@@ -95,20 +95,16 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("phone_number", phone_number));
         ServerRequest sr = new ServerRequest();
-        JSONObject json = sr.getJSON(Config.ip + "/editProfile/getImage", params);// change method url accordingly
+        JSONObject json = sr.getJSON(Config.ip + "/getImage", params);// change method url accordingly
         //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
         if (json != null) {
-            try {
 
-                String jsonstr = json.getString("response");
-                Bitmap b = base64ToBitmap(jsonstr);
+            String jsonstr = json.toString();
+            Bitmap b = base64ToBitmap(jsonstr);
 
-                profilePictureImageView.setImageBitmap(b);
-                Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            profilePictureImageView.setImageBitmap(b);
+            Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
         }
 
         profilePictureImageView.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.header));

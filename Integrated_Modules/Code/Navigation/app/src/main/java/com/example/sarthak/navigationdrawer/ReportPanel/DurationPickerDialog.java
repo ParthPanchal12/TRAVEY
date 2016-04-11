@@ -1,4 +1,4 @@
-package com.example.sarthak.customdialog;
+package com.example.sarthak.navigationdrawer.ReportPanel;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -28,7 +28,7 @@ public class DurationPickerDialog extends TimePickerDialog {
     }
 
     public void updateTitle(int hour, int minute) {
-        setTitle("Duration: " + formatNumber(hour) + ":" + formatNumber(minute));
+        setTitle("Duration: " + hour + ":" + formatNumber(minute));
     }
 
     private String formatNumber(int number) {
