@@ -49,7 +49,7 @@ public class Login extends Fragment {
 
         View view = inflater.inflate(R.layout.activity_login, container, false);
 
-        sr = new ServerRequest();
+        sr = new ServerRequest(getContext());
         phone_number = (EditText) view.findViewById(R.id.login_phone_number);
         password = (EditText) view.findViewById(R.id.login_password);
         login = (Button) view.findViewById(R.id.login_login);
@@ -97,54 +97,60 @@ public class Login extends Fragment {
                             params.add(new BasicNameValuePair(Config.gcmId, regId));
                         }
 
-                        ServerRequest sr = new ServerRequest();
-                        JSONObject json = sr.getJSON(Config.ip + "/login", params);
-                        if (json != null) {
-                            try {
-                                String jsonstr = json.getString("response");
-                                if (json.getBoolean("res")) {
-                                    String token = json.getString("token");
-                                    String grav = json.getString("grav");
-                                    SharedPreferences.Editor edit = pref.edit();
-                                    //Storing Data using SharedPreferences
-                                    edit.putString("token", token);
-                                    edit.putString("grav", grav);
+                        Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
+                        if (isInternetPresent) {
+                            //ServerRequest sr = new ServerRequest();
+                            JSONObject json = sr.getJSON(Config.ip + "/login", params);
+                            if (json != null) {
+                                try {
+                                    String jsonstr = json.getString("response");
+                                    if (json.getBoolean("res")) {
+                                        String token = json.getString("token");
+                                        String grav = json.getString("grav");
+                                        SharedPreferences.Editor edit = pref.edit();
+                                        //Storing Data using SharedPreferences
+                                        edit.putString("token", token);
+                                        edit.putString("grav", grav);
 
 
-                                    History h = new History();
-                                    h.date = "19/2/96";
-                                    h.source = "Gandhinagar";
-                                    h.destination = "Ahmedabad";
+                                        History h = new History();
+                                        h.date = "19/2/96";
+                                        h.source = "Gandhinagar";
+                                        h.destination = "Ahmedabad";
 
-                                    Gson gson = new Gson();
-                                    String s = gson.toJson(h);
+                                        Gson gson = new Gson();
+                                        String s = gson.toJson(h);
 
-                                    params_history = new ArrayList<NameValuePair>();
-                                    params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                    params_history.add(new BasicNameValuePair(Config.history, s));
-                                    //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
+                                        params_history = new ArrayList<NameValuePair>();
+                                        params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                                        params_history.add(new BasicNameValuePair(Config.history, s));
+                                        //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
 
 
-                                    params_req_send = new ArrayList<NameValuePair>();
-                                    params_req_send.add(new BasicNameValuePair("fromn", "from__n"));
-                                    params_req_send.add(new BasicNameValuePair("fromu", "from__u"));
-                                    params_req_send.add(new BasicNameValuePair("to", "to__"));
-                                    params_req_send.add(new BasicNameValuePair("ttle", "title__"));
-                                    //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
+                                        params_req_send = new ArrayList<NameValuePair>();
+                                        params_req_send.add(new BasicNameValuePair("fromn", "from__n"));
+                                        params_req_send.add(new BasicNameValuePair("fromu", "from__u"));
+                                        params_req_send.add(new BasicNameValuePair("to", "to__"));
+                                        params_req_send.add(new BasicNameValuePair("ttle", "title__"));
+                                        //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
 
-                                    Intent profactivity = new Intent(getContext(), MapsActivity.class);
-                                    edit.putString("phone_number", phone_number_txt);
-                                    edit.commit();
-                                    startActivity(profactivity);
-                                    ((Activity) getContext()).finish();
+                                        Intent profactivity = new Intent(getContext(), MapsActivity.class);
+                                        edit.putString("phone_number", phone_number_txt);
+                                        edit.commit();
+                                        startActivity(profactivity);
+                                        ((Activity) getContext()).finish();
+                                    }
+
+                                    Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-
-                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
+                        } else {
+                            Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
                         }
+
                     } else {
                         Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                     }

@@ -1,6 +1,9 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,10 +32,11 @@ public class ServerRequest {
     static JSONObject jObj = null;
     static JSONArray jArray = null;
     static String json = "";
+    private Context _context;
 
 
-    public ServerRequest() {
-
+    public ServerRequest(Context context) {
+        this._context = context;
     }
 
     public JSONObject getJSONFromUrl(String url, List<NameValuePair> params) {
@@ -178,7 +182,7 @@ public class ServerRequest {
         @Override
         protected JSONObject doInBackground(Params... args) {
 
-            ServerRequest request = new ServerRequest();
+            ServerRequest request = new ServerRequest(_context);
             JSONObject json = request.getJSONFromUrl(args[0].url,args[0].params);
 
             return json;
@@ -198,7 +202,7 @@ public class ServerRequest {
         @Override
         protected JSONArray doInBackground(Params... args) {
 
-            ServerRequest request = new ServerRequest();
+            ServerRequest request = new ServerRequest(_context);
             JSONArray json = request.getJSONArrayFromUrl(args[0].url, args[0].params);
 
             return json;
@@ -211,6 +215,23 @@ public class ServerRequest {
 
         }
 
+    }
+
+
+    public boolean isConnectingToInternet(){
+        ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null)
+        {
+            NetworkInfo[] info = connectivity.getAllNetworkInfo();
+            if (info != null)
+                for (int i = 0; i < info.length; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                    {
+                        return true;
+                    }
+
+        }
+        return false;
     }
 
 }

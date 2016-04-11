@@ -74,7 +74,7 @@ public class Register extends Fragment {
                 if (user_name_txt.isEmpty() || phone_number_txt.isEmpty() || email_txt.isEmpty() || password_txt.isEmpty() || confirm_password_txt.isEmpty()) {
                     Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
                 } else {
-
+                    //if(){}else{}
 
                     char ph_1 = phone_number_txt.charAt(0);
                     int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));
@@ -136,24 +136,32 @@ public class Register extends Fragment {
                                 Log.d(Config.password, password_txt);
 
                                 Log.d("history", s);
-                                ServerRequest sr = new ServerRequest();
+                                ServerRequest sr = new ServerRequest(getContext());
                                 Log.d("here", "params sent");
-                                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                                JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
-                                Log.d("here", "json received");
-                                if (json != null) {
-                                    try {
-                                        String jsonstr = json.getString("response");
-                                        if (jsonstr.equals("yes")) {
-                                            openActivity(getE164Number());
-                                        } else {
-                                            Toast.makeText(getContext(), "Phone number already existed!", Toast.LENGTH_SHORT).show();
+
+                                Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
+                                if(isInternetPresent){
+                                    //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                                    JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
+                                    Log.d("here", "json received");
+                                    if (json != null) {
+                                        try {
+                                            String jsonstr = json.getString("response");
+                                            if (jsonstr.equals("yes")) {
+                                                openActivity(getE164Number());
+                                            } else {
+                                                Toast.makeText(getContext(), "Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                            }
+                                            Log.d("Hello", jsonstr);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
-                                        Log.d("Hello", jsonstr);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
                                     }
                                 }
+                                else{
+                                    Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
+                                }
+
 
                             } else {
                                 Toast.makeText(getContext(), "Password does not match !", Toast.LENGTH_LONG).show();
