@@ -388,6 +388,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void addLabelsForAllReports() {
+
+        //clearing the map before adding all the other reports.
+        //mMap.clear();
+
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, phone_number));
         ServerRequest sr = new ServerRequest(MapsActivity.this);

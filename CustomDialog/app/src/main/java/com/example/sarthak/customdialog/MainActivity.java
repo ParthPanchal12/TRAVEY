@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -22,43 +23,28 @@ public class MainActivity extends AppCompatActivity {
     private int days;
     private FButton hour_minute_selector;
     private FButton day_selector;
+    String ar[]={"Share your location with friend","Get his location"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.temp);
         boolean wrapInScrollView = true;
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
-                .title("Enter Report Parameters")
-                .customView(R.layout.activity_main, wrapInScrollView)
-                .positiveText("Add")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
+        new MaterialDialog.Builder(this)
+                .title("Select an option")
+                .items(ar)
+                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        //add to database and dismiss dialog
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        /**
+                         * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                         * returning false here won't allow the newly selected radio button to actually be selected.
+                         **/
+                        Toast.makeText(MainActivity.this, ""+ar[which], Toast.LENGTH_SHORT).show();
+                        return true;
                     }
                 })
-                .negativeText("Dismiss")
-                .onNegative(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
-                    }
-                })
+                .positiveText("Choose")
                 .show();
-        hour_minute_selector = (FButton) dialog.getCustomView().findViewById(R.id.hour_minute_selectorButton_ReportAdd);
-        hour_minute_selector.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DurationPickerDialog durationPickerDialog = new DurationPickerDialog(MainActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        hours = hourOfDay;
-                        minutes = minute;
-                    }
-                }, 0, 0);
-                durationPickerDialog.show();
-            }
-        });
 
     }
 }

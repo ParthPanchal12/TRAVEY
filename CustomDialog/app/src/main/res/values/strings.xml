@@ -8,4 +8,8 @@
     <string name="minutesDuration">minutes</string>
     <string name="selectLocationForReport">Select Location</string>
     <string name="addDescriptionReport">Add Description</string>
+    <array name="options_friend_location">
+        <item>Share your location with friend</item>
+        <item>Get his location</item>
+    </array>
 </resources>
