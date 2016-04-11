@@ -1,7 +1,6 @@
 package com.example.sarthak.navigationdrawer.FriendsNearMe;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,9 +21,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
-import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
-import com.example.sarthak.navigationdrawer.ContactDisplay.Contacts;
 import com.example.sarthak.navigationdrawer.ContactDisplay.Friends;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
@@ -44,7 +41,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +121,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.latitude, "" + 23.187699));
         params.add(new BasicNameValuePair(Config.longitude, "" + 72.6275614));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(FriendsNearMe.this);
         Log.d("FriendsNearMe", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/friendsNearBy", params);
@@ -133,7 +129,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
 
         if (json != null) {
 
-            Log.d("JsonAllReports", "" + json);
+            Log.d("JsonAllFriends", "" + json);
             for (int i = 0; i < json.length(); i++) {
                 Gson gson = new Gson();
                 try {
@@ -148,18 +144,6 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
             }
             success = 1;
             addMarkerForFriends();
-
-        }
-        if (success == 1) {
-            if (pref.contains("actualFriends")) {
-                List actualFriend;
-                String jsonactualFriends = pref.getString("actualFriends", null);
-                Gson gson = new Gson();
-                Contacts[] favoriteItems = gson.fromJson(jsonactualFriends,Contacts[].class);
-                actualFriend = Arrays.asList(favoriteItems);
-                actualFriends = new ArrayList(actualFriend);
-            } else
-                Toast.makeText(FriendsNearMe.this, "Shared preference does not contain", Toast.LENGTH_SHORT).show();;
             progressBar.hide();
         }
     }

@@ -144,7 +144,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     private boolean getLocationOfFriend() {
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(DisplayFriendsOnMap.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/getLocation", params);

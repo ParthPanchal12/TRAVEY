@@ -137,7 +137,7 @@ public class LocationService extends Service {
             mLastLocation.set(location);
             SharedPreferences pref = getApplicationContext().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
             String phone_number = pref.getString(Config.phone_number, "");
-            ServerRequest sr = new ServerRequest();
+            ServerRequest sr = new ServerRequest(getApplicationContext());
             ArrayList<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(Config.phone_number, phone_number));
             params.add(new BasicNameValuePair(Config.latitude, "" + mLastLocation.getLatitude()));
@@ -177,7 +177,7 @@ public class LocationService extends Service {
 
                     SharedPreferences pref = getApplicationContext().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
                     String phone_number = pref.getString(Config.phone_number, "");
-                    ServerRequest sr = new ServerRequest();
+                    ServerRequest sr = new ServerRequest(getApplicationContext());
                     ArrayList<NameValuePair> params = new ArrayList<>();
                     params.add(new BasicNameValuePair(Config.phone_number, phone_number));
                     params.add(new BasicNameValuePair(Config.latitude, "" + mLastLocation.getLatitude()));

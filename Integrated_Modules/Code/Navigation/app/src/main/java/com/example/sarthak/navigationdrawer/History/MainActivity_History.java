@@ -62,7 +62,7 @@ public class MainActivity_History extends AppCompatActivity {
 
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MainActivity_History.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONObject json = sr.getJSON(Config.ip + "/history", params);

@@ -62,7 +62,7 @@ public class MainActivity_Leaderboard extends AppCompatActivity {
 
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, "1234567891"));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MainActivity_Leaderboard.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/leaderBoard", params);

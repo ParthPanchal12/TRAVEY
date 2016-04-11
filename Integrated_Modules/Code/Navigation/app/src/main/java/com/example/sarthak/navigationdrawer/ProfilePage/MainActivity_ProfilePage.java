@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.R;
 
 import org.apache.http.NameValuePair;
@@ -94,7 +95,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         String phone_number = pref.getString("phone_number", "");
         ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("phone_number", phone_number));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
         JSONObject json = sr.getJSON(Config.ip + "/getImage", params);// change method url accordingly
         //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
@@ -212,7 +213,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         parameters.add(new BasicNameValuePair(Config.photo,photo));
         parameters.add(new BasicNameValuePair(Config.phone_number,"8758964908"));
 
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONObject json = sr.getJSON(Config.ip+"/register",parameters);
@@ -395,7 +396,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("phone_number", phone_number));
                 params.add(new BasicNameValuePair("image", ss));
-                ServerRequest sr=new ServerRequest();
+                ServerRequest sr=new ServerRequest(MainActivity_ProfilePage.this);
                 JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
                 //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 

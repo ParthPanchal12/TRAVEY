@@ -41,7 +41,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     TextView resend_timer;
     SharedPreferences pref;
     String phone_number;
-    ServerRequest sr = new ServerRequest();
+    ServerRequest sr = new ServerRequest(getApplicationContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

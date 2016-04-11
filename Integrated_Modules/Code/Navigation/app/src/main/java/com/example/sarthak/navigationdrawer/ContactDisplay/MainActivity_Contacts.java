@@ -41,8 +41,10 @@ import org.json.JSONException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -60,6 +62,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     SharedPreferences pref;
     SharedPreferences.Editor edit;
     private SweetAlertDialog progressBar;
+    private ArrayList<Friends> friendsFromSharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,15 +241,16 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
 
 
+        saveAllToSharedPreferences();
         getCommonContacts();
         alphabeticalSorting();
-        saveAllToSharedPreferences();
         inProgress = 1;
     }
 
     public void saveAllToSharedPreferences() {
         Gson gson = new Gson();
-        String jsonactualFriends = gson.toJson(actualFriends);
+        String jsonactualFriends = gson.toJson(friends);
+        Log.d("SharedPref",""+jsonactualFriends);
         edit.putString("actualFriends", jsonactualFriends);
         edit.commit();
     }
@@ -256,7 +260,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
         /*Take all the users from the database*/
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
         Log.d("Contacts", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONArray json = sr.getJSONArray(Config.ip + "/allContacts", params);
@@ -298,7 +302,13 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            getAllContacts();
+            getContactsFromSharedPref();
+            if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
+                Log.d("AsyncSharedPrefContact","success"+friends.size());
+            } else {
+                getAllContacts();
+            }
+            inProgress=1;
             Log.d("Ser", "" + friends.size());
             return null;
         }
@@ -314,6 +324,12 @@ public class MainActivity_Contacts extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (inProgress == 1) {
+                if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
+                    friends.clear();
+                    friends=friendsFromSharedPref;
+                    getCommonContacts();
+                    Log.d("AsyncSharedPrefContact","success"+friends.size());
+                }
                 retryRelativeLayout.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
             } else {
@@ -357,8 +373,13 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
     }
 
-    private void getContactsFromSharedPref(){
-
+    private void getContactsFromSharedPref() {
+        if (pref.contains("actualFriends")) {
+            String friend_temp = pref.getString("actualFriends", null);
+            Gson gson = new Gson();
+            Friends contacts[] = gson.fromJson(friend_temp, Friends[].class);
+            friendsFromSharedPref = new ArrayList(Arrays.asList(contacts));
+        }
     }
 }
 

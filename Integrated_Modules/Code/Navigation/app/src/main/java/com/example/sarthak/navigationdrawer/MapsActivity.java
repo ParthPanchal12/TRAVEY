@@ -390,7 +390,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void addLabelsForAllReports() {
         ArrayList<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MapsActivity.this);
         reports = new ArrayList<Reports>();
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
@@ -557,7 +557,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         parametersDatabase.add(new BasicNameValuePair(Config.latitude, ""+lat_report));
         parametersDatabase.add(new BasicNameValuePair(Config.longitude, ""+long_report));
 
-        ServerRequest sr = new ServerRequest();
+        ServerRequest sr = new ServerRequest(MapsActivity.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
         JSONObject json = sr.getJSON(Config.ip+"/reportAdd",parametersDatabase);
@@ -608,7 +608,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     case 1:
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
                         params1.add(new BasicNameValuePair(Config.reportId, id));
-                        ServerRequest sr1 = new ServerRequest();
+                        ServerRequest sr1 = new ServerRequest(MapsActivity.this);
                         Log.d("here", "params sent" + id);
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                         JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
@@ -623,7 +623,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     case 2:
                         ArrayList<NameValuePair> params2 = new ArrayList<>();
                         params2.add(new BasicNameValuePair(Config.reportId, id));
-                        ServerRequest sr2 = new ServerRequest();
+                        ServerRequest sr2 = new ServerRequest(MapsActivity.this);
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                         JSONArray json2 = sr2.getJSONArray(Config.ip + "/reportDownVote", params2);
