@@ -198,6 +198,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
                 Toast.makeText(VerificationActivity.this, jsonstr, Toast.LENGTH_SHORT).show();
                 SharedPreferences.Editor edit = pref.edit();
                 edit.putString("phone_number", phone_number);
+                edit.commit();
                 startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
                 Log.d("Hello", jsonstr);
             } catch (JSONException e) {

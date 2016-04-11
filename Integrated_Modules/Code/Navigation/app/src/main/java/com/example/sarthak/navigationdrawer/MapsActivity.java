@@ -524,7 +524,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ArrayList<NameValuePair> parametersDatabase=new ArrayList<NameValuePair>();
 
         /*To do*/
-        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        parametersDatabase.add(new BasicNameValuePair(Config.phone_number, phone_number));
 
         /*Time format*/
         /*July 22, 2013 14:00:00*/

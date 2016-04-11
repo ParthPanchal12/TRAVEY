@@ -1,11 +1,26 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.sarthak.navigationdrawer.R;
+import com.example.sarthak.navigationdrawer.ReportPanel.DurationPickerDialog;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,6 +41,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import info.hoang8f.widget.FButton;
+
 public class ServerRequest {
 
     static InputStream is = null;
@@ -37,6 +54,10 @@ public class ServerRequest {
 
     public ServerRequest(Context context) {
         this._context = context;
+        //Looper.prepare();
+        /*if(!isConnectingToInternet()){
+            getDialogCheckInternet();
+        }*/
     }
 
     public JSONObject getJSONFromUrl(String url, List<NameValuePair> params) {
@@ -232,6 +253,25 @@ public class ServerRequest {
 
         }
         return false;
+    }
+
+    private void getDialogCheckInternet() {
+
+        boolean wrapInScrollView = true;
+        MaterialDialog dialog = new MaterialDialog.Builder(this._context)
+                .title("You are not connected to the internet")
+                .customView(R.layout.conect_internet, wrapInScrollView)
+                .positiveText("Retry")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //add to database and dismiss dialog
+                        if (!isConnectingToInternet()) {
+                            getDialogCheckInternet();
+                        }
+                    }
+                })
+                .show();
     }
 
 }

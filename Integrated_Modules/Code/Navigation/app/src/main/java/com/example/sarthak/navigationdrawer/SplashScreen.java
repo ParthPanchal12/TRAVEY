@@ -46,10 +46,15 @@ public class SplashScreen extends AppCompatActivity {
                 edit.commit();
             }
 
-
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Log.d("here", "json received");
             Intent intent = new Intent(SplashScreen.this, LoginRegister.class);
             startActivity(intent);
+            finish();
 
         } else {
             Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
