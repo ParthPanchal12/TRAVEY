@@ -26,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
@@ -249,8 +250,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
     public void saveAllToSharedPreferences() {
         Gson gson = new Gson();
-        String jsonactualFriends = gson.toJson(friends);
-        Log.d("SharedPref",""+jsonactualFriends);
+        String jsonactualFriends = gson.toJson(actualFriends);
+        Log.d("SharedPref", "" + jsonactualFriends);
         edit.putString("actualFriends", jsonactualFriends);
         edit.commit();
     }
@@ -304,11 +305,11 @@ public class MainActivity_Contacts extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             getContactsFromSharedPref();
             if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
-                Log.d("AsyncSharedPrefContact","success"+friends.size());
+                Log.d("AsyncSharedPrefContact", "success" + friends.size());
             } else {
                 getAllContacts();
             }
-            inProgress=1;
+            inProgress = 1;
             Log.d("Ser", "" + friends.size());
             return null;
         }
@@ -325,10 +326,12 @@ public class MainActivity_Contacts extends AppCompatActivity {
             super.onPostExecute(aVoid);
             if (inProgress == 1) {
                 if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
-                    friends.clear();
-                    friends=friendsFromSharedPref;
-                    getCommonContacts();
-                    Log.d("AsyncSharedPrefContact","success"+friends.size());
+                    actualFriends.clear();
+
+                    /*TO check if the contacts are appearing even if the user is offline*/
+                    actualFriends = friendsFromSharedPref;
+                    adapter.notifyDataSetChanged();
+                    Log.d("AsyncSharedPrefContact", "success" + friends.size());
                 }
                 retryRelativeLayout.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
@@ -351,31 +354,36 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
 
     private void selectTypeForFriend() {
-        CharSequence methodsToTakeSource[] = new CharSequence[]{"Share your location", "Get his location"};
+        String methodsToTakeSource[] = {"Share your location", "Get his location"};
+        new MaterialDialog.Builder(this)
+                .title("Select an option")
+                .items(methodsToTakeSource)
+                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        /**
+                         * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                         * returning false here won't allow the newly selected radio button to actually be selected.
+                         **/
+                        switch (which) {
+                            case 0:
+                                ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+                                params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+                                params.add(new BasicNameValuePair(Config.user_name, "Sarthak"));
+                                ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
+                                Log.d("here", "params sent");
+                                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                                sr.getJSON(Config.ip + "/shareLocationWithFriend", params);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick an option");
-        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        ArrayList<NameValuePair> params=new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair(Config.phone_number,"8758964908"));
-                        params.add(new BasicNameValuePair(Config.user_name,"Sarthak"));
-                        ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
-                        Log.d("here", "params sent");
-                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        sr.getJSON(Config.ip + "/shareLocationWithFriend", params);
-                        return;
-                    case 1:
-                        Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
-                        startActivity(intent);
-                        return;
-                }
-            }
-        });
-        builder.show();
+                            case 1:
+                                Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
+                                startActivity(intent);
+                        }
+                        return true;
+                    }
+                })
+                .positiveText("Choose")
+                .show();
 
     }
 
