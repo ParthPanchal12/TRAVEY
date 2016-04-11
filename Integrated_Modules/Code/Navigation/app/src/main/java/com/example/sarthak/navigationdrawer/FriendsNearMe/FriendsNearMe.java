@@ -28,11 +28,14 @@ import com.example.sarthak.navigationdrawer.ContactDisplay.Contacts;
 import com.example.sarthak.navigationdrawer.ContactDisplay.Friends;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -111,10 +114,10 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
 
-        progressBar.show();
+
 
         friendsNearMe=new ArrayList<>();
-        getFriendsNearMe();
+
 
     }
 
@@ -136,7 +139,8 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
                 try {
                     User user = gson.fromJson(json.getString(i), new TypeToken<User>() {
                     }.getType());
-                    Log.d("UserLat",""+user.getLatitude());
+                    user.getCoordinates();
+                    Log.d("UserLat",""+user.getLatitude()+user.getName());
                     friendsNearMe.add(user);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -172,11 +176,19 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void animateCameraToShowNearMeArea(){
-
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        Log.d("LatMy",""+myLastKnownLocation.getLatitude());
+        builder.include(new LatLng(myLastKnownLocation.getLatitude(),myLastKnownLocation.getLongitude()));
+        builder.include(new LatLng(friendsNearMe.get(0).getLatitude(),friendsNearMe.get(0).getLongitude()));
+        LatLngBounds bounds = builder.build();
+        int padding = 310; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.animateCamera(cu);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        progressBar.show();
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -192,12 +204,16 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         }
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        getFriendsNearMe();
     }
 
     @Override
     public void onLocationChanged(Location location) {
         myLastKnownLocation = location;
 
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        mMap.animateCamera(cameraUpdate);
         //locationManager.removeUpdates(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
