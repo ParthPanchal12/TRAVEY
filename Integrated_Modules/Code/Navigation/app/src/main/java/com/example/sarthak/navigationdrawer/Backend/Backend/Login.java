@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.sarthak.navigationdrawer.GCM.GCM;
 import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
@@ -88,9 +87,9 @@ public class Login extends Fragment {
                         params = new ArrayList<NameValuePair>();
                         params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
                         params.add(new BasicNameValuePair(Config.password, password_txt));
-                        GCM gcm = new GCM(getContext());
 
-                        regId = gcm.getRegId();
+
+                        regId = pref.getString("gcm_id", "");
                         if (regId == null && regId.isEmpty()) {
                             Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
                         } else {
