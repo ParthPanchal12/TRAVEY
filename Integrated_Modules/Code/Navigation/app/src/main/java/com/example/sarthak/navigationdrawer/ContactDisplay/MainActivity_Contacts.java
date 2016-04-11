@@ -360,7 +360,13 @@ public class MainActivity_Contacts extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        //do something
+                        ArrayList<NameValuePair> params=new ArrayList<NameValuePair>();
+                        params.add(new BasicNameValuePair(Config.phone_number,"8758964908"));
+                        params.add(new BasicNameValuePair(Config.user_name,"Sarthak"));
+                        ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
+                        Log.d("here", "params sent");
+                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                        sr.getJSON(Config.ip + "/shareLocationWithFriend", params);
                         return;
                     case 1:
                         Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
