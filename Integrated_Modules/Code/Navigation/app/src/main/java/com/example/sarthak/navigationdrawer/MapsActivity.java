@@ -893,7 +893,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /*Enable Permissions if not granted*/
     private void enablePermissions() {
         //To see this code many threads running simultaneously requesting permissions
-        /*
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
@@ -926,13 +926,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
             }
-        }*/
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
-        /*
+
         switch (requestCode) {
             case PERMISSION_CHECK: {
                 // If request is cancelled, the result arrays are empty.
@@ -949,7 +949,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             // other 'case' lines to check for other
             // permissions this app might request
         }
-        */
+
     }
 
 

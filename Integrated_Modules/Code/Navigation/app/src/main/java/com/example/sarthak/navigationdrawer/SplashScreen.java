@@ -63,11 +63,11 @@ public class SplashScreen extends AppCompatActivity {
         } else {
             Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
         }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
