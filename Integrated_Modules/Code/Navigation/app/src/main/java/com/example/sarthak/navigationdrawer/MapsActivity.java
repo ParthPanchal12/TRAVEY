@@ -474,6 +474,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //add to database and dismiss dialog
                         if(lat_report!=0 && long_report!=0){
+                            description=(EditText)dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
+                            descriptionReport=description.getText().toString();
                             saveDetailsToDataBase();
                             lat_report=0;
                             long_report=0;
@@ -491,8 +493,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 })
                 .show();
-        description=(EditText)dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
-        descriptionReport=description.getText().toString();
+
         location_report=(EditText)dialog.getCustomView().findViewById(R.id.locationReportEditText);
         location_report.setOnClickListener(new View.OnClickListener() {
             @Override

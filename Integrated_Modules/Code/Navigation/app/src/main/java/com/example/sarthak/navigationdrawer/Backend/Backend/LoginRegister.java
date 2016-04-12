@@ -22,14 +22,6 @@ public class LoginRegister extends AppCompatActivity {
         setContentView(R.layout.activity_login_register);
 
 
-        String token;
-        SharedPreferences pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-        token = pref.getString("token", "");
-
-        if (token != "") {
-            startActivity(new Intent(LoginRegister.this, MapsActivity.class));
-            finish();
-        }
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
 //        setSupportActionBar(myToolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);

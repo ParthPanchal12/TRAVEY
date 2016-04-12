@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_id": "gcmtest-d26ea",
+    "project_number": "788979097270",
+    "name": "GcmTest"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788979097270:android:3cd36dbfe06be9d4",
+        "client_id": "android:com.example.sarthak.gcmtest",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.sarthak.gcmtest",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788979097270:android:c3fde30add9d03b8",
+        "client_id": "android:com.example.sarthak.gcm_travey",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.sarthak.gcm_travey",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788979097270:android:4d0cceb5839ad0e2",
+        "client_id": "android:com.example.sarthak.navigationdrawer",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.sarthak.navigationdrawer",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

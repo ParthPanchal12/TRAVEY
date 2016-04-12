@@ -3,6 +3,7 @@ package com.example.sarthak.navigationdrawer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,44 +23,65 @@ import java.util.ArrayList;
  */
 public class SplashScreen extends AppCompatActivity {
 
+    private Boolean isInternetPresent;
+    private String token;
+    private GCM gcm;
+    private String regId;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-
-        ArrayList<NameValuePair> params = new ArrayList<>();
-
-        ServerRequest sr = new ServerRequest(this);
-        Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
-        if (isInternetPresent) {
-            GCM gcm = new GCM(this);
-
-            String regId = gcm.getRegId();
-            if (regId == null && regId.isEmpty()) {
-                Toast.makeText(this, "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
-            } else {
-                SharedPreferences pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-                SharedPreferences.Editor edit = pref.edit();
-                //Storing Data using SharedPreferences
-                edit.putString("gcm_id", regId);
-                edit.commit();
-            }
-
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            Log.d("here", "json received");
-            Intent intent = new Intent(SplashScreen.this, LoginRegister.class);
-            startActivity(intent);
-            finish();
-
-        } else {
-            Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
-        }
+        new CheckGCM().execute();
         System.out.println("Hiiiithere11");
+        gcm = new GCM(SplashScreen.this);
+        regId = gcm.getRegId();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
+    class CheckGCM extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            ServerRequest sr = new ServerRequest(SplashScreen.this);
+            isInternetPresent = sr.isConnectingToInternet(); // true or false
+            if (isInternetPresent) {
+
+                if (regId == null && regId.isEmpty()) {
+                    Toast.makeText(SplashScreen.this, "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
+                } else {
+                }
+
+
+                Log.d("here", "json received");
+
+                SharedPreferences pref = SplashScreen.this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+                token = pref.getString("token", "");
+
+            } else {
+                Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (token!=null && token != "") {
+                Log.d("TestTest","Test");
+                startActivity(new Intent(SplashScreen.this, MapsActivity.class));
+                finish();
+            }else {
+                Intent intent = new Intent(SplashScreen.this, LoginRegister.class);
+                startActivity(intent);
+                finish();
+            }
+        }
+    }
 }
+
