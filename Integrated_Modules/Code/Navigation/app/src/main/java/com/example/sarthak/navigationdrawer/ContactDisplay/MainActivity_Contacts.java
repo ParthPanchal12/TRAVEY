@@ -108,7 +108,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     @Override
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
-                        Toast.makeText(MainActivity_Contacts.this, "Clicked on" + actualFriends.get(position).getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
                         selectTypeForFriend();
                     }
                 })
