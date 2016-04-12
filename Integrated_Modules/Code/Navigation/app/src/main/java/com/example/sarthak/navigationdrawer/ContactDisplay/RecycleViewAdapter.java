@@ -1,6 +1,7 @@
 package com.example.sarthak.navigationdrawer.ContactDisplay;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,9 +12,16 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.R;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +96,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         return filter;
     }
 
-    class CustomViewHolder extends RecyclerView.ViewHolder {
+    class CustomViewHolder extends RecyclerView.ViewHolder{
         private View view;
         private TextView name;
         private TextView phone;
@@ -138,6 +146,8 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         public void setTextDrawable() {
             this.image.setImageDrawable(drawable);
         }
+
+
 
     }
 

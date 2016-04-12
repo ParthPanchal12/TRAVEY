@@ -12,6 +12,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,9 @@ import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.Friends;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -51,7 +56,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 /**
  * Created by sarthak on 9/4/16.
  */
-public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private GoogleMap mMap;
     private LocationManager locationManager;
     private static final long MIN_TIME = 400;
@@ -63,6 +68,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     SharedPreferences.Editor edit;
     ArrayList<Friends> actualFriends;
     private SweetAlertDialog progressBar;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +99,15 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         progressBar.setTitleText("Getting friends near you..");
         progressBar.setCancelable(false);
 
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+
        /*location manager*/
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -111,8 +126,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
 
 
-
-        friendsNearMe=new ArrayList<>();
+        friendsNearMe = new ArrayList<>();
 
 
     }
@@ -136,7 +150,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
                     User user = gson.fromJson(json.getString(i), new TypeToken<User>() {
                     }.getType());
                     user.getCoordinates();
-                    Log.d("UserLat",""+user.getLatitude()+user.getName());
+                    Log.d("UserLat", "" + user.getLatitude() + user.getName());
                     friendsNearMe.add(user);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -151,7 +165,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     private void addMarkerForFriends() {
 
         for (int i = 0; i < friendsNearMe.size(); i++) {
-            Log.d("MarkerPosition",""+friendsNearMe.get(i).getLatitude()+","+friendsNearMe.get(i).getLongitude());
+            Log.d("MarkerPosition", "" + friendsNearMe.get(i).getLatitude() + "," + friendsNearMe.get(i).getLongitude());
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(friendsNearMe.get(i).getLatitude(), friendsNearMe.get(i).getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
@@ -159,8 +173,19 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         animateCameraToShowNearMeArea();
     }
 
-    private void animateCameraToShowNearMeArea(){
+    private void animateCameraToShowNearMeArea() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        myLastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         Log.d("LatMy",""+myLastKnownLocation.getLatitude());
         builder.include(new LatLng(myLastKnownLocation.getLatitude(),myLastKnownLocation.getLongitude()));
         builder.include(new LatLng(friendsNearMe.get(0).getLatitude(),friendsNearMe.get(0).getLongitude()));
@@ -266,5 +291,32 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     protected void onDestroy() {
         super.onDestroy();
         progressBar.dismiss();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

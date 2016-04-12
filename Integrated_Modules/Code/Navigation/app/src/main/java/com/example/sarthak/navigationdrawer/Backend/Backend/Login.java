@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sarthak.navigationdrawer.GCM.GCM;
 import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
@@ -40,6 +41,7 @@ public class Login extends Fragment {
     SharedPreferences pref;
     ServerRequest sr;
     Dialog reset;
+    SharedPreferences gcm_pref;
     private String regId;
     private SweetAlertDialog pDialog;
 
@@ -54,8 +56,7 @@ public class Login extends Fragment {
         login = (Button) view.findViewById(R.id.login_login);
         forgot_password = (TextView) view.findViewById(R.id.login_forgot_password);
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-
-
+        gcm_pref=this.getActivity().getSharedPreferences(GCM.class.getSimpleName(),Context.MODE_PRIVATE);
         pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         pDialog.setTitleText("Logging you in please Wait!");
@@ -89,10 +90,13 @@ public class Login extends Fragment {
                         params.add(new BasicNameValuePair(Config.password, password_txt));
 
 
-                        regId = pref.getString("gcm_id", "");
-                        if (regId == null && regId.isEmpty()) {
+                        regId = gcm_pref.getString("registration_id","");
+                        if (regId == null) {
                             Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if(regId.isEmpty()){
+                            Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
+                        } else{
+                            Log.d("Adding gcm id to params",""+regId);
                             params.add(new BasicNameValuePair(Config.gcmId, regId));
                         }
 

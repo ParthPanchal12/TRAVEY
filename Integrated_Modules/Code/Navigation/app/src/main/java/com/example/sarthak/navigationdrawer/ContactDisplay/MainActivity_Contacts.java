@@ -352,10 +352,9 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
     }
 
-
     private void selectTypeForFriend() {
         String methodsToTakeSource[] = {"Share your location", "Get his location"};
-        new MaterialDialog.Builder(this)
+        new MaterialDialog.Builder(MainActivity_Contacts.this)
                 .title("Select an option")
                 .items(methodsToTakeSource)
                 .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
@@ -368,16 +367,17 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         switch (which) {
                             case 0:
                                 ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                                params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+                                params.add(new BasicNameValuePair(Config.phone_number, "8401589488"));
                                 params.add(new BasicNameValuePair(Config.user_name, "Sarthak"));
                                 ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
                                 Log.d("here", "params sent");
                                 //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                                 sr.getJSON(Config.ip + "/shareLocationWithFriend", params);
-
+                                break;
                             case 1:
                                 Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
                                 startActivity(intent);
+                                break;
                         }
                         return true;
                     }
@@ -386,6 +386,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 .show();
 
     }
+
+
 
     private void getContactsFromSharedPref() {
         if (pref.contains("actualFriends")) {
