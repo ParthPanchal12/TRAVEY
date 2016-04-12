@@ -503,7 +503,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (GooglePlayServicesRepairableException e) {
                     Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
                 } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
+                   Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
                 }
             }
         });
@@ -612,30 +612,58 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     case 1:
                         ArrayList<NameValuePair> params1 = new ArrayList<>();
                         params1.add(new BasicNameValuePair(Config.reportId, id));
+                        params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
                         ServerRequest sr1 = new ServerRequest(MapsActivity.this);
                         Log.d("here", "params sent" + id);
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                         JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
-                        Log.d("here", "json received");
-                        Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
-                        Reports rep = reports.get(pos);
-                        rep.setUpvotes(rep.getUpvotes() + 1);
-                        reports.set(pos, rep);
+                        if (json1 != null) {
+                            try {
+                                String rsp = json1.getString("response");
+                                if (rsp.equals("Can only upvote once")) {
+                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d("here", "json received");
+                                    Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                                    Reports rep = reports.get(pos);
+                                    rep.setUpvotes(rep.getUpvotes() + 1);
+                                    reports.set(pos, rep);
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
 
 
                         return;
                     case 2:
                         ArrayList<NameValuePair> params2 = new ArrayList<>();
                         params2.add(new BasicNameValuePair(Config.reportId, id));
+                        params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
                         ServerRequest sr2 = new ServerRequest(MapsActivity.this);
                         Log.d("here", "params sent");
                         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONArray json2 = sr2.getJSONArray(Config.ip + "/reportDownVote", params2);
-                        Log.d("here", "json received");
-                        Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
-                        Reports rep1 = reports.get(pos);
-                        rep1.setDownvotes(rep1.getDownvotes() + 1);
-                        reports.set(pos, rep1);
+                        JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+                        if (json2 != null) {
+                            try {
+                                String rsp = json2.getString("response");
+                                if (rsp.equals("Can only downvote once")) {
+                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d("here", "json received");
+                                    Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                                    Reports rep1 = reports.get(pos);
+                                    rep1.setDownvotes(rep1.getDownvotes() + 1);
+                                    reports.set(pos, rep1);
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
                         return;
                 }
             }

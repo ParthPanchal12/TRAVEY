@@ -24,7 +24,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Register extends Fragment {
     EditText user_name, phone_number, email, password, confirm_password;
     Button register;
