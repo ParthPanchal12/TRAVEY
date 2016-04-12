@@ -92,8 +92,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
         retryRelativeLayout = (RelativeLayout) findViewById(R.id.layout_retry_contact_display);
         retryButton = (Button) findViewById(R.id.button_retry);
 
-        new GetContactsAsync().execute();
-
 
         adapter = new RecycleViewAdapter(MainActivity_Contacts.this, actualFriends);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_all_contacts);
@@ -101,6 +99,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity_Contacts.this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
+        new GetContactsAsync().execute();
 
         /*Item click listener*/
 
@@ -109,7 +108,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     @Override
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
-                        Toast.makeText(MainActivity_Contacts.this, "Clicked on" + position, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
                         selectTypeForFriend();
                     }
                 })
@@ -142,8 +141,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
     }
 
     private void alphabeticalSorting() {
-        if (friends != null && friends.size() > 0) {
-            Collections.sort(friends, new Comparator<Friends>() {
+        if (actualFriends != null && actualFriends.size() > 0) {
+            Collections.sort(actualFriends, new Comparator<Friends>() {
                 @Override
                 public int compare(final Friends object1, final Friends object2) {
                     return object1.getName().compareTo(object2.getName());
@@ -242,18 +241,9 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
 
 
-        saveAllToSharedPreferences();
         getCommonContacts();
         alphabeticalSorting();
         inProgress = 1;
-    }
-
-    public void saveAllToSharedPreferences() {
-        Gson gson = new Gson();
-        String jsonactualFriends = gson.toJson(actualFriends);
-        Log.d("SharedPref", "" + jsonactualFriends);
-        edit.putString("actualFriends", jsonactualFriends);
-        edit.commit();
     }
 
     private void getDatabaseContacts() {
@@ -303,12 +293,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            getContactsFromSharedPref();
-            if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
-                Log.d("AsyncSharedPrefContact", "success" + friends.size());
-            } else {
-                getAllContacts();
-            }
+            getAllContacts();
             inProgress = 1;
             Log.d("Ser", "" + friends.size());
             return null;
@@ -325,18 +310,10 @@ public class MainActivity_Contacts extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (inProgress == 1) {
-                if (friendsFromSharedPref != null && friendsFromSharedPref.size() != 0) {
-                    actualFriends.clear();
-
-                    /*TO check if the contacts are appearing even if the user is offline*/
-                    actualFriends = friendsFromSharedPref;
-                    adapter.notifyDataSetChanged();
-                    Log.d("AsyncSharedPrefContact", "success" + friends.size());
-                }
-                retryRelativeLayout.setVisibility(View.GONE);
                 adapter.notifyDataSetChanged();
+                retryRelativeLayout.setVisibility(View.GONE);
             } else {
-                friends = new ArrayList<>();
+                actualFriends.clear();
                 adapter.notifyDataSetChanged();
                 retryRelativeLayout.setVisibility(View.VISIBLE);
             }
@@ -385,17 +362,6 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 .positiveText("Choose")
                 .show();
 
-    }
-
-
-
-    private void getContactsFromSharedPref() {
-        if (pref.contains("actualFriends")) {
-            String friend_temp = pref.getString("actualFriends", null);
-            Gson gson = new Gson();
-            Friends contacts[] = gson.fromJson(friend_temp, Friends[].class);
-            friendsFromSharedPref = new ArrayList(Arrays.asList(contacts));
-        }
     }
 }
 

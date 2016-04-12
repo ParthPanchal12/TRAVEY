@@ -32,7 +32,7 @@ import java.util.Random;
  */
 public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.CustomViewHolder> implements Filterable {
     private static Context ctx;
-    private ArrayList<Friends> friends;
+    public ArrayList<Friends> friends;
     private ArrayList<Friends> all_friends;
     private LayoutInflater inflater;
     private CustomFilterable filter;

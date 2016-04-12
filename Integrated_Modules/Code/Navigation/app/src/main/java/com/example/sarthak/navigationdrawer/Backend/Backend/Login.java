@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.GCM.GCM;
 import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
@@ -166,96 +169,97 @@ public class Login extends Fragment {
         forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reset = new Dialog(getContext());
-                reset.setTitle("Reset Password");
-                reset.setContentView(R.layout.reset_pass_init);
-                cont = (Button) reset.findViewById(R.id.resbtn);
-                cancel = (Button) reset.findViewById(R.id.cancelbtn);
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        reset.dismiss();
-                    }
-                });
-                res_email = (EditText) reset.findViewById(R.id.email);
 
-                cont.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        email_res_txt = res_email.getText().toString();
 
-                        params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("email", email_res_txt));
+                MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                        .title("Forgot Password")
+                        .customView(R.layout.reset_pass_init, true)
+                        .positiveText("Continue")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                //add to database and dismiss dialog
+                                email_res_txt = res_email.getText().toString();
 
-                        //  JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass", params);
-                        JSONObject json = sr.getJSON(Config.ip + "/api/resetpass", params);
+                                params = new ArrayList<NameValuePair>();
+                                params.add(new BasicNameValuePair("email", email_res_txt));
 
-                        if (json != null) {
-                            try {
-                                String jsonstr = json.getString("response");
-                                if (json.getBoolean("res")) {
-                                    Log.e("JSON", jsonstr);
-                                    Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-                                    reset.setContentView(R.layout.reset_pass_code);
-                                    cont_code = (Button) reset.findViewById(R.id.conbtn);
-                                    code = (EditText) reset.findViewById(R.id.code);
-                                    newpass = (EditText) reset.findViewById(R.id.npass);
-                                    cancel1 = (Button) reset.findViewById(R.id.cancel);
-                                    cancel1.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            reset.dismiss();
-                                        }
-                                    });
-                                    cont_code.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            code_txt = code.getText().toString();
-                                            npass_txt = newpass.getText().toString();
-                                            Log.e("Code", code_txt);
-                                            Log.e("New pass", npass_txt);
-                                            params = new ArrayList<NameValuePair>();
-                                            params.add(new BasicNameValuePair("email", email_res_txt));
-                                            params.add(new BasicNameValuePair("code", code_txt));
-                                            params.add(new BasicNameValuePair("newpass", npass_txt));
+                                //  JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass", params);
+                                JSONObject json = sr.getJSON(Config.ip + "/api/resetpass", params);
 
-                                            JSONObject json = sr.getJSON(Config.ip + "/api/resetpass/chg", params);
-                                            //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
-
-                                            if (json != null) {
-                                                try {
-
-                                                    String jsonstr = json.getString("response");
-                                                    if (json.getBoolean("res")) {
-                                                        reset.dismiss();
-                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-
-                                                    } else {
-                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
+                                if (json != null) {
+                                    try {
+                                        String jsonstr = json.getString("response");
+                                        if (json.getBoolean("res")) {
+                                            Log.e("JSON", jsonstr);
+                                            Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+                                            reset.setContentView(R.layout.reset_pass_code);
+                                            cont_code = (Button) reset.findViewById(R.id.conbtn);
+                                            code = (EditText) reset.findViewById(R.id.code);
+                                            newpass = (EditText) reset.findViewById(R.id.npass);
+                                            cancel1 = (Button) reset.findViewById(R.id.cancel);
+                                            cancel1.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    reset.dismiss();
                                                 }
-                                            }
+                                            });
+                                            cont_code.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    code_txt = code.getText().toString();
+                                                    npass_txt = newpass.getText().toString();
+                                                    Log.e("Code", code_txt);
+                                                    Log.e("New pass", npass_txt);
+                                                    params = new ArrayList<NameValuePair>();
+                                                    params.add(new BasicNameValuePair("email", email_res_txt));
+                                                    params.add(new BasicNameValuePair("code", code_txt));
+                                                    params.add(new BasicNameValuePair("newpass", npass_txt));
+
+                                                    JSONObject json = sr.getJSON(Config.ip + "/api/resetpass/chg", params);
+                                                    //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+
+                                                    if (json != null) {
+                                                        try {
+
+                                                            String jsonstr = json.getString("response");
+                                                            if (json.getBoolean("res")) {
+                                                                reset.dismiss();
+                                                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                                                            } else {
+                                                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                                                            }
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+
+                                                }
+                                            });
+                                        } else {
+
+                                            Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
 
                                         }
-                                    });
-                                } else {
-
-                                    Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+
                             }
-                        }
+                        })
+                        .negativeText("Cancel")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
 
-                    }
-                });
-
-
-                reset.show();
+                res_email = (EditText) dialog.getCustomView().findViewById(R.id.email);
             }
         });
 

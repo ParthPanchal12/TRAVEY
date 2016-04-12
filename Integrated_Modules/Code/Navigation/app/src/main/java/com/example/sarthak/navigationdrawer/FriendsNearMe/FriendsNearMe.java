@@ -41,12 +41,14 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -55,7 +57,8 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 /**
  * Created by sarthak on 9/4/16.
  */
-public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
     SharedPreferences pref;
@@ -63,11 +66,10 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
     ArrayList<Friends> actualFriends;
     private GoogleMap mMap;
     private LocationManager locationManager;
-    private Location myLastKnownLocation;
+    private LatLng myLastKnownLocation;
     private int success = 0;
     private ArrayList<User> friendsNearMe;
     private SweetAlertDialog progressBar;
-    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,13 +100,7 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         progressBar.setTitleText("Getting friends near you..");
         progressBar.setCancelable(false);
 
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
+
 
 
        /*location manager*/
@@ -206,14 +202,32 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        myLastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        Log.d("LatMy",""+myLastKnownLocation.getLatitude());
-        builder.include(new LatLng(myLastKnownLocation.getLatitude(),myLastKnownLocation.getLongitude()));
-        builder.include(new LatLng(friendsNearMe.get(0).getLatitude(),friendsNearMe.get(0).getLongitude()));
-        LatLngBounds bounds = builder.build();
-        int padding = 310; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.animateCamera(cu);
+        ServerRequest sr = new ServerRequest(getApplicationContext());
+        ArrayList<NameValuePair> parameters = new ArrayList<>();
+        String phone_number = pref.getString(Config.phone_number, "");
+        parameters.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        JSONArray json = sr.getJSONArray(Config.ip+"/getMyLocation", parameters);
+
+        if (json != null) {
+            try {
+                Log.d("JsonFriend", "" + json);
+                myLastKnownLocation=new LatLng(json.getDouble(0),json.getDouble(1));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (myLastKnownLocation == null) {
+            Toast.makeText(FriendsNearMe.this, "Unable to get your location", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.d("LatMy", "" + myLastKnownLocation.latitude);
+            builder.include(new LatLng(myLastKnownLocation.latitude, myLastKnownLocation.longitude));
+            builder.include(new LatLng(friendsNearMe.get(0).getLatitude(), friendsNearMe.get(0).getLongitude()));
+            LatLngBounds bounds = builder.build();
+            int padding = 310; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            mMap.animateCamera(cu);
+        }
     }
 
     @Override
@@ -239,7 +253,6 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
 
     @Override
     public void onLocationChanged(Location location) {
-        myLastKnownLocation = location;
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
@@ -314,30 +327,5 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         progressBar.dismiss();
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
 
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 }

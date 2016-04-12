@@ -3,7 +3,6 @@ package com.example.sarthak.navigationdrawer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -13,10 +12,6 @@ import android.widget.Toast;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.GCM.GCM;
-
-import org.apache.http.NameValuePair;
-
-import java.util.ArrayList;
 
 /**
  * Created by parth panchal on 11-04-2016.
@@ -31,8 +26,13 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
         System.out.println("Hiiiithere11");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         gcm = new GCM(SplashScreen.this);
         regId = gcm.getRegId();
         ServerRequest sr = new ServerRequest(SplashScreen.this);
@@ -63,11 +63,7 @@ public class SplashScreen extends AppCompatActivity {
         } else {
             Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
         }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
 
     }
 
