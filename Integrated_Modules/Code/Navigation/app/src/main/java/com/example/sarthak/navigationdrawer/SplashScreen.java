@@ -33,6 +33,12 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         System.out.println("Hiiiithere11");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         gcm = new GCM(SplashScreen.this);
         regId = gcm.getRegId();
         ServerRequest sr = new ServerRequest(SplashScreen.this);
@@ -63,11 +69,7 @@ public class SplashScreen extends AppCompatActivity {
         } else {
             Toast.makeText(SplashScreen.this, "No internet Connection!", Toast.LENGTH_SHORT).show();
         }
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+
 
     }
 

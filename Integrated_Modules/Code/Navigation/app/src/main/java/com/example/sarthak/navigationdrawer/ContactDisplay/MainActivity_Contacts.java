@@ -242,9 +242,9 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
 
 
-        saveAllToSharedPreferences();
         getCommonContacts();
         alphabeticalSorting();
+        saveAllToSharedPreferences();
         inProgress = 1;
     }
 
