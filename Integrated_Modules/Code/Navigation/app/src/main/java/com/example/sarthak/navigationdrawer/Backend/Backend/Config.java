@@ -21,5 +21,6 @@ public interface Config {
     public final String reportId="reportId";
     public final String location="location";
     public final String gcmId="gcm_id";
+    public final String sharedLocation="shared_location";
 
 }

@@ -30,8 +30,12 @@ import com.msg91.sendotp.library.SendOtpVerification;
 import com.msg91.sendotp.library.Verification;
 import com.msg91.sendotp.library.VerificationListener;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 
 public class VerificationActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, VerificationListener {
@@ -40,14 +44,14 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
     private Verification mVerification;
     TextView resend_timer;
     SharedPreferences pref;
-    String phone_number;
-    ServerRequest sr = new ServerRequest(getApplicationContext());
+    String phone_number,email,user_name,from;
+    ServerRequest sr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verification);
-
+        sr = new ServerRequest(getApplicationContext());
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar_Verification);
@@ -114,6 +118,9 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
         if (intent != null) {
             String phoneNumber = intent.getStringExtra(Register.INTENT_PHONENUMBER);
             String countryCode = intent.getStringExtra(Register.INTENT_COUNTRY_CODE);
+            email = intent.getStringExtra("email");
+            user_name = intent.getStringExtra("user_name");
+            from = intent.getStringExtra("from");
             TextView phoneText = (TextView) findViewById(R.id.numberText);
             phoneText.setText("+" + countryCode + phoneNumber);
             createVerification(phoneNumber, skipPermissionCheck, countryCode);
@@ -191,20 +198,44 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
         hideProgressBarAndShowMessage(R.string.verified);
         showCompleted();
 
-        JSONObject json = sr.getJSON(com.example.sarthak.navigationdrawer.Backend.Backend.Config.ip+"/register",Register.params);
-        if(json != null) {
+        if(from.equals("register")){
+            JSONObject json = sr.getJSON(com.example.sarthak.navigationdrawer.Backend.Backend.Config.ip+"/register",Register.params);
+            if(json != null) {
+                try {
+                    String jsonstr = json.getString("response");
+                    Toast.makeText(VerificationActivity.this, jsonstr, Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor edit = pref.edit();
+                    edit.putString("phone_number", phone_number);
+                    edit.putString("email", email);
+                    edit.putString("user_name",user_name);
+                    edit.commit();
+                    startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
+                    Log.d("Hello", jsonstr);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(from.equals("edit_phone")){
+            //sr = new ServerRequest(getApplicationContext());
+            ArrayList<NameValuePair> parameters=new ArrayList<>();
+            parameters.add(new BasicNameValuePair("phone_number",pref.getString("phone_number", "")));
+            parameters.add(new BasicNameValuePair("new_phone_number",phone_number));
+            Log.d("edit_detail",phone_number);
+
+            String jsonstr = "not getting it";
+            Log.d("verify", pref.getString("phone_number", "")+"  "+phone_number);
+            JSONObject json = sr.getJSON(com.example.sarthak.navigationdrawer.Backend.Backend.Config.ip+"/editProfile/phone_number",parameters);
             try {
-                String jsonstr = json.getString("response");
-                Toast.makeText(VerificationActivity.this, jsonstr, Toast.LENGTH_SHORT).show();
-                SharedPreferences.Editor edit = pref.edit();
-                edit.putString("phone_number", phone_number);
-                edit.commit();
-                startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
-                Log.d("Hello", jsonstr);
+                jsonstr = json.getString("response");
+                Log.d("in_very",jsonstr+ "  "+ pref.getString("phone_number", "")+"  "+phone_number);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Toast.makeText(VerificationActivity.this, jsonstr, Toast.LENGTH_SHORT).show();
+            finish();
         }
+
     }
 
     @Override

@@ -134,11 +134,12 @@ public class Login extends Fragment {
                                         params_req_send.add(new BasicNameValuePair("fromn", "from__n"));
                                         params_req_send.add(new BasicNameValuePair("fromu", "from__u"));
                                         params_req_send.add(new BasicNameValuePair("to", "to__"));
-                                        params_req_send.add(new BasicNameValuePair("ttle", "title__"));
+                                        params_req_send.add(new BasicNameValuePair("title", "title__"));
                                         //JSONObject json1 = sr.getJSON(Config.ip+"/send",params_req_send);
 
                                         Intent profactivity = new Intent(getContext(), MapsActivity.class);
                                         edit.putString("phone_number", phone_number_txt);
+                                        Log.d("chalo",phone_number_txt);
                                         edit.commit();
                                         startActivity(profactivity);
                                         ((Activity) getContext()).finish();

@@ -38,6 +38,9 @@ public class Register extends Fragment {
         Intent verification = new Intent(getContext(), VerificationActivity.class);
         verification.putExtra(INTENT_PHONENUMBER, phoneNumber);
         verification.putExtra(INTENT_COUNTRY_CODE, "91");
+        verification.putExtra("email",email_txt);
+        verification.putExtra("user_name",user_name_txt);
+        verification.putExtra("from","register");
         startActivity(verification);
         Log.d("start", "Activity started");
     }
@@ -74,8 +77,8 @@ public class Register extends Fragment {
                     Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
                 } else {
                     //if(){}else{}
-                    if (phone_number_txt != null && (phone_number_txt.length() != 10 || phone_number_txt.length() != 11 || phone_number_txt.length() != 13)) {
-                        Toast.makeText(getContext(), "Please Enter a valid phone number", Toast.LENGTH_SHORT).show();
+                    if (phone_number_txt == null || (phone_number_txt.length() != 10 && phone_number_txt.length() != 11 && phone_number_txt.length() != 13)) {
+                        Toast.makeText(getContext(), "Please Enter a valid phone number"+ phone_number_txt, Toast.LENGTH_SHORT).show();
                     } else {
                         char ph_1 = phone_number_txt.charAt(0);
                         int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));

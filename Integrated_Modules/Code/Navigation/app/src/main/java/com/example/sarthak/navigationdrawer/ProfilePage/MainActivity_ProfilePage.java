@@ -51,16 +51,19 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private Toolbar toolbar;
     private int profilePicture;
     private int userInfoIcons[] = {R.drawable.ic_call_black_24dp, R.drawable.ic_mail_black_24dp, R.drawable.ic_star_half_black_24dp, R.drawable.ic_location_on_black_24dp};
-    private String userInfoTitle[] = {"Phone", "Mail", "Rating", "Location Shared Status"};
+    private String userInfoTitle[] = {"Phone number", "E-Mail", "Rating", "Location Shared Status"};
     private String userInfoDescription[] = {"1233456789", "123456@gmail.com", "4.5", "Shared"};
     private CollapsingToolbarLayout collapsingToolbar;
-    private String nameOfUser = "Sarthak";
+    private String nameOfUser;
     private FloatingActionButton floatingActionButton, floatingActionButtonChangeName, floatingActionButtonChangePhoto;
     private Intent galleryIntent;
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
+    String phone_number;
+    String email;
     private String selectedImagePath,imgDecodableString;
+    ServerRequest sr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +73,15 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         /*Customising Toolbar*/
         toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_ProfilePage);
-        collapsingToolbar.setTitle(nameOfUser);
+
         setSupportActionBar(toolbar);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout_profilePage);
         appBarLayout.setExpanded(true);
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        nameOfUser = pref.getString("user_name","");
+
+        collapsingToolbar.setTitle(nameOfUser);
+        sr = new ServerRequest(this);
 
 
         /*If clicked on Profile Pic then show the photo*/
@@ -92,13 +99,27 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         /*Setting the profile pic*/
         profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
         profilePicture = R.drawable.header;
-        String phone_number = pref.getString("phone_number", "");
-        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("phone_number", phone_number));
-        ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
-        JSONObject json = sr.getJSON(Config.ip + "/getImage", params);// change method url accordingly
-        //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+        phone_number = pref.getString(Config.phone_number, "");
+        email = pref.getString(Config.email,"");
+        userInfoDescription[1] = email;
+        userInfoDescription[0] = phone_number;
 
+        ArrayList<NameValuePair> params_editEmail = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editUserName = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editImage = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editPhoneNumber = new ArrayList<NameValuePair>();
+        final ArrayList<NameValuePair> params_editSharedLocation = new ArrayList<NameValuePair>();
+        final ArrayList<NameValuePair> params_editAllowedToPost = new ArrayList<NameValuePair>();
+
+        params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editEmail.add(new BasicNameValuePair(Config.email, email));
+
+        params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
+
+        //params_editUserName.
+        /*sr = new ServerRequest(MainActivity_ProfilePage.this);
+        JSONObject json = sr.getJSON(Config.ip + "/getImage", params_editImage);// change method url accordingly
         if (json != null) {
 
             String jsonstr = json.toString();
@@ -107,7 +128,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             profilePictureImageView.setImageBitmap(b);
             Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
         }
-
+*/
         profilePictureImageView.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.header));
         colorToolbars();
 
@@ -140,20 +161,31 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                             }
                             if (profile.get(position).getTitle().equals("Location Shared Status")) {
                                 /*Toggle the status*/
-                                if (profile.get(position).getDescription().equals("Shared"))
+                                if (profile.get(position).getDescription().equals("Shared")) {
+                                    params_editSharedLocation.removeAll(params_editSharedLocation);
+                                    params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                                    params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
+                                    Log.d("on_click", phone_number);
+                                    sr.getJSON(Config.ip+"/editProfile/shared_location",params_editSharedLocation);
                                     profile.get(position).setDescription("Not Shared");
+                                }
                                 else {
+                                    params_editSharedLocation.removeAll(params_editSharedLocation);
+                                    params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                                    params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "1"));
+                                    Log.d("on_click", phone_number);
+                                    sr.getJSON(Config.ip+"/editProfile/shared_location",params_editSharedLocation);
                                     profile.get(position).setDescription("Shared");
                                 }
                                 /*notify that the dataset has changed*/
                                 adapter.notifyDataSetChanged();
-                                saveLocationSharedToDatabase();
                             } else {
                                 /*Call the EditProfile class to let the user edit his/her detail*/
                                 Intent intent = new Intent(MainActivity_ProfilePage.this, EditProfile.class);
                                 intent.putExtra("Title", profile.get(position).getTitle());
                                 intent.putExtra("Description", profile.get(position).getDescription());
                                 startActivity(intent);
+                                finish();
                             }
                         }
                     }
@@ -189,6 +221,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 intent.putExtra("Title", "Name");
                 intent.putExtra("Description", nameOfUser);
                 startActivity(intent);
+                finish();
             }
         });
         floatingActionButtonChangePhoto.setOnClickListener(new View.OnClickListener() {
@@ -230,11 +263,6 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    /*To add*/
-    private void saveLocationSharedToDatabase(){
-
     }
 
     /*Toggle between open and closed FAB states*/
