@@ -18,4 +18,5 @@
         android:text="UserInfo"
         android:id="@+id/editText_UserInfoEdit"
         android:textSize="@dimen/textSize" />
+
 </RelativeLayout>
