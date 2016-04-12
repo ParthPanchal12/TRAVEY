@@ -38,6 +38,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -48,8 +49,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -57,16 +56,16 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * Created by sarthak on 9/4/16.
  */
 public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallback, LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private GoogleMap mMap;
-    private LocationManager locationManager;
     private static final long MIN_TIME = 400;
     private static final float MIN_DISTANCE = 1000;
-    private Location myLastKnownLocation;
-    private int success = 0;
-    private ArrayList<User> friendsNearMe;
     SharedPreferences pref;
     SharedPreferences.Editor edit;
     ArrayList<Friends> actualFriends;
+    private GoogleMap mMap;
+    private LocationManager locationManager;
+    private Location myLastKnownLocation;
+    private int success = 0;
+    private ArrayList<User> friendsNearMe;
     private SweetAlertDialog progressBar;
     private GoogleApiClient mGoogleApiClient;
 
@@ -169,10 +168,32 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(friendsNearMe.get(i).getLatitude(), friendsNearMe.get(i).getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+
         }
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                for (int j = 0; j < friendsNearMe.size(); j++) {
+                    LatLng loc1 = new LatLng(friendsNearMe.get(j).getLatitude(), friendsNearMe.get(j).getLongitude());
+                    if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
+
+                        getDetailsForFriend(friendsNearMe.get(j).getName());
+                        break;
+                    }
+                }
+
+                return false;
+            }
+        });
         animateCameraToShowNearMeArea();
     }
 
+    private void getDetailsForFriend(String name) {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(name);
+        builder.show();
+    }
     private void animateCameraToShowNearMeArea() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
