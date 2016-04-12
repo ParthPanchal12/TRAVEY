@@ -51,8 +51,8 @@ public class SplashScreen extends AppCompatActivity {
             isInternetPresent = sr.isConnectingToInternet(); // true or false
             if (isInternetPresent) {
 
-                if (regId == null && regId.isEmpty()) {
-                    Toast.makeText(SplashScreen.this, "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
+                if (regId == null || regId.isEmpty()) {
+                    //Toast.makeText(SplashScreen.this, "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
                 } else {
                 }
 
