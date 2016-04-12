@@ -7,9 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -64,6 +66,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -73,8 +76,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
 import info.hoang8f.widget.FButton;
 
@@ -120,6 +131,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FButton day_selector;
     private double lat_report;
     private double long_report;
+    private LatLng destinationLatLng;
+    private LatLng sourceLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,7 +282,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.i("Selected", "Place: " + place.getName());
                 lastSelectedLocationName = String.valueOf(place.getName());
                 lastSelectedLatLng = place.getLatLng();
-                LatLng sourceLatLng = place.getLatLng();
+                sourceLatLng = place.getLatLng();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(sourceLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
                 if (sourceMarker != null) {
@@ -285,6 +298,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     builder.include(sourceMarker.getPosition());
                     builder.include(destinationMarker.getPosition());
                     LatLngBounds bounds = builder.build();
+                    // Getting URL to the Google Directions API
+                    String url = getDirectionsUrl(sourceLatLng, destinationLatLng);
+                    DownloadTask downloadTask = new DownloadTask();
+                    // Start downloading json data from Google Directions API
+                    downloadTask.execute(url);
                     int padding = 310; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     mMap.animateCamera(cu);
@@ -309,7 +327,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i("Selected", "Place: " + place.getName());
-                LatLng destinationLatLng = place.getLatLng();
+                destinationLatLng = place.getLatLng();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(destinationLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
                 if (destinationMarker != null) {
@@ -326,6 +344,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LatLngBounds bounds = builder.build();
                     int padding = 310; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    // Getting URL to the Google Directions API
+                    String url = getDirectionsUrl(sourceLatLng, destinationLatLng);
+                    DownloadTask downloadTask = new DownloadTask();
+                    // Start downloading json data from Google Directions API
+                    downloadTask.execute(url);
                     mMap.animateCamera(cu);
                     cardView_Destination.setVisibility(View.GONE);
                     cardView_Source.setVisibility(View.GONE);
@@ -473,14 +496,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //add to database and dismiss dialog
-                        if(lat_report!=0 && long_report!=0){
-                            description=(EditText)dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
-                            descriptionReport=description.getText().toString();
+                        if (lat_report != 0 && long_report != 0) {
+                            description = (EditText) dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
+                            descriptionReport = description.getText().toString();
                             saveDetailsToDataBase();
-                            lat_report=0;
-                            long_report=0;
+                            lat_report = 0;
+                            long_report = 0;
                             addLabelsForAllReports();
-                        }else{
+                        } else {
                             Toast.makeText(MapsActivity.this, "Please enter a location", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -494,7 +517,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 })
                 .show();
 
-        location_report=(EditText)dialog.getCustomView().findViewById(R.id.locationReportEditText);
+        location_report = (EditText) dialog.getCustomView().findViewById(R.id.locationReportEditText);
         location_report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -504,7 +527,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (GooglePlayServicesRepairableException e) {
                     Log.d("PlacesAPI Demo", "GooglePlayServicesRepairableException thrown");
                 } catch (GooglePlayServicesNotAvailableException e) {
-                   Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
+                    Log.d("PlacesAPI Demo", "GooglePlayServicesNotAvailableException thrown");
                 }
             }
         });
@@ -526,7 +549,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void saveDetailsToDataBase() {
-        ArrayList<NameValuePair> parametersDatabase=new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> parametersDatabase = new ArrayList<NameValuePair>();
 
         /*To do*/
         parametersDatabase.add(new BasicNameValuePair(Config.phone_number, phone_number));
@@ -534,15 +557,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         /*Time format*/
         /*July 22, 2013 14:00:00*/
 
-        Calendar calendar=Calendar.getInstance();
-        int month=calendar.get(Calendar.MONTH);
-        int year=calendar.get(Calendar.YEAR);
-        int day=calendar.get(Calendar.DAY_OF_MONTH);
-        int hours=calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes=calendar.get(Calendar.MINUTE);
-        String monthString=getMonthFormatted(month);
-        int seconds=0;
-        String finalStartDate=getFormattedDate(monthString,day,year,hours,minutes,seconds);
+        Calendar calendar = Calendar.getInstance();
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        String monthString = getMonthFormatted(month);
+        int seconds = 0;
+        String finalStartDate = getFormattedDate(monthString, day, year, hours, minutes, seconds);
         int dayNew = 0, hourNew = 0, minuteNew = 0;
         if (minutes + this.minutes >= 60) {
             minuteNew += (minutes + this.minutes % 60);
@@ -554,45 +577,44 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         dayNew += day;
         String finalEndDate = getFormattedDate(monthString, dayNew, year, hourNew, minuteNew, seconds);
-        Log.d("enddate",finalEndDate);
+        Log.d("enddate", finalEndDate);
         parametersDatabase.add(new BasicNameValuePair(Config.detail, descriptionReport));
-        parametersDatabase.add(new BasicNameValuePair(Config.tag,typeOfReport));
+        parametersDatabase.add(new BasicNameValuePair(Config.tag, typeOfReport));
         parametersDatabase.add(new BasicNameValuePair(Config.start_time, finalStartDate));
         parametersDatabase.add(new BasicNameValuePair(Config.end_time, finalEndDate));
-        parametersDatabase.add(new BasicNameValuePair(Config.latitude, ""+lat_report));
-        parametersDatabase.add(new BasicNameValuePair(Config.longitude, ""+long_report));
+        parametersDatabase.add(new BasicNameValuePair(Config.latitude, "" + lat_report));
+        parametersDatabase.add(new BasicNameValuePair(Config.longitude, "" + long_report));
 
         ServerRequest sr = new ServerRequest(MapsActivity.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-        JSONObject json = sr.getJSON(Config.ip+"/reportAdd",parametersDatabase);
+        JSONObject json = sr.getJSON(Config.ip + "/reportAdd", parametersDatabase);
         Log.d("here", "json received");
-        if(json != null){
-            try{
+        if (json != null) {
+            try {
                 String jsonstr = json.getString("response");
                 //String sue = json.getString("use");
 
                 //Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
 
                 Log.d("Hello", jsonstr);
-            }catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
 
-
     }
 
     private String getFormattedDate(String monthString, int day, int year, int hours, int minutes, int seconds) {
-        String formattedDate= monthString+" "+day+", "+year+" "+hours+":"+minutes+":"+seconds;
-        Log.d("FormattedDate",formattedDate);
+        String formattedDate = monthString + " " + day + ", " + year + " " + hours + ":" + minutes + ":" + seconds;
+        Log.d("FormattedDate", formattedDate);
         return formattedDate;
     }
 
-    private String getMonthFormatted(int month){
-        String monthString[]={
-                "January","February","March","April","May","June","July","August","September","October","November","December"
+    private String getMonthFormatted(int month) {
+        String monthString[] = {
+                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
         };
         return monthString[month];
     }
@@ -749,8 +771,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (resultCode == RESULT_OK) {
                 randomPickedPlaceLatLng = getRandomPickedPlaceOnMap(PlacePicker.getPlace(data, this));
                 //to set the place name in location edit text
-                Place place=PlacePicker.getPlace(data,this);
-                if(place!=null){
+                Place place = PlacePicker.getPlace(data, this);
+                if (place != null) {
                     location_report.setText(place.getName());
                 }
             }
@@ -764,8 +786,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return null;
         else {
             LatLng latLng = place.getLatLng();
-            lat_report=latLng.latitude;
-            long_report=latLng.longitude;
+            lat_report = latLng.latitude;
+            long_report = latLng.longitude;
             return latLng;
         }
     }
@@ -929,4 +951,174 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         */
     }
+
+
+    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+
+        // Origin of route
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
+        // Destination of route
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+
+        // Sensor enabled
+        String sensor = "sensor=false";
+
+        //multiples routes
+        String alt = "alternatives=true";
+
+        //key
+        String key = "key=AIzaSyAiEXRpe8fClqv5KzTN3X-JKlGywHZVOfs";
+
+        // Building the parameters to the web service
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + alt;
+
+        // Output format
+        String output = "json";
+
+
+        // Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+
+        return url;
+    }
+
+    /**
+     * A method to download json data from url
+     */
+    private String downloadUrl(String strUrl) throws IOException {
+        String data = "";
+        InputStream iStream = null;
+        HttpURLConnection urlConnection = null;
+        try {
+            URL url = new URL(strUrl);
+
+// Creating an http connection to communicate with url
+            urlConnection = (HttpURLConnection) url.openConnection();
+
+// Connecting to url
+            urlConnection.connect();
+
+// Reading data from url
+            iStream = urlConnection.getInputStream();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+            StringBuffer sb = new StringBuffer();
+
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+
+            data = sb.toString();
+
+            br.close();
+
+        } catch (Exception e) {
+            Log.d("MapsActtivity.this", e.toString());
+        } finally {
+            iStream.close();
+            urlConnection.disconnect();
+        }
+        return data;
+    }
+
+    // Fetches data from url passed
+    private class DownloadTask extends AsyncTask<String, Void, String> {
+
+        // Downloading data in non-ui thread
+        @Override
+        protected String doInBackground(String... url) {
+
+// For storing data from web service
+            String data = "";
+
+            try {
+// Fetching the data from web service
+                data = downloadUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        // Executes in UI thread, after the execution of
+// doInBackground()
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            ParserTask parserTask = new ParserTask();
+
+// Invokes the thread for parsing the JSON data
+            parserTask.execute(result);
+
+        }
+    }
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsJSONParser parser = new DirectionsJSONParser();
+
+// Starts parsing data
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+
+        // Executes in UI thread, after the parsing process
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList points = null;
+            PolylineOptions lineOptions = null;
+            MarkerOptions markerOptions = new MarkerOptions();
+
+// Traversing through all the routes
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList();
+                lineOptions = new PolylineOptions();
+
+// Fetching i-th route
+                List<HashMap<String, String>> path = result.get(i);
+
+// Fetching all the points in i-th route
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                // Adding all the points in the route to LineOptions
+                lineOptions.addAll(points);
+                lineOptions.width(10);
+                lineOptions.color(Color.RED);
+
+            }
+
+            // Drawing polyline in the Google Map for the i-th route
+            mMap.addPolyline(lineOptions);
+        }
+    }
+
+
 }
