@@ -39,7 +39,7 @@ public class Login extends Fragment {
     EditText phone_number, password, res_email, code, newpass;
     Button login, cont, cancel, cancel1, cont_code;
     TextView forgot_password;
-    String phone_number_txt, password_txt, email_res_txt, code_txt, npass_txt;
+    String phone_number_txt, password_txt, email_res_txt, code_txt, npass_txt,shared_location;
     List<NameValuePair> params, params_history, params_req_send;
     SharedPreferences pref;
     ServerRequest sr;
@@ -64,6 +64,7 @@ public class Login extends Fragment {
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         pDialog.setTitleText("Logging you in please Wait!");
         pDialog.setCancelable(false);
+        //reset = new
 
         login.setOnClickListener(new View.OnClickListener() {
 
@@ -113,6 +114,9 @@ public class Login extends Fragment {
                                     if (json.getBoolean("res")) {
                                         String token = json.getString("token");
                                         String grav = json.getString("grav");
+                                        String email = json.getString("email");
+                                        String user_name = json.getString("user_name");
+                                        shared_location = json.getString("shared_location");
                                         SharedPreferences.Editor edit = pref.edit();
                                         //Storing Data using SharedPreferences
                                         edit.putString("token", token);
@@ -142,7 +146,10 @@ public class Login extends Fragment {
 
                                         Intent profactivity = new Intent(getContext(), MapsActivity.class);
                                         edit.putString("phone_number", phone_number_txt);
-                                        Log.d("chalo",phone_number_txt);
+                                        edit.putString("email", email);
+                                        edit.putString("user_name",user_name);
+                                        edit.putString("shared_location",shared_location);
+                                        Log.d("chalo",shared_location);
                                         edit.commit();
                                         startActivity(profactivity);
                                         ((Activity) getContext()).finish();
@@ -171,6 +178,7 @@ public class Login extends Fragment {
             public void onClick(View view) {
 
 
+
                 MaterialDialog dialog = new MaterialDialog.Builder(getContext())
                         .title("Forgot Password")
                         .customView(R.layout.reset_pass_init, true)
@@ -193,51 +201,59 @@ public class Login extends Fragment {
                                         if (json.getBoolean("res")) {
                                             Log.e("JSON", jsonstr);
                                             Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
-                                            reset.setContentView(R.layout.reset_pass_code);
-                                            cont_code = (Button) reset.findViewById(R.id.conbtn);
-                                            code = (EditText) reset.findViewById(R.id.code);
-                                            newpass = (EditText) reset.findViewById(R.id.npass);
-                                            cancel1 = (Button) reset.findViewById(R.id.cancel);
-                                            cancel1.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    reset.dismiss();
-                                                }
-                                            });
-                                            cont_code.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    code_txt = code.getText().toString();
-                                                    npass_txt = newpass.getText().toString();
-                                                    Log.e("Code", code_txt);
-                                                    Log.e("New pass", npass_txt);
-                                                    params = new ArrayList<NameValuePair>();
-                                                    params.add(new BasicNameValuePair("email", email_res_txt));
-                                                    params.add(new BasicNameValuePair("code", code_txt));
-                                                    params.add(new BasicNameValuePair("newpass", npass_txt));
+                                            MaterialDialog reset = new MaterialDialog.Builder(getContext())
+                                                    .title("New password")
+                                                    .customView(R.layout.reset_pass_code, true)
+                                                    .positiveText("Reset")
+                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                                                    JSONObject json = sr.getJSON(Config.ip + "/api/resetpass/chg", params);
-                                                    //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
+                                                            code = (EditText) dialog.getCustomView().findViewById(R.id.code);
+                                                            newpass = (EditText) dialog.getCustomView().findViewById(R.id.npass);
 
-                                                    if (json != null) {
-                                                        try {
+                                                            code_txt = code.getText().toString();
+                                                            npass_txt = newpass.getText().toString();
+                                                            Log.e("Code", code_txt);
+                                                            Log.e("New pass", npass_txt);
+                                                            params = new ArrayList<NameValuePair>();
+                                                            params.add(new BasicNameValuePair("email", email_res_txt));
+                                                            params.add(new BasicNameValuePair("code", code_txt));
+                                                            params.add(new BasicNameValuePair("newpass", npass_txt));
 
-                                                            String jsonstr = json.getString("response");
-                                                            if (json.getBoolean("res")) {
-                                                                reset.dismiss();
-                                                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+                                                            JSONObject json = sr.getJSON(Config.ip + "/api/resetpass/chg", params);
+                                                            //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
-                                                            } else {
-                                                                Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+                                                            if (json != null) {
+                                                                try {
 
+                                                                    String jsonstr = json.getString("response");
+                                                                    if (json.getBoolean("res")) {
+                                                                        dialog.dismiss();
+                                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                                                                    } else {
+                                                                        Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
+
+                                                                    }
+                                                                } catch (JSONException e) {
+                                                                    e.printStackTrace();
+                                                                }
                                                             }
-                                                        } catch (JSONException e) {
-                                                            e.printStackTrace();
-                                                        }
-                                                    }
 
-                                                }
-                                            });
+                                                        }
+                                                    })
+                                                    .negativeText("Cancel")
+                                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    }).show();
+                                            //reset.setContentView(R.layout.reset_pass_code);
+
+
+
                                         } else {
 
                                             Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();

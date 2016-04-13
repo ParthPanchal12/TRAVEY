@@ -60,7 +60,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    String phone_number;
+    String phone_number,shared_location,Rating;
     String email;
     private String selectedImagePath,imgDecodableString;
     ServerRequest sr;
@@ -77,11 +77,39 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         setSupportActionBar(toolbar);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout_profilePage);
         appBarLayout.setExpanded(true);
+
+        /*Setting the profile pic*/
+        profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
+        profilePicture = R.drawable.header;
+
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         nameOfUser = pref.getString("user_name","");
+        phone_number = pref.getString(Config.phone_number, "");
+        email = pref.getString(Config.email,"");
+        shared_location = pref.getString("shared_location", "");
+        Toast.makeText(MainActivity_ProfilePage.this, shared_location, Toast.LENGTH_SHORT).show();
+        Log.d("shared",shared_location);
+        if(shared_location.equals("1"))
+            shared_location = "Shared";
+        else
+            shared_location = "Not Shared";
 
         collapsingToolbar.setTitle(nameOfUser);
         sr = new ServerRequest(this);
+
+
+        ArrayList<NameValuePair> params_editEmail = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editUserName = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editImage = new ArrayList<NameValuePair>();
+        ArrayList<NameValuePair> params_editPhoneNumber = new ArrayList<NameValuePair>();
+        final ArrayList<NameValuePair> params_editSharedLocation = new ArrayList<NameValuePair>();
+        final ArrayList<NameValuePair> params_editAllowedToPost = new ArrayList<NameValuePair>();
+
+        params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editEmail.add(new BasicNameValuePair(Config.email, email));
+
+        params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
 
 
         /*If clicked on Profile Pic then show the photo*/
@@ -96,26 +124,18 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             }
         });
 
-        /*Setting the profile pic*/
-        profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
-        profilePicture = R.drawable.header;
-        phone_number = pref.getString(Config.phone_number, "");
-        email = pref.getString(Config.email,"");
+
+
+        JSONObject json = sr.getJSON(Config.ip + "/getRating", params_editEmail);
+        try {
+            Rating = json.getString("rating");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         userInfoDescription[1] = email;
         userInfoDescription[0] = phone_number;
-
-        ArrayList<NameValuePair> params_editEmail = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editUserName = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editImage = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editPhoneNumber = new ArrayList<NameValuePair>();
-        final ArrayList<NameValuePair> params_editSharedLocation = new ArrayList<NameValuePair>();
-        final ArrayList<NameValuePair> params_editAllowedToPost = new ArrayList<NameValuePair>();
-
-        params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        params_editEmail.add(new BasicNameValuePair(Config.email, email));
-
-        params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
+        userInfoDescription[2] = Rating;
+        userInfoDescription[3] = shared_location;
 
         //params_editUserName.
         /*sr = new ServerRequest(MainActivity_ProfilePage.this);
