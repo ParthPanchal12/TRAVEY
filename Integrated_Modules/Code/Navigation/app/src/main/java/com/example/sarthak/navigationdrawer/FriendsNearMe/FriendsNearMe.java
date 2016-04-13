@@ -163,6 +163,8 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
             Log.d("MarkerPosition", "" + friendsNearMe.get(i).getLatitude() + "," + friendsNearMe.get(i).getLongitude());
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(friendsNearMe.get(i).getLatitude(), friendsNearMe.get(i).getLongitude()))
+                    .snippet(friendsNearMe.get(i).getPhone_number())
+                    .title(friendsNearMe.get(i).getName())
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
         }
@@ -172,8 +174,6 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
                 for (int j = 0; j < friendsNearMe.size(); j++) {
                     LatLng loc1 = new LatLng(friendsNearMe.get(j).getLatitude(), friendsNearMe.get(j).getLongitude());
                     if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
-
-                        getDetailsForFriend(friendsNearMe.get(j).getName());
                         break;
                     }
                 }
@@ -184,12 +184,6 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         animateCameraToShowNearMeArea();
     }
 
-    private void getDetailsForFriend(String name) {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(name);
-        builder.show();
-    }
     private void animateCameraToShowNearMeArea() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -206,12 +200,12 @@ public class FriendsNearMe extends AppCompatActivity implements OnMapReadyCallba
         ArrayList<NameValuePair> parameters = new ArrayList<>();
         String phone_number = pref.getString(Config.phone_number, "");
         parameters.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        JSONArray json = sr.getJSONArray(Config.ip+"/getMyLocation", parameters);
+        JSONArray json = sr.getJSONArray(Config.ip + "/getMyLocation", parameters);
 
         if (json != null) {
             try {
                 Log.d("JsonFriend", "" + json);
-                myLastKnownLocation=new LatLng(json.getDouble(0),json.getDouble(1));
+                myLastKnownLocation = new LatLng(json.getDouble(0), json.getDouble(1));
 
             } catch (JSONException e) {
                 e.printStackTrace();
