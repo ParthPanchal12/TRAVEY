@@ -244,7 +244,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
         /*Take all the users from the database*/
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        params.add(new BasicNameValuePair(Config.phone_number, pref.getString(Config.phone_number, "")));
         ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
         Log.d("Contacts", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
