@@ -23,7 +23,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.GCM.GCM;
 import com.example.sarthak.navigationdrawer.MapsActivity;
 import com.example.sarthak.navigationdrawer.R;
-import com.google.gson.Gson;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -126,17 +125,17 @@ public class Login extends Fragment {
                                         edit.putString("grav", grav);
 
 
-                                        History h = new History();
-                                        h.date = "19/2/96";
-                                        h.source = "Gandhinagar";
-                                        h.destination = "Ahmedabad";
-
-                                        Gson gson = new Gson();
-                                        String s = gson.toJson(h);
+//                                        History h = new History();
+//                                        h.date = "19/2/96";
+//                                        h.source = "Gandhinagar";
+//                                        h.destination = "Ahmedabad";
+//
+//                                        Gson gson = new Gson();
+//                                        String s = gson.toJson(h);
 
                                         params_history = new ArrayList<NameValuePair>();
                                         params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                        params_history.add(new BasicNameValuePair(Config.history, s));
+                                        //params_history.add(new BasicNameValuePair(Config.history, s));
                                         //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
 
 

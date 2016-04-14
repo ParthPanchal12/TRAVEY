@@ -23,7 +23,6 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -112,6 +111,15 @@
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_check_white_24dp"
+            android:id="@+id/fab_addHistory"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            android:layout_margin="16dp"
+            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView

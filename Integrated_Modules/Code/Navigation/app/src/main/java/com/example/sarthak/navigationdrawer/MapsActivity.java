@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.History;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LocationService;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
@@ -135,6 +137,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng destinationLatLng;
     private LatLng sourceLatLng;
     private ArrayList<Polyline> polylines;
+    private FloatingActionButton fab_addHistory;
+    private String sourceName = "";
+    private String destName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -246,6 +251,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         /*To do enable permission code*/
         enablePermissions();
 
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -271,6 +277,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
+
         /*Autocomplete Source and Destination Box*/
 
         cardView_Destination = (CardView) findViewById(R.id.card_view_Destination_search);
@@ -286,6 +294,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 lastSelectedLocationName = String.valueOf(place.getName());
                 lastSelectedLatLng = place.getLatLng();
                 sourceLatLng = place.getLatLng();
+                sourceName = place.getName().toString();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(sourceLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
                 if (sourceMarker != null) {
@@ -312,6 +321,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     mMap.animateCamera(cu);
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom));
+                    fab_addHistory.setVisibility(View.VISIBLE);
 
                 }
                 cardView_Destination.setVisibility(View.VISIBLE);
@@ -332,6 +342,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i("Selected", "Place: " + place.getName());
+                destName = place.getName().toString();
                 destinationLatLng = place.getLatLng();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(destinationLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
@@ -356,6 +367,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     DownloadTask downloadTask = new DownloadTask();
                     // Start downloading json data from Google Directions API
                     downloadTask.execute(url);
+                    fab_addHistory.setVisibility(View.VISIBLE);
                     mMap.animateCamera(cu);
                     cardView_Destination.setVisibility(View.GONE);
                     cardView_Source.setVisibility(View.GONE);
@@ -373,6 +385,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
+
+        /*Add history*/
+        fab_addHistory = (FloatingActionButton) findViewById(R.id.fab_addHistory);
+        fab_addHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addHistory();
+                fab_addHistory.setVisibility(View.GONE);
+            }
+        });
 
         /*Floating action buttons inside the menu*/
         fab_menu_report_panel = (FloatingActionsMenu) findViewById(R.id.fab_report_panel);
@@ -417,6 +440,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private void addHistory() {
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair(Config.phone_number, pref.getString(Config.phone_number, "")));
+
+        History h = new History();
+        Calendar calendar = Calendar.getInstance();
+        h.date = "" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.YEAR);
+        h.source = sourceName;
+        h.destination = destName;
+
+        Gson gson = new Gson();
+        String s = gson.toJson(h);
+        params.add(new BasicNameValuePair(Config.history, s));
+
+        ServerRequest sr = new ServerRequest(MapsActivity.this);
+        JSONObject jsonObject = sr.getJSON(Config.ip + "/historyAdd", params);
+        if (jsonObject != null) {
+            try {
+                String temp = jsonObject.getString("response");
+                Log.d("Maps", temp);
+                Toast.makeText(MapsActivity.this, temp, Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(MapsActivity.this, "Could not add to history", Toast.LENGTH_SHORT).show();
+        }
+    }
     private void addLabelsForAllReports() {
 
         //clearing the map before adding all the other reports.
@@ -862,6 +913,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 cancel_source_and_destination.setVisible(false);
                 cardView_Source.setVisibility(View.VISIBLE);
                 cardView_Destination.setVisibility(View.VISIBLE);
+                fab_addHistory.setVisibility(View.GONE);
                 return true;
             case R.id.action_get_currentLocation:
                 goToCurrentLocation();
@@ -1129,7 +1181,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
                 // Drawing polyline in the Google Map for the i-th route
-//                polylines.add(mMap.addPolyline(lineOptions));
+                polylines.add(mMap.addPolyline(lineOptions));
 //                mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
 //                    @Override
 //                    public void onPolylineClick(Polyline polyline) {
