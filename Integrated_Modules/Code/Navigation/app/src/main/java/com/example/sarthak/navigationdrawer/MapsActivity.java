@@ -30,6 +30,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -90,6 +92,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import info.hoang8f.widget.FButton;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
@@ -468,6 +471,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Toast.makeText(MapsActivity.this, "Could not add to history", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void addLabelsForAllReports() {
 
         //clearing the map before adding all the other reports.
@@ -523,7 +527,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 LatLng loc1 = new LatLng(loc[0], loc[1]);
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j);
+                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j, reports.get(j).getEnd_time());
                                     Log.d("checkVote", "After one iteration" + reports.size());
                                     break;
                                 }
@@ -545,6 +549,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void getDialogReportAdd() {
+
+
         boolean wrapInScrollView = true;
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Enter Report Parameters")
@@ -678,78 +684,184 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos) {
+    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos, String durationTime) {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+
+        ServerRequest serverRequest = new ServerRequest(MapsActivity.this);
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        String up = "", down = "";
+        SweetAlertDialog progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        progressBar.setTitleText("Getting your contacts");
+        progressBar.setCancelable(false);
+        progressBar.show();
+        params.add(new BasicNameValuePair(Config.reportId, id));
+        JSONObject jsonObject = serverRequest.getJSON(Config.ip + "/getUpvotes", params);
+        if (jsonObject != null) {
+            try {
+                up = jsonObject.getString("upvotes");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        jsonObject = serverRequest.getJSON(Config.ip + "/getDownvotes", params);
+        if (jsonObject != null) {
+            try {
+                down = jsonObject.getString("downvotes");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        progressBar.hide();
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .customView(R.layout.custom_layout_for_reports_description, true)
+                .show();
+
+        ImageView upvoteImage = (ImageView) dialog.getCustomView().findViewById(R.id.image_UpVote_reports);
+        ImageView downvoteImage = (ImageView) dialog.getCustomView().findViewById(R.id.image_DownVote_reports);
+        TextView type_report = (TextView) dialog.getCustomView().findViewById(R.id.tv_type_report_display);
+        type_report.setText(title);
+        TextView description_report = (TextView) dialog.getCustomView().findViewById(R.id.description_dislpayReport);
+        description_report.setText(detail);
+        TextView duration = (TextView) dialog.getCustomView().findViewById(R.id.duration_report_display);
+        duration.setText(duration.getText() + durationTime);
+        TextView upvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_upvotesTotal);
+        TextView downvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_downvotesTotal);
+        upvoteText.setText(up);
+        downvoteText.setText(down);
+
+        upvoteImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-
-                        return;
-                    case 1:
-                        ArrayList<NameValuePair> params1 = new ArrayList<>();
-                        params1.add(new BasicNameValuePair(Config.reportId, id));
-                        params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
-                        ServerRequest sr1 = new ServerRequest(MapsActivity.this);
-                        Log.d("here", "params sent" + id);
-                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
-                        if (json1 != null) {
-                            try {
-                                String rsp = json1.getString("response");
-                                if (rsp.equals("Can only upvote once")) {
-                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("here", "json received");
-                                    Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
-                                    Reports rep = reports.get(pos);
-                                    rep.setUpvotes(rep.getUpvotes() + 1);
-                                    reports.set(pos, rep);
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+            public void onClick(View v) {
+                ArrayList<NameValuePair> params1 = new ArrayList<>();
+                params1.add(new BasicNameValuePair(Config.reportId, id));
+                params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                ServerRequest sr1 = new ServerRequest(MapsActivity.this);
+                Log.d("here", "params sent" + id);
+                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
+                if (json1 != null) {
+                    try {
+                        String rsp = json1.getString("response");
+                        if (rsp.equals("Can only upvote once")) {
+                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("here", "json received");
+                            Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                            Reports rep = reports.get(pos);
+                            rep.setUpvotes(rep.getUpvotes() + 1);
+                            reports.set(pos, rep);
 
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-
-                        return;
-                    case 2:
-                        ArrayList<NameValuePair> params2 = new ArrayList<>();
-                        params2.add(new BasicNameValuePair(Config.reportId, id));
-                        params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
-                        ServerRequest sr2 = new ServerRequest(MapsActivity.this);
-                        Log.d("here", "params sent");
-                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
-                        if (json2 != null) {
-                            try {
-                                String rsp = json2.getString("response");
-                                if (rsp.equals("Can only downvote once")) {
-                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("here", "json received");
-                                    Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
-                                    Reports rep1 = reports.get(pos);
-                                    rep1.setDownvotes(rep1.getDownvotes() + 1);
-                                    reports.set(pos, rep1);
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                        return;
                 }
+
             }
         });
-        builder.show();
+        downvoteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<NameValuePair> params2 = new ArrayList<>();
+                params2.add(new BasicNameValuePair(Config.reportId, id));
+                params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                ServerRequest sr2 = new ServerRequest(MapsActivity.this);
+                Log.d("here", "params sent");
+                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+                if (json2 != null) {
+                    try {
+                        String rsp = json2.getString("response");
+                        if (rsp.equals("Can only downvote once")) {
+                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("here", "json received");
+                            Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                            Reports rep1 = reports.get(pos);
+                            rep1.setDownvotes(rep1.getDownvotes() + 1);
+                            reports.set(pos, rep1);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(title);
+//        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                switch (which) {
+//                    case 0:
+//
+//                        return;
+//                    case 1:
+//                        ArrayList<NameValuePair> params1 = new ArrayList<>();
+//                        params1.add(new BasicNameValuePair(Config.reportId, id));
+//                        params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
+//                        ServerRequest sr1 = new ServerRequest(MapsActivity.this);
+//                        Log.d("here", "params sent" + id);
+//                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+//                        JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
+//                        if (json1 != null) {
+//                            try {
+//                                String rsp = json1.getString("response");
+//                                if (rsp.equals("Can only upvote once")) {
+//                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    Log.d("here", "json received");
+//                                    Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+//                                    Reports rep = reports.get(pos);
+//                                    rep.setUpvotes(rep.getUpvotes() + 1);
+//                                    reports.set(pos, rep);
+//
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//
+//                        return;
+//                    case 2:
+//                        ArrayList<NameValuePair> params2 = new ArrayList<>();
+//                        params2.add(new BasicNameValuePair(Config.reportId, id));
+//                        params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
+//                        ServerRequest sr2 = new ServerRequest(MapsActivity.this);
+//                        Log.d("here", "params sent");
+//                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+//                        JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+//                        if (json2 != null) {
+//                            try {
+//                                String rsp = json2.getString("response");
+//                                if (rsp.equals("Can only downvote once")) {
+//                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    Log.d("here", "json received");
+//                                    Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+//                                    Reports rep1 = reports.get(pos);
+//                                    rep1.setDownvotes(rep1.getDownvotes() + 1);
+//                                    reports.set(pos, rep1);
+//
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//                        return;
+//                }
+//            }
+//        });
+//        builder.show();
 
     }
 

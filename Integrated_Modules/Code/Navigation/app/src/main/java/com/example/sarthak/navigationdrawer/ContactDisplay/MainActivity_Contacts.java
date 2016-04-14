@@ -1,9 +1,7 @@
 package com.example.sarthak.navigationdrawer.ContactDisplay;
 
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -12,10 +10,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,10 +38,8 @@ import org.json.JSONException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -109,7 +103,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
-                        selectTypeForFriend();
+                        selectTypeForFriend(adapter.friends.get(position).getPhone());
                     }
                 })
         );
@@ -329,7 +323,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
     }
 
-    private void selectTypeForFriend() {
+    private void selectTypeForFriend(final String phone) {
         String methodsToTakeSource[] = {"Share your location", "Get his location"};
         new MaterialDialog.Builder(MainActivity_Contacts.this)
                 .title("Select an option")
@@ -344,8 +338,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         switch (which) {
                             case 0:
                                 ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                                params.add(new BasicNameValuePair(Config.phone_number, "8401589488"));
-                                params.add(new BasicNameValuePair(Config.user_name, "Sarthak"));
+                                params.add(new BasicNameValuePair(Config.phone_number, phone));
+                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
                                 ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
                                 Log.d("here", "params sent");
                                 //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
