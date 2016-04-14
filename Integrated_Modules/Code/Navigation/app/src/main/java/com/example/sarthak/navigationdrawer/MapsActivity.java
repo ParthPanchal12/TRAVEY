@@ -611,6 +611,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         hours = hourOfDay;
                         minutes = minute;
+                        hour_minute_selector.setText("Selected Time:" + hours + ":" + minutes);
                     }
                 }, 0, 0);
                 durationPickerDialog.show();
@@ -732,7 +733,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         TextView description_report = (TextView) dialog.getCustomView().findViewById(R.id.description_dislpayReport);
         description_report.setText(detail);
         TextView duration = (TextView) dialog.getCustomView().findViewById(R.id.duration_report_display);
-        duration.setText(duration.getText() + durationTime);
+        duration.setText("End Time:" + durationTime);
         TextView upvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_upvotesTotal);
         TextView downvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_downvotesTotal);
         upvoteText.setText(up);

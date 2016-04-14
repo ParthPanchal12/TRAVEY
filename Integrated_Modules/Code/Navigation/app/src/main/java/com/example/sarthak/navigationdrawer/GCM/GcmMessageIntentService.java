@@ -2,12 +2,16 @@ package com.example.sarthak.navigationdrawer.GCM;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -48,10 +52,16 @@ public class GcmMessageIntentService extends IntentService {
             @Override
             public void run() {
 
+                Intent intent = new Intent(getApplicationContext(), MainActivity_Contacts.class);
+                PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 NotificationCompat.Builder mBuilder =
                         (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(R.drawable.ic_launcher)
                                 .setContentTitle(message)
+                                .setSound(sound)
+                                .setContentIntent(pendingIntent)
                                 .setContentText(message_message);
 
                 mNotificationId++;

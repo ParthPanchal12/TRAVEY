@@ -28,6 +28,12 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         System.out.println("Hiiiithere11");
 
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
         gcm = new GCM(SplashScreen.this);
         regId = gcm.getRegId();
         ServerRequest sr = new ServerRequest(SplashScreen.this);
