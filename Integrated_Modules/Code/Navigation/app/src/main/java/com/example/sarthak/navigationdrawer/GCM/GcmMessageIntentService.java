@@ -18,6 +18,7 @@ public class GcmMessageIntentService extends IntentService {
     private Handler handler;
     GoogleCloudMessaging gcm;
     String message;
+    String message_message;
     private int mNotificationId = 0;
     public GcmMessageIntentService() {
         super("GcmMessageHandler");
@@ -36,6 +37,7 @@ public class GcmMessageIntentService extends IntentService {
         gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
         message = extras.getString("title");
+        message_message = extras.getString("message");
         showNotification();
         Log.i("GCM", "Received : (" + messageType + ")  " + extras.getString("title"));
         GCMBroadcastReceiver.completeWakefulIntent(intent);
@@ -50,7 +52,7 @@ public class GcmMessageIntentService extends IntentService {
                         (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
                                 .setSmallIcon(R.drawable.ic_launcher)
                                 .setContentTitle(message)
-                                .setContentText("Hello World!");
+                                .setContentText(message_message);
 
                 mNotificationId++;
                 // Gets an instance of the NotificationManager service
