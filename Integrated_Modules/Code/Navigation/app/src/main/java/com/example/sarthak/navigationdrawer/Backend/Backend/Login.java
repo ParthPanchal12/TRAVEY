@@ -39,7 +39,7 @@ public class Login extends Fragment {
     EditText phone_number, password, res_email, code, newpass;
     Button login, cont, cancel, cancel1, cont_code;
     TextView forgot_password;
-    String phone_number_txt, password_txt, email_res_txt, code_txt, npass_txt,shared_location;
+    String phone_number_txt, password_txt, email_res_txt, code_txt, npass_txt, shared_location;
     List<NameValuePair> params, params_history, params_req_send;
     SharedPreferences pref;
     ServerRequest sr;
@@ -52,6 +52,11 @@ public class Login extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.activity_login, container, false);
+        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Please wait a while");
+        pDialog.setCancelable(false);
+        pDialog.show();
 
         sr = new ServerRequest(getContext());
         phone_number = (EditText) view.findViewById(R.id.login_phone_number);
@@ -59,11 +64,8 @@ public class Login extends Fragment {
         login = (Button) view.findViewById(R.id.login_login);
         forgot_password = (TextView) view.findViewById(R.id.login_forgot_password);
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-        gcm_pref=this.getActivity().getSharedPreferences(GCM.class.getSimpleName(),Context.MODE_PRIVATE);
-        pDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
-        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        pDialog.setTitleText("Logging you in please Wait!");
-        pDialog.setCancelable(false);
+        gcm_pref = this.getActivity().getSharedPreferences(GCM.class.getSimpleName(), Context.MODE_PRIVATE);
+        pDialog.hide();
         //reset = new
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -72,6 +74,7 @@ public class Login extends Fragment {
             public void onClick(View v) {
 
                 //call pdialog
+
 
                 phone_number_txt = phone_number.getText().toString();
                 password_txt = password.getText().toString();
@@ -94,13 +97,13 @@ public class Login extends Fragment {
                         params.add(new BasicNameValuePair(Config.password, password_txt));
 
 
-                        regId = gcm_pref.getString("registration_id","");
+                        regId = gcm_pref.getString("registration_id", "");
                         if (regId == null) {
                             Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
-                        } else if(regId.isEmpty()){
+                        } else if (regId.isEmpty()) {
                             Toast.makeText(getContext(), "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
-                        } else{
-                            Log.d("Adding gcm id to params",""+regId);
+                        } else {
+                            Log.d("Adding gcm id to params", "" + regId);
                             params.add(new BasicNameValuePair(Config.gcmId, regId));
                         }
 
@@ -147,9 +150,9 @@ public class Login extends Fragment {
                                         Intent profactivity = new Intent(getContext(), MapsActivity.class);
                                         edit.putString("phone_number", phone_number_txt);
                                         edit.putString("email", email);
-                                        edit.putString("user_name",user_name);
-                                        edit.putString("shared_location",shared_location);
-                                        Log.d("chalo",shared_location);
+                                        edit.putString("user_name", user_name);
+                                        edit.putString("shared_location", shared_location);
+                                        Log.d("chalo", shared_location);
                                         edit.commit();
                                         startActivity(profactivity);
                                         ((Activity) getContext()).finish();
@@ -169,6 +172,7 @@ public class Login extends Fragment {
                         Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                     }
                 }
+                pDialog.hide();
             }
         });
 
@@ -176,7 +180,6 @@ public class Login extends Fragment {
         forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
 
                 MaterialDialog dialog = new MaterialDialog.Builder(getContext())
@@ -253,7 +256,6 @@ public class Login extends Fragment {
                                             //reset.setContentView(R.layout.reset_pass_code);
 
 
-
                                         } else {
 
                                             Toast.makeText(getContext(), jsonstr, Toast.LENGTH_LONG).show();
@@ -282,6 +284,14 @@ public class Login extends Fragment {
 
         return view;
     }
+
+    private int PERMISSION_CHECK_FINE_LOCATION = 12;
+    private int PERMISSION_CHECK_CONTACTS = 12;
+    private int PERMISSION_CHECK_COARSE_LOCATION = 12;
+    private int PERMISSION_CHECK_SMS = 12;
+    private int PERMISSION_CHECK_TELEPHONE = 12;
+    private int PERMISSION_CHECK_STORAGE = 12;
+
 
 }
 

@@ -66,6 +66,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -133,6 +134,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double long_report;
     private LatLng destinationLatLng;
     private LatLng sourceLatLng;
+    private ArrayList<Polyline> polylines;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +199,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
                 if (menuItem.getTitle().equals("Profile")) {
+
                     Intent intent = new Intent(MapsActivity.this, MainActivity_ProfilePage.class);
                     startActivity(intent);
                 } else if (menuItem.getTitle().equals("Places")) {
@@ -294,6 +297,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
                 if (destinationMarker != null) {
+                    //mMap.clear();
+                    //addLabelsForAllReports();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(sourceMarker.getPosition());
                     builder.include(destinationMarker.getPosition());
@@ -338,6 +343,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
                 if (sourceMarker != null) {
+                    //mMap.clear();
+                    //addLabelsForAllReports();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(sourceMarker.getPosition());
                     builder.include(destinationMarker.getPosition());
@@ -894,61 +901,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void enablePermissions() {
         //To see this code many threads running simultaneously requesting permissions
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK);
-            }
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CHECK);
-            }
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CHECK);
-            }
-        }
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
-            }
-        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK);
+//            }
+//        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CHECK);
+//            }
+//        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+//            }
+//        }
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+//            }
+//        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
 
-        switch (requestCode) {
-            case PERMISSION_CHECK: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    return;
-
-                } else {
-                    enablePermissions();
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
+//        switch (requestCode) {
+//            case PERMISSION_CHECK: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    return;
+//
+//                } else {
+//                    enablePermissions();
+//                }
+//                return;
+//            }
+//
+//            // other 'case' lines to check for other
+//            // permissions this app might request
+//        }
 
     }
 
@@ -1085,10 +1092,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-            ArrayList points = null;
+
+
+            ArrayList<LatLng> points = new ArrayList();
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
-
+            polylines = new ArrayList<>();
+            polylines.clear();
 // Traversing through all the routes
             for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList();
@@ -1110,14 +1120,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
-                lineOptions.width(10);
-                lineOptions.color(Color.RED);
+                lineOptions.width(20);
+                if (i == 0)
+                    lineOptions.color(Color.BLUE);
+                else
+                    lineOptions.color(getResources().getColor(R.color.fbutton_color_asbestos));
+                lineOptions.geodesic(true);
 
+
+                // Drawing polyline in the Google Map for the i-th route
+//                polylines.add(mMap.addPolyline(lineOptions));
+//                mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+//                    @Override
+//                    public void onPolylineClick(Polyline polyline) {
+//                        for(int i=0;i<polylines.size();i++){
+//                            polylines.get(i).setColor(getResources().getColor(R.color.fbutton_color_asbestos));
+//                        }
+//                        polyline.setColor(getResources().getColor(R.color.fbutton_color_clouds));
+//                    }
+//                });
             }
 
-            // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
         }
+
     }
 
 
