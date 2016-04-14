@@ -457,6 +457,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String s = gson.toJson(h);
         params.add(new BasicNameValuePair(Config.history, s));
 
+        Log.d("history_string",s);
+
         ServerRequest sr = new ServerRequest(MapsActivity.this);
         JSONObject jsonObject = sr.getJSON(Config.ip + "/historyAdd", params);
         if (jsonObject != null) {

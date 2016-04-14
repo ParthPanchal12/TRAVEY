@@ -56,10 +56,12 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Backend.Backend.VerificationActivity"
             android:label="@string/title_activity_verification"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ProfilePage.MainActivity_ProfilePage"
             android:theme="@style/AppTheme">
             <meta-data
@@ -69,6 +71,7 @@
         <activity
             android:name=".ProfilePage.EditProfile"
             android:label="@string/title_activity_edit_profile"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ProfilePage.MainActivity_ProfilePage"
             android:theme="@style/AppTheme">
             <meta-data
@@ -78,6 +81,7 @@
         <activity
             android:name=".ProfilePage.MainActivity_ProfilePage"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -86,6 +90,7 @@
         <activity
             android:name=".ProfilePage.ViewProfileImage"
             android:label="@string/title_view_profile_photo"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ProfilePage.MainActivity_ProfilePage"
             android:theme="@style/AppTheme">
             <meta-data
@@ -95,6 +100,7 @@
         <activity
             android:name=".Places_PlacePicker.MainActivity_PlacePicker"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -104,6 +110,7 @@
         <activity
             android:name=".LeaderBoard.MainActivity_Leaderboard"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -112,6 +119,7 @@
         <activity
             android:name=".History.MainActivity_History"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -120,6 +128,7 @@
         <activity
             android:name=".ContactDisplay.MainActivity_Contacts"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -128,6 +137,7 @@
         <activity
             android:name=".ContactDisplay.DisplayFriendsOnMap"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -136,6 +146,7 @@
         <activity
             android:name=".FriendsNearMe.FriendsNearMe"
             android:parentActivityName=".MapsActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
