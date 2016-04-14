@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,7 +37,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
-import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.R;
 
 import org.apache.http.NameValuePair;
@@ -47,6 +48,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MainActivity_ProfilePage extends AppCompatActivity {
     private static int PICK_IMAGE_REQUEST = 1;
@@ -66,18 +69,25 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
     private Boolean isFabOpen = false;
-    String phone_number,shared_location,Rating;
+    String phone_number, shared_location, Rating;
     String email;
-    private String selectedImagePath,imgDecodableString;
+    private String selectedImagePath, imgDecodableString;
     ServerRequest sr;
+
     EditText oldpass,newpass;
     List<NameValuePair> params;
     String token,grav,oldpasstxt,newpasstxt;
+
+    private SweetAlertDialog progressBar;
+    private ArrayList<NameValuePair> params_editEmail;
+    private ArrayList<NameValuePair> params_editSharedLocation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_profile_page);
+
 
         /*Customising Toolbar*/
         toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
@@ -87,15 +97,24 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout_profilePage);
         appBarLayout.setExpanded(true);
 
+        progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        progressBar.setTitleText("Getting your information");
+        progressBar.setCancelable(false);
+
+        new Task_async().execute();
+
         /*Setting the profile pic*/
         profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
         profilePicture = R.drawable.header;
 
+
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
-        nameOfUser = pref.getString("user_name","");
+        nameOfUser = pref.getString("user_name", "");
         phone_number = pref.getString(Config.phone_number, "");
-        email = pref.getString(Config.email,"");
+        email = pref.getString(Config.email, "");
         shared_location = pref.getString("shared_location", "");
+
         //Toast.makeText(MainActivity_ProfilePage.this, shared_location, Toast.LENGTH_SHORT).show();
         Log.d("shared",shared_location);
         if(shared_location.equals("1"))
@@ -104,21 +123,10 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             shared_location = "Not Shared";
 
         collapsingToolbar.setTitle(nameOfUser);
-        sr = new ServerRequest(this);
 
 
-        ArrayList<NameValuePair> params_editEmail = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editUserName = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editImage = new ArrayList<NameValuePair>();
-        ArrayList<NameValuePair> params_editPhoneNumber = new ArrayList<NameValuePair>();
-        final ArrayList<NameValuePair> params_editSharedLocation = new ArrayList<NameValuePair>();
-        final ArrayList<NameValuePair> params_editAllowedToPost = new ArrayList<NameValuePair>();
 
-        params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        params_editEmail.add(new BasicNameValuePair(Config.email, email));
 
-        params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
-        params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
 
 
         /*If clicked on Profile Pic then show the photo*/
@@ -135,12 +143,6 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
 
 
 
-        JSONObject json = sr.getJSON(Config.ip + "/getRating", params_editEmail);
-        try {
-            Rating = json.getString("rating");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
         userInfoDescription[1] = email;
         userInfoDescription[0] = phone_number;
         userInfoDescription[2] = Rating;
@@ -195,15 +197,14 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                                     params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
                                     params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
                                     Log.d("on_click", phone_number);
-                                    sr.getJSON(Config.ip+"/editProfile/shared_location",params_editSharedLocation);
+                                    sr.getJSON(Config.ip + "/editProfile/shared_location", params_editSharedLocation);
                                     profile.get(position).setDescription("Not Shared");
-                                }
-                                else {
+                                } else {
                                     params_editSharedLocation.removeAll(params_editSharedLocation);
                                     params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
                                     params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "1"));
                                     Log.d("on_click", phone_number);
-                                    sr.getJSON(Config.ip+"/editProfile/shared_location",params_editSharedLocation);
+                                    sr.getJSON(Config.ip + "/editProfile/shared_location", params_editSharedLocation);
                                     profile.get(position).setDescription("Shared");
                                 }
                                 /*notify that the dataset has changed*/
@@ -333,26 +334,27 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
 
     }
 
+
     /*To add*/
-    private void savePhotoToDatabase(String photo){
-        ArrayList<NameValuePair> parameters=new ArrayList<>();
-        parameters.add(new BasicNameValuePair(Config.photo,photo));
-        parameters.add(new BasicNameValuePair(Config.phone_number,"8758964908"));
+    private void savePhotoToDatabase(String photo) {
+        ArrayList<NameValuePair> parameters = new ArrayList<>();
+        parameters.add(new BasicNameValuePair(Config.photo, photo));
+        parameters.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
 
         ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-        JSONObject json = sr.getJSON(Config.ip+"/register",parameters);
+        JSONObject json = sr.getJSON(Config.ip + "/register", parameters);
         Log.d("here", "json received");
-        if(json != null){
-            try{
+        if (json != null) {
+            try {
                 String jsonstr = json.getString("response");
                 String sue = json.getString("use");
 
-                Toast.makeText(MainActivity_ProfilePage.this,jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity_ProfilePage.this, jsonstr + "     " + sue, Toast.LENGTH_LONG).show();
 
                 Log.d("Hello", jsonstr);
-            }catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
@@ -517,11 +519,11 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 String ss = bitmapToBase64(bitmap);
 
                 profilePictureImageView.setImageBitmap(base64ToBitmap(ss));
-                String phone_number = pref.getString("phone_number","");
-                ArrayList<NameValuePair >params = new ArrayList<NameValuePair>();
+                String phone_number = pref.getString("phone_number", "");
+                ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(new BasicNameValuePair("phone_number", phone_number));
                 params.add(new BasicNameValuePair("image", ss));
-                ServerRequest sr=new ServerRequest(MainActivity_ProfilePage.this);
+                ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
                 JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
                 //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
@@ -529,7 +531,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                     try {
 
                         String jsonstr = json.getString("response");
-                        Toast.makeText(MainActivity_ProfilePage.this, ""+jsonstr, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -594,5 +596,42 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 collapsingToolbar.setContentScrimColor(mutedColor);
             }
         });
+    }
+
+    class Task_async extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.show();
+            sr = new ServerRequest(getApplicationContext());
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            params_editEmail = new ArrayList<NameValuePair>();
+            params_editSharedLocation = new ArrayList<NameValuePair>();
+
+            params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
+            params_editEmail.add(new BasicNameValuePair(Config.email, email));
+
+            params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+            params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            JSONObject json = sr.getJSON(Config.ip + "/getRating", params_editEmail);
+            try {
+                Rating = json.getString("rating");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            progressBar.hide();
+        }
     }
 }

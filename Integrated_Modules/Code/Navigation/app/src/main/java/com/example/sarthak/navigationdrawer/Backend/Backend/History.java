@@ -1,9 +1,9 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 public class History {
-    String date;
-    String source;
-    String destination;
+    public String date;
+    public String source;
+    public String destination;
 
     public History() {
     }

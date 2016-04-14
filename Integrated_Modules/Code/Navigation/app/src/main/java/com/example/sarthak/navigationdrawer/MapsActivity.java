@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
@@ -29,12 +30,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
+import com.example.sarthak.navigationdrawer.Backend.Backend.History;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LocationService;
 import com.example.sarthak.navigationdrawer.Backend.Backend.LoginRegister;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
@@ -66,6 +70,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -87,6 +92,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import info.hoang8f.widget.FButton;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
@@ -133,6 +139,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double long_report;
     private LatLng destinationLatLng;
     private LatLng sourceLatLng;
+    private ArrayList<Polyline> polylines;
+    private FloatingActionButton fab_addHistory;
+    private String sourceName = "";
+    private String destName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +207,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
                 if (menuItem.getTitle().equals("Profile")) {
+
                     Intent intent = new Intent(MapsActivity.this, MainActivity_ProfilePage.class);
                     startActivity(intent);
                 } else if (menuItem.getTitle().equals("Places")) {
@@ -243,6 +254,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         /*To do enable permission code*/
         enablePermissions();
 
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -268,6 +280,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 
+
+
         /*Autocomplete Source and Destination Box*/
 
         cardView_Destination = (CardView) findViewById(R.id.card_view_Destination_search);
@@ -283,6 +297,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 lastSelectedLocationName = String.valueOf(place.getName());
                 lastSelectedLatLng = place.getLatLng();
                 sourceLatLng = place.getLatLng();
+                sourceName = place.getName().toString();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(sourceLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
                 if (sourceMarker != null) {
@@ -294,6 +309,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
                 if (destinationMarker != null) {
+                    //mMap.clear();
+                    //addLabelsForAllReports();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(sourceMarker.getPosition());
                     builder.include(destinationMarker.getPosition());
@@ -307,6 +324,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     mMap.animateCamera(cu);
                     //mMap.animateCamera(CameraUpdateFactory.zoomTo(mMap.getCameraPosition().zoom));
+                    fab_addHistory.setVisibility(View.VISIBLE);
 
                 }
                 cardView_Destination.setVisibility(View.VISIBLE);
@@ -327,6 +345,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onPlaceSelected(Place place) {
                 Log.i("Selected", "Place: " + place.getName());
+                destName = place.getName().toString();
                 destinationLatLng = place.getLatLng();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(destinationLatLng, 15);
                 mMap.animateCamera(cameraUpdate);
@@ -338,6 +357,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
                 if (sourceMarker != null) {
+                    //mMap.clear();
+                    //addLabelsForAllReports();
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     builder.include(sourceMarker.getPosition());
                     builder.include(destinationMarker.getPosition());
@@ -349,6 +370,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     DownloadTask downloadTask = new DownloadTask();
                     // Start downloading json data from Google Directions API
                     downloadTask.execute(url);
+                    fab_addHistory.setVisibility(View.VISIBLE);
                     mMap.animateCamera(cu);
                     cardView_Destination.setVisibility(View.GONE);
                     cardView_Source.setVisibility(View.GONE);
@@ -366,6 +388,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
+
+        /*Add history*/
+        fab_addHistory = (FloatingActionButton) findViewById(R.id.fab_addHistory);
+        fab_addHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addHistory();
+                fab_addHistory.setVisibility(View.GONE);
+            }
+        });
 
         /*Floating action buttons inside the menu*/
         fab_menu_report_panel = (FloatingActionsMenu) findViewById(R.id.fab_report_panel);
@@ -408,6 +441,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         startService(new Intent(this, LocationService.class));//Start the location refresh service
 
 
+    }
+
+    private void addHistory() {
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair(Config.phone_number, pref.getString(Config.phone_number, "")));
+
+        History h = new History();
+        Calendar calendar = Calendar.getInstance();
+        h.date = "" + calendar.get(Calendar.DAY_OF_MONTH) + "/" + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.YEAR);
+        h.source = sourceName;
+        h.destination = destName;
+
+        Gson gson = new Gson();
+        String s = gson.toJson(h);
+        params.add(new BasicNameValuePair(Config.history, s));
+
+        ServerRequest sr = new ServerRequest(MapsActivity.this);
+        JSONObject jsonObject = sr.getJSON(Config.ip + "/historyAdd", params);
+        if (jsonObject != null) {
+            try {
+                String temp = jsonObject.getString("response");
+                Log.d("Maps", temp);
+                Toast.makeText(MapsActivity.this, temp, Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Toast.makeText(MapsActivity.this, "Could not add to history", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void addLabelsForAllReports() {
@@ -465,7 +527,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 LatLng loc1 = new LatLng(loc[0], loc[1]);
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j);
+                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j, reports.get(j).getEnd_time());
                                     Log.d("checkVote", "After one iteration" + reports.size());
                                     break;
                                 }
@@ -487,6 +549,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     private void getDialogReportAdd() {
+
+
         boolean wrapInScrollView = true;
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Enter Report Parameters")
@@ -625,78 +689,184 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos) {
+    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos, String durationTime) {
         CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+
+        ServerRequest serverRequest = new ServerRequest(MapsActivity.this);
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        String up = "", down = "";
+        SweetAlertDialog progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        progressBar.setTitleText("Getting your contacts");
+        progressBar.setCancelable(false);
+        progressBar.show();
+        params.add(new BasicNameValuePair(Config.reportId, id));
+        JSONObject jsonObject = serverRequest.getJSON(Config.ip + "/getUpvotes", params);
+        if (jsonObject != null) {
+            try {
+                up = jsonObject.getString("upvotes");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        jsonObject = serverRequest.getJSON(Config.ip + "/getDownvotes", params);
+        if (jsonObject != null) {
+            try {
+                down = jsonObject.getString("downvotes");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        progressBar.hide();
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .customView(R.layout.custom_layout_for_reports_description, true)
+                .show();
+
+        ImageView upvoteImage = (ImageView) dialog.getCustomView().findViewById(R.id.image_UpVote_reports);
+        ImageView downvoteImage = (ImageView) dialog.getCustomView().findViewById(R.id.image_DownVote_reports);
+        TextView type_report = (TextView) dialog.getCustomView().findViewById(R.id.tv_type_report_display);
+        type_report.setText(title);
+        TextView description_report = (TextView) dialog.getCustomView().findViewById(R.id.description_dislpayReport);
+        description_report.setText(detail);
+        TextView duration = (TextView) dialog.getCustomView().findViewById(R.id.duration_report_display);
+        duration.setText(duration.getText() + durationTime);
+        TextView upvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_upvotesTotal);
+        TextView downvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_downvotesTotal);
+        upvoteText.setText(up);
+        downvoteText.setText(down);
+
+        upvoteImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-
-                        return;
-                    case 1:
-                        ArrayList<NameValuePair> params1 = new ArrayList<>();
-                        params1.add(new BasicNameValuePair(Config.reportId, id));
-                        params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
-                        ServerRequest sr1 = new ServerRequest(MapsActivity.this);
-                        Log.d("here", "params sent" + id);
-                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
-                        if (json1 != null) {
-                            try {
-                                String rsp = json1.getString("response");
-                                if (rsp.equals("Can only upvote once")) {
-                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("here", "json received");
-                                    Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
-                                    Reports rep = reports.get(pos);
-                                    rep.setUpvotes(rep.getUpvotes() + 1);
-                                    reports.set(pos, rep);
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+            public void onClick(View v) {
+                ArrayList<NameValuePair> params1 = new ArrayList<>();
+                params1.add(new BasicNameValuePair(Config.reportId, id));
+                params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                ServerRequest sr1 = new ServerRequest(MapsActivity.this);
+                Log.d("here", "params sent" + id);
+                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
+                if (json1 != null) {
+                    try {
+                        String rsp = json1.getString("response");
+                        if (rsp.equals("Can only upvote once")) {
+                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("here", "json received");
+                            Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                            Reports rep = reports.get(pos);
+                            rep.setUpvotes(rep.getUpvotes() + 1);
+                            reports.set(pos, rep);
 
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-
-                        return;
-                    case 2:
-                        ArrayList<NameValuePair> params2 = new ArrayList<>();
-                        params2.add(new BasicNameValuePair(Config.reportId, id));
-                        params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
-                        ServerRequest sr2 = new ServerRequest(MapsActivity.this);
-                        Log.d("here", "params sent");
-                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                        JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
-                        if (json2 != null) {
-                            try {
-                                String rsp = json2.getString("response");
-                                if (rsp.equals("Can only downvote once")) {
-                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Log.d("here", "json received");
-                                    Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
-                                    Reports rep1 = reports.get(pos);
-                                    rep1.setDownvotes(rep1.getDownvotes() + 1);
-                                    reports.set(pos, rep1);
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                        return;
                 }
+
             }
         });
-        builder.show();
+        downvoteImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<NameValuePair> params2 = new ArrayList<>();
+                params2.add(new BasicNameValuePair(Config.reportId, id));
+                params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                ServerRequest sr2 = new ServerRequest(MapsActivity.this);
+                Log.d("here", "params sent");
+                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+                if (json2 != null) {
+                    try {
+                        String rsp = json2.getString("response");
+                        if (rsp.equals("Can only downvote once")) {
+                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Log.d("here", "json received");
+                            Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                            Reports rep1 = reports.get(pos);
+                            rep1.setDownvotes(rep1.getDownvotes() + 1);
+                            reports.set(pos, rep1);
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(title);
+//        builder.setItems(methodsToTakeSource, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                switch (which) {
+//                    case 0:
+//
+//                        return;
+//                    case 1:
+//                        ArrayList<NameValuePair> params1 = new ArrayList<>();
+//                        params1.add(new BasicNameValuePair(Config.reportId, id));
+//                        params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
+//                        ServerRequest sr1 = new ServerRequest(MapsActivity.this);
+//                        Log.d("here", "params sent" + id);
+//                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+//                        JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
+//                        if (json1 != null) {
+//                            try {
+//                                String rsp = json1.getString("response");
+//                                if (rsp.equals("Can only upvote once")) {
+//                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    Log.d("here", "json received");
+//                                    Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+//                                    Reports rep = reports.get(pos);
+//                                    rep.setUpvotes(rep.getUpvotes() + 1);
+//                                    reports.set(pos, rep);
+//
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//
+//                        return;
+//                    case 2:
+//                        ArrayList<NameValuePair> params2 = new ArrayList<>();
+//                        params2.add(new BasicNameValuePair(Config.reportId, id));
+//                        params2.add(new BasicNameValuePair(Config.phone_number, phone_number));
+//                        ServerRequest sr2 = new ServerRequest(MapsActivity.this);
+//                        Log.d("here", "params sent");
+//                        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+//                        JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+//                        if (json2 != null) {
+//                            try {
+//                                String rsp = json2.getString("response");
+//                                if (rsp.equals("Can only downvote once")) {
+//                                    Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+//                                } else {
+//                                    Log.d("here", "json received");
+//                                    Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+//                                    Reports rep1 = reports.get(pos);
+//                                    rep1.setDownvotes(rep1.getDownvotes() + 1);
+//                                    reports.set(pos, rep1);
+//
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//                        return;
+//                }
+//            }
+//        });
+//        builder.show();
 
     }
 
@@ -860,6 +1030,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 cancel_source_and_destination.setVisible(false);
                 cardView_Source.setVisibility(View.VISIBLE);
                 cardView_Destination.setVisibility(View.VISIBLE);
+                fab_addHistory.setVisibility(View.GONE);
                 return true;
             case R.id.action_get_currentLocation:
                 goToCurrentLocation();
@@ -899,61 +1070,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void enablePermissions() {
         //To see this code many threads running simultaneously requesting permissions
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK);
-            }
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CHECK);
-            }
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CHECK);
-            }
-        }
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
-                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
-            }
-        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK);
+//            }
+//        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_CHECK);
+//            }
+//        }
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+//            }
+//        }
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MapsActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                Toast.makeText(MapsActivity.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+//                return;
+//            } else {
+//                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK);
+//            }
+//        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
 
-        switch (requestCode) {
-            case PERMISSION_CHECK: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    return;
-
-                } else {
-                    enablePermissions();
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
+//        switch (requestCode) {
+//            case PERMISSION_CHECK: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    return;
+//
+//                } else {
+//                    enablePermissions();
+//                }
+//                return;
+//            }
+//
+//            // other 'case' lines to check for other
+//            // permissions this app might request
+//        }
 
     }
 
@@ -1090,10 +1261,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Executes in UI thread, after the parsing process
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-            ArrayList points = null;
+
+
+            ArrayList<LatLng> points = new ArrayList();
             PolylineOptions lineOptions = null;
             MarkerOptions markerOptions = new MarkerOptions();
-
+            polylines = new ArrayList<>();
+            polylines.clear();
 // Traversing through all the routes
             for (int i = 0; i < result.size(); i++) {
                 points = new ArrayList();
@@ -1115,14 +1289,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
-                lineOptions.width(10);
-                lineOptions.color(Color.RED);
+                lineOptions.width(20);
+                if (i == 0)
+                    lineOptions.color(Color.BLUE);
+                else
+                    lineOptions.color(getResources().getColor(R.color.fbutton_color_asbestos));
+                lineOptions.geodesic(true);
 
+
+                // Drawing polyline in the Google Map for the i-th route
+                polylines.add(mMap.addPolyline(lineOptions));
+//                mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+//                    @Override
+//                    public void onPolylineClick(Polyline polyline) {
+//                        for(int i=0;i<polylines.size();i++){
+//                            polylines.get(i).setColor(getResources().getColor(R.color.fbutton_color_asbestos));
+//                        }
+//                        polyline.setColor(getResources().getColor(R.color.fbutton_color_clouds));
+//                    }
+//                });
             }
 
-            // Drawing polyline in the Google Map for the i-th route
-            mMap.addPolyline(lineOptions);
         }
+
     }
 
 
