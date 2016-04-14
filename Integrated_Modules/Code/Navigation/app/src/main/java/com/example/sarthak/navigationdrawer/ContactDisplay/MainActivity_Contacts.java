@@ -25,15 +25,18 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.GCM.App;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -103,7 +106,14 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
-                        selectTypeForFriend(adapter.friends.get(position).getPhone());
+                        String phone=adapter.friends.get(position).getPhone();
+                        String acc_phone="";
+                        if(phone.length()==11){
+                            acc_phone=""+phone.charAt(1)+phone.charAt(2)+phone.charAt(3)+phone.charAt(4)+phone.charAt(5)+phone.charAt(6)+phone.charAt(7)+phone.charAt(8)+phone.charAt(9)+phone.charAt(10);
+                        }else if(phone.length()==13){
+                            acc_phone=""+phone.charAt(3)+phone.charAt(4)+phone.charAt(5)+phone.charAt(6)+phone.charAt(7)+phone.charAt(8)+phone.charAt(9)+phone.charAt(10)+phone.charAt(11)+phone.charAt(12);
+                        }
+                        selectTypeForFriend(acc_phone);
                     }
                 })
         );
@@ -325,6 +335,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
 
     private void selectTypeForFriend(final String phone) {
         String methodsToTakeSource[] = {"Share your location", "Get his location"};
+
+
         new MaterialDialog.Builder(MainActivity_Contacts.this)
                 .title("Select an option")
                 .items(methodsToTakeSource)
@@ -338,12 +350,21 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         switch (which) {
                             case 0:
                                 ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                                params.add(new BasicNameValuePair(Config.phone_number, phone));
-                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
+                                params.add(new BasicNameValuePair(Config.phone_number,phone));
+//                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
                                 ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
-                                Log.d("here", "params sent");
+                                Log.d("here", ""+phone);
                                 //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                                sr.getJSON(Config.ip + "/shareLocationWithFriend", params);
+                                JSONObject jsonObject=sr.getJSON(Config.ip + "/getGcm", params);
+                                if(jsonObject!=null){
+                                    try {
+                                        String reg_id=jsonObject.getString(Config.gcmId);
+                                       App gcmApp=new App();
+                                        gcmApp.sendNotification(reg_id,pref.getString(Config.user_name, "")+"shared his location with you");
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
                             case 1:
                                 Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
