@@ -33,7 +33,7 @@ public class SplashScreen extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         gcm = new GCM(SplashScreen.this);
         regId = gcm.getRegId();
         ServerRequest sr = new ServerRequest(SplashScreen.this);
