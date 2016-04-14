@@ -81,14 +81,6 @@ public class Login extends Fragment {
                 } else {
 
 
-                    char ph_1 = phone_number_txt.charAt(0);
-                    int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));
-                    int ph2 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(1)));
-                    int ph3 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(2)));
-
-                    if ((ph_1 == '+' && ph2 == 9 && ph3 == 1 && phone_number_txt.length() == 13) || (ph1 == 0 && phone_number_txt.length() == 11) || (phone_number_txt.length() == 10)) {
-
-
                         params = new ArrayList<NameValuePair>();
                         params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
                         params.add(new BasicNameValuePair(Config.password, password_txt));
@@ -123,17 +115,17 @@ public class Login extends Fragment {
                                         edit.putString("grav", grav);
 
 
-                                        History h = new History();
+                                        /*History h = new History();
                                         h.date = "19/2/96";
                                         h.source = "Gandhinagar";
                                         h.destination = "Ahmedabad";
 
                                         Gson gson = new Gson();
                                         String s = gson.toJson(h);
-
+*/
                                         params_history = new ArrayList<NameValuePair>();
                                         params_history.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                        params_history.add(new BasicNameValuePair(Config.history, s));
+                                        //params_history.add(new BasicNameValuePair(Config.history, s));
                                         //JSONObject json1 = sr.getJSON(Register.IP+"/reportAdd",params_history);
 
 
@@ -165,11 +157,9 @@ public class Login extends Fragment {
                             Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
                         }
 
-                    } else {
-                        Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                     }
                 }
-            }
+
         });
 
 

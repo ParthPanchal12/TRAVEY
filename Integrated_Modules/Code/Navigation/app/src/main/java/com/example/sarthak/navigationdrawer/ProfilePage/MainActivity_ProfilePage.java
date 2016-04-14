@@ -1,5 +1,6 @@
 package com.example.sarthak.navigationdrawer.ProfilePage;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -25,9 +27,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
@@ -41,6 +46,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity_ProfilePage extends AppCompatActivity {
     private static int PICK_IMAGE_REQUEST = 1;
@@ -50,12 +56,12 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private ArrayList<ProfileClass> profile;
     private Toolbar toolbar;
     private int profilePicture;
-    private int userInfoIcons[] = {R.drawable.ic_call_black_24dp, R.drawable.ic_mail_black_24dp, R.drawable.ic_star_half_black_24dp, R.drawable.ic_location_on_black_24dp};
-    private String userInfoTitle[] = {"Phone number", "E-Mail", "Rating", "Location Shared Status"};
-    private String userInfoDescription[] = {"1233456789", "123456@gmail.com", "4.5", "Shared"};
+    private int userInfoIcons[] = {R.drawable.ic_call_black_24dp, R.drawable.ic_mail_black_24dp, R.drawable.ic_star_half_black_24dp, R.drawable.ic_location_on_black_24dp,R.drawable.ic_location_on_black_24dp};
+    private String userInfoTitle[] = {"Phone number", "E-Mail", "Rating", "Location Shared Status", "Change Password"};
+    private String userInfoDescription[] = {"1233456789", "123456@gmail.com", "4.5", "Shared", "******"};
     private CollapsingToolbarLayout collapsingToolbar;
     private String nameOfUser;
-    private FloatingActionButton floatingActionButton, floatingActionButtonChangeName, floatingActionButtonChangePhoto;
+    private FloatingActionButton floatingActionButton, floatingActionButtonChangeName, floatingActionButtonChangePhoto, floatingActionButtonChangePassword;
     private Intent galleryIntent;
     private ImageView profilePictureImageView;
     private Animation fab_open, fab_close;
@@ -64,6 +70,9 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     String email;
     private String selectedImagePath,imgDecodableString;
     ServerRequest sr;
+    EditText oldpass,newpass;
+    List<NameValuePair> params;
+    String token,grav,oldpasstxt,newpasstxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +96,11 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         phone_number = pref.getString(Config.phone_number, "");
         email = pref.getString(Config.email,"");
         shared_location = pref.getString("shared_location", "");
-        Toast.makeText(MainActivity_ProfilePage.this, shared_location, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity_ProfilePage.this, shared_location, Toast.LENGTH_SHORT).show();
         Log.d("shared",shared_location);
         if(shared_location.equals("1"))
             shared_location = "Shared";
-        else
+        if(shared_location.equals("0"))
             shared_location = "Not Shared";
 
         collapsingToolbar.setTitle(nameOfUser);
@@ -199,7 +208,59 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                                 }
                                 /*notify that the dataset has changed*/
                                 adapter.notifyDataSetChanged();
-                            } else {
+                            } else if(profile.get(position).getTitle().equals("Change Password")){
+                                //pref = getSharedPreferences("AppPref", MODE_PRIVATE);
+                                token = pref.getString("token", "");
+                                grav = pref.getString("grav", "");
+
+                                /*If clicked on change name FAB then redirect to EditProfile class to change his name*/
+                                MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity_ProfilePage.this)
+                                        .title("Change Password")
+                                        .customView(R.layout.chgpassword_frag, true)
+                                        .positiveText("Add")
+                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                //add to database and dismiss dialog
+                                                oldpass = (EditText)dialog.findViewById(R.id.oldpass);
+                                                newpass = (EditText)dialog.findViewById(R.id.newpass);
+                                                oldpasstxt = oldpass.getText().toString();
+                                                newpasstxt = newpass.getText().toString();
+                                                params = new ArrayList<NameValuePair>();
+                                                params.add(new BasicNameValuePair("oldpass", oldpasstxt));
+                                                params.add(new BasicNameValuePair("newpass", newpasstxt));
+                                                params.add(new BasicNameValuePair("id", token));
+                                                ServerRequest sr = new ServerRequest(getApplicationContext());
+
+                                                JSONObject json = sr.getJSON(Config.ip+"/api/chgpass",params);
+                                                if(json != null){
+                                                    try{
+                                                        String jsonstr = json.getString("response");
+                                                        if(json.getBoolean("res")){
+
+                                                            dialog.dismiss();
+                                                            Toast.makeText(getApplication(),jsonstr,Toast.LENGTH_SHORT).show();
+                                                        }else {
+                                                            Toast.makeText(getApplication(),jsonstr,Toast.LENGTH_SHORT).show();
+
+                                                        }
+                                                    }catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                            }
+                                        })
+                                        .negativeText("Dismiss")
+                                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .show();
+
+                            }else{
                                 /*Call the EditProfile class to let the user edit his/her detail*/
                                 Intent intent = new Intent(MainActivity_ProfilePage.this, EditProfile.class);
                                 intent.putExtra("Title", profile.get(position).getTitle());
@@ -207,6 +268,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                             }
+
                         }
                     }
                 })
@@ -221,6 +283,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         floatingActionButton = (FloatingActionButton) findViewById(R.id.fab_EditProfile);
         floatingActionButtonChangeName = (FloatingActionButton) findViewById(R.id.fab_ChangeName);
         floatingActionButtonChangePhoto = (FloatingActionButton) findViewById(R.id.fab_ChangePhoto);
+        //floatingActionButtonChangePassword = (FloatingActionButton) findViewById(R.id.fab_ChangePassword);
 
         /*On click listeners for each FAB*/
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -258,6 +321,16 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             }
         });
 
+        /*floatingActionButtonChangePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                *//*Close the open FAB*//*
+                animateFAB();
+
+
+            }
+        });*/
+
     }
 
     /*To add*/
@@ -291,15 +364,19 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             floatingActionButton.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_edit_white_24dp));
             floatingActionButtonChangeName.startAnimation(fab_close);
             floatingActionButtonChangePhoto.startAnimation(fab_close);
+            //floatingActionButtonChangePassword.startAnimation(fab_close);
             floatingActionButtonChangeName.setClickable(false);
             floatingActionButtonChangePhoto.setClickable(false);
+            //floatingActionButtonChangePassword.setClickable(false);
             isFabOpen = false;
         } else {
             floatingActionButton.setImageBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_clear_white_24dp));
             floatingActionButtonChangeName.startAnimation(fab_open);
             floatingActionButtonChangePhoto.startAnimation(fab_open);
+            //floatingActionButtonChangePassword.startAnimation(fab_open);
             floatingActionButtonChangeName.setClickable(true);
             floatingActionButtonChangePhoto.setClickable(true);
+            //floatingActionButtonChangePassword.setClickable(true);
             isFabOpen = true;
         }
     }

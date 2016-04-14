@@ -35,6 +35,7 @@
         android:paddingTop="20dp"
         android:paddingBottom="20dp"
         android:hint="Phone Number"
+        android:maxLength="10"
         android:ems="10"
         android:id="@+id/register_phone_number"
         android:layout_gravity="center_horizontal" />

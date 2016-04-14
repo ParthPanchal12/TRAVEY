@@ -107,14 +107,14 @@ public class ProfileActivity extends Activity {
 
                     }
                 });
-                cancel = (Button)dlg.findViewById(R.id.cancelbtn);
+                /*cancel = (Button)dlg.findViewById(R.id.cancelbtn);
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         dlg.dismiss();
                     }
                 });
-                dlg.show();
+                dlg.show();*/
             }
         });
 

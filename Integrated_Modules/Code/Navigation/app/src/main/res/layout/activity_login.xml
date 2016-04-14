@@ -19,6 +19,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="100dp"
         android:ems="10"
+        android:maxLength="10"
         android:hint="Phone Number"
         android:inputType="phone"
         android:numeric="decimal"

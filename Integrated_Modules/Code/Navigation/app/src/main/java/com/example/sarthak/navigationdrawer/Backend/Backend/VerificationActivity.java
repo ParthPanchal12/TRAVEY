@@ -210,6 +210,7 @@ public class VerificationActivity extends AppCompatActivity implements ActivityC
                     edit.putString("user_name",user_name);
                     edit.commit();
                     startActivity(new Intent(VerificationActivity.this, MapsActivity.class));
+                    finish();
                     Log.d("Hello", jsonstr);
                 } catch (JSONException e) {
                     e.printStackTrace();

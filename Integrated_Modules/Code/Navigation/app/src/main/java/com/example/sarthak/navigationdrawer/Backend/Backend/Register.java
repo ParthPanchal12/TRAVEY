@@ -85,21 +85,6 @@ public class Register extends Fragment {
                     if (phone_number_txt == null || (phone_number_txt.length() != 10 && phone_number_txt.length() != 11 && phone_number_txt.length() != 13)) {
                         Toast.makeText(getContext(), "Please Enter a valid phone number"+ phone_number_txt, Toast.LENGTH_SHORT).show();
                     } else {
-                        char ph_1 = phone_number_txt.charAt(0);
-                        int ph1 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(0)));
-                        int ph2 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(1)));
-                        int ph3 = Integer.parseInt(String.valueOf(phone_number_txt.charAt(2)));
-
-                        if ((ph_1 == '+' && ph2 == 9 && ph3 == 1 && phone_number_txt.length() == 13) || (ph1 == 0 && phone_number_txt.length() == 11) || (phone_number_txt.length() == 10)) {
-
-                            StringBuilder sb = new StringBuilder(phone_number_txt);
-                            if (phone_number_txt.length() == 13) {
-                                sb.deleteCharAt(0);
-                                sb.deleteCharAt(1);
-                                sb.deleteCharAt(2);
-                            }
-                            if (phone_number_txt.length() == 11) sb.deleteCharAt(0);
-                            phone_number_txt = sb.toString();
 
                             if (!(email_txt.indexOf("@") < 1 || email_txt.lastIndexOf(".") < email_txt.indexOf("@") + 2 || email_txt.lastIndexOf(".") + 2 >= email_txt.length())) {
 
@@ -181,12 +166,10 @@ public class Register extends Fragment {
                             } else {
                                 Toast.makeText(getContext(), "Email id not valid !", Toast.LENGTH_LONG).show();
                             }
-                        } else {
-                            Toast.makeText(getContext(), "Phone number not valid !", Toast.LENGTH_LONG).show();
                         }
                     }
                 }
-            }
+
         });
 
         return view;

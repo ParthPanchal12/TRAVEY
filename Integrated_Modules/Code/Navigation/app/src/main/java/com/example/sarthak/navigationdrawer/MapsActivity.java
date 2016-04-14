@@ -499,10 +499,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         if (lat_report != 0 && long_report != 0) {
                             description = (EditText) dialog.getCustomView().findViewById(R.id.descriptionReportEditText);
                             descriptionReport = description.getText().toString();
-                            saveDetailsToDataBase();
-                            lat_report = 0;
-                            long_report = 0;
-                            addLabelsForAllReports();
+                            if(descriptionReport == null){
+                                Toast.makeText(MapsActivity.this, "Please enter description", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                saveDetailsToDataBase();
+                                lat_report = 0;
+                                long_report = 0;
+                                addLabelsForAllReports();
+                            }
                         } else {
                             Toast.makeText(MapsActivity.this, "Please enter a location", Toast.LENGTH_SHORT).show();
                         }

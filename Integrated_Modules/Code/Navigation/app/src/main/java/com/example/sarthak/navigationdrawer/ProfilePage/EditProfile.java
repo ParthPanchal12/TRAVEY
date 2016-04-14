@@ -69,34 +69,44 @@ public class EditProfile extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 userInfo=editTextDescription.getText().toString();
-                s = getKey();
-                if(s.equals("new_phone_number")){
-                    s = "phone_number";
-                    ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair(Config.phone_number, userInfo));
-                    JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
-                    Log.d("here", "json received");
-                    if (json != null) {
-                        try {
-                            String jsonstr = json.getString("response");
-                            if (jsonstr.equals("yes")) {
-                                openActivity(getE164Number());
-                                edit.putString(s, userInfo);
+                if(userInfo == null){
+                    Toast.makeText(EditProfile.this, "Please fill data", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    s = getKey();
+                    if(s.equals("new_phone_number")){
+                        s = "phone_number";
+                        ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
+                        params.add(new BasicNameValuePair(Config.phone_number, userInfo));
+                        JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
+                        Log.d("here", "json received");
+                        if (json != null) {
+                            try {
+                                String jsonstr = json.getString("response");
+                                if (jsonstr.equals("yes")) {
+                                    if(userInfo.length() == 10){
+                                        openActivity(getE164Number());
+                                        edit.putString(s, userInfo);
 
-                                Toast.makeText(getApplicationContext(), "New Phone number saved!", Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "New Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "New Phone number saved!", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), "Enter 10 digit number!", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "New Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                }
+                                Log.d("Hello", jsonstr);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            Log.d("Hello", jsonstr);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
-                }else {
-                    saveDetailsToDatabases();
-                    edit.putString(s, userInfo);
+                    }else {
+                        saveDetailsToDatabases();
+                        edit.putString(s, userInfo);
 
-                    Toast.makeText(getApplicationContext(), "New "+ s +" !", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "New "+ s +" !", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
