@@ -29,10 +29,12 @@ public class Register extends Fragment {
     Button register;
     String user_name_txt, email_txt, password_txt, confirm_password_txt, phone_number_txt;
     static List<NameValuePair> params;
+    static List<NameValuePair> params_user;
     ArrayList<History> history = new ArrayList<>();
     public static final String INTENT_PHONENUMBER = "phonenumber";
     public static final String INTENT_COUNTRY_CODE = "code";
     SharedPreferences pref;
+    ServerRequest sr;
 
     private void openActivity(String phoneNumber) {
         Intent verification = new Intent(getContext(), VerificationActivity.class);
@@ -62,6 +64,7 @@ public class Register extends Fragment {
         confirm_password = (EditText) view.findViewById(R.id.register_confirm__password);
         register = (Button) view.findViewById(R.id.register_register);
         pref = this.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        sr = new ServerRequest(getContext());
 
         register.setOnClickListener(new View.OnClickListener() {
 
@@ -76,7 +79,9 @@ public class Register extends Fragment {
                 if (user_name_txt.isEmpty() || phone_number_txt.isEmpty() || email_txt.isEmpty() || password_txt.isEmpty() || confirm_password_txt.isEmpty()) {
                     Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
                 } else {
-                    //if(){}else{}
+                    /*params_user.add(new BasicNameValuePair(Config.ip,user_name_txt));
+                    JSONObject j_user = sr.getJSON(Config.ip+"/checkUserExists",params_user);
+                    if(){}else{}*/
                     if (phone_number_txt == null || (phone_number_txt.length() != 10 && phone_number_txt.length() != 11 && phone_number_txt.length() != 13)) {
                         Toast.makeText(getContext(), "Please Enter a valid phone number"+ phone_number_txt, Toast.LENGTH_SHORT).show();
                     } else {
@@ -106,7 +111,7 @@ public class Register extends Fragment {
                                         Log.d("here", "register is clicked");
                                         Toast.makeText(getContext(), "Register clicked !", Toast.LENGTH_LONG).show();
 
-                                        Users user = new Users();
+                                        /*Users user = new Users();
                                         History h = new History();
 
 
@@ -126,24 +131,23 @@ public class Register extends Fragment {
                                         String lat = "145";
                                         String long_ = "125";
                                         Gson gson = new Gson();
-                                        String s = gson.toJson(history);
+                                        String s = gson.toJson(history);*/
 
                                         params = new ArrayList<NameValuePair>();
                                         params.add(new BasicNameValuePair(Config.user_name, user_name_txt));
                                         params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
                                         params.add(new BasicNameValuePair(Config.email, email_txt));
                                         params.add(new BasicNameValuePair(Config.password, password_txt));
-                                        params.add(new BasicNameValuePair(Config.history, s));
+                                        /*params.add(new BasicNameValuePair(Config.history, s));
                                         params.add(new BasicNameValuePair(Config.latitude, lat));
-                                        params.add(new BasicNameValuePair(Config.longitude, long_));
+                                        params.add(new BasicNameValuePair(Config.longitude, long_));*/
 
                                         Log.d(Config.user_name, user_name_txt);
                                         Log.d(Config.phone_number, phone_number_txt);
                                         Log.d(Config.email, email_txt);
                                         Log.d(Config.password, password_txt);
 
-                                        Log.d("history", s);
-                                        ServerRequest sr = new ServerRequest(getContext());
+                                        //Log.d("history", s);
                                         Log.d("here", "params sent");
 
                                         Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false

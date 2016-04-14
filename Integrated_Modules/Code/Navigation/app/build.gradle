@@ -39,8 +39,11 @@ dependencies {
     compile files('libs/ion-1.3.7.jar')
     compile 'cn.pedant.sweetalert:library:1.3'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'com.pubnub:pubnub-android:3.7.8'
+    //'com.pubnub:pubnub-android-debug:3.7.+' For the debug version
     compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') {
         transitive = true
     }
     compile 'info.hoang8f:fbutton:1.0.5'
+    compile files('libs/Statistic-2.6.1.jar')
 }
