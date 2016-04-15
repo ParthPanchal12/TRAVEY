@@ -417,6 +417,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayList<NameValuePair> params_check = new ArrayList<>();
                 params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
                 JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                Log.d("allowed", json_check_allowed_to_post.toString());
                 try {
                     allowed = json_check_allowed_to_post.getString("res");
                     Log.d("allowed",allowed);
@@ -438,6 +439,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayList<NameValuePair> params_check = new ArrayList<>();
                 params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
                 JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                Log.d("allowed", json_check_allowed_to_post.toString());
                 try {
                     allowed = json_check_allowed_to_post.getString("res");
                     Log.d("allowed",allowed);
@@ -459,6 +461,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayList<NameValuePair> params_check = new ArrayList<>();
                 params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
                 JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                Log.d("allowed", json_check_allowed_to_post.toString());
                 try {
                     allowed = json_check_allowed_to_post.getString("res");
                     Log.d("allowed",allowed);
@@ -480,6 +483,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ArrayList<NameValuePair> params_check = new ArrayList<>();
                 params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
                 JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                Log.d("allowed", json_check_allowed_to_post.toString());
                 try {
                     allowed = json_check_allowed_to_post.getString("res");
                     Log.d("allowed",allowed);
