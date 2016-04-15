@@ -224,8 +224,9 @@ public class ServerRequest {
         protected void onPostExecute(JSONObject json) {
 
             super.onPostExecute(json);
-            progressBar.hide();
+            progressBar.dismiss();
         }
+
 
     }
 
