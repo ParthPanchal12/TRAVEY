@@ -1,26 +1,19 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 
-import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.R;
-import com.example.sarthak.navigationdrawer.ReportPanel.DurationPickerDialog;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.gson.JsonIOException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,7 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import info.hoang8f.widget.FButton;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ServerRequest {
 
@@ -50,7 +43,7 @@ public class ServerRequest {
     static JSONArray jArray = null;
     static String json = "";
     private Context _context;
-
+    SweetAlertDialog progressBar;
 
     public ServerRequest(Context context) {
         this._context = context;
@@ -157,30 +150,32 @@ public class ServerRequest {
     }
 
     JSONObject jobj;
+
     public JSONObject getJSON(String url, List<NameValuePair> params) {
 
-        Params param = new Params(url,params);
+        Params param = new Params(url, params);
         Request myTask = new Request();
-        try{
-            jobj= myTask.execute(param).get();
-        }catch (InterruptedException e) {
+        try {
+            jobj = myTask.execute(param).get();
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        }catch (ExecutionException e){
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return jobj;
     }
 
     JSONArray jarray;
+
     public JSONArray getJSONArray(String url, List<NameValuePair> params) {
 
-        Params param = new Params(url,params);
+        Params param = new Params(url, params);
         RequestArray myTask = new RequestArray();
-        try{
-            jarray= myTask.execute(param).get();
-        }catch (InterruptedException e) {
+        try {
+            jarray = myTask.execute(param).get();
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        }catch (ExecutionException e){
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return jarray;
@@ -201,10 +196,26 @@ public class ServerRequest {
     private class Request extends AsyncTask<Params, String, JSONObject> {
 
         @Override
-        protected JSONObject doInBackground(Params... args) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar = new SweetAlertDialog(_context, SweetAlertDialog.PROGRESS_TYPE);
+            progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            progressBar.setTitleText("");
+            progressBar.setCancelable(false);
+            progressBar.show();
+        }
 
-            ServerRequest request = new ServerRequest(_context);
-            JSONObject json = request.getJSONFromUrl(args[0].url,args[0].params);
+        @Override
+        protected JSONObject doInBackground(Params... args) {
+            JSONObject json = null;
+            try {
+                ServerRequest request = new ServerRequest(_context);
+                json = request.getJSONFromUrl(args[0].url, args[0].params);
+            } catch (JsonIOException e) {
+                Toast.makeText(_context, "Could not complete your request", Toast.LENGTH_SHORT).show();
+            } catch (RuntimeException e) {
+                Toast.makeText(_context, "Could not complete your request", Toast.LENGTH_SHORT).show();
+            }
 
             return json;
         }
@@ -213,7 +224,7 @@ public class ServerRequest {
         protected void onPostExecute(JSONObject json) {
 
             super.onPostExecute(json);
-
+            progressBar.hide();
         }
 
     }
@@ -239,15 +250,13 @@ public class ServerRequest {
     }
 
 
-    public boolean isConnectingToInternet(){
+    public boolean isConnectingToInternet() {
         ConnectivityManager connectivity = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null)
-        {
+        if (connectivity != null) {
             NetworkInfo[] info = connectivity.getAllNetworkInfo();
             if (info != null)
                 for (int i = 0; i < info.length; i++)
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
-                    {
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED) {
                         return true;
                     }
 

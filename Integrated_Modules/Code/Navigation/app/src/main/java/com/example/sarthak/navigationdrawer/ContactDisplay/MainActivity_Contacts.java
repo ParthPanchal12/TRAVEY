@@ -29,7 +29,6 @@ import com.example.sarthak.navigationdrawer.GCM.App;
 import com.example.sarthak.navigationdrawer.LeaderBoard.User;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.NameValuePair;
@@ -106,12 +105,12 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
-                        String phone=adapter.friends.get(position).getPhone();
-                        String acc_phone="";
-                        if(phone.length()==11){
-                            acc_phone=""+phone.charAt(1)+phone.charAt(2)+phone.charAt(3)+phone.charAt(4)+phone.charAt(5)+phone.charAt(6)+phone.charAt(7)+phone.charAt(8)+phone.charAt(9)+phone.charAt(10);
-                        }else if(phone.length()==13){
-                            acc_phone=""+phone.charAt(3)+phone.charAt(4)+phone.charAt(5)+phone.charAt(6)+phone.charAt(7)+phone.charAt(8)+phone.charAt(9)+phone.charAt(10)+phone.charAt(11)+phone.charAt(12);
+                        String phone = adapter.friends.get(position).getPhone();
+                        String acc_phone = "";
+                        if (phone.length() == 11) {
+                            acc_phone = "" + phone.charAt(1) + phone.charAt(2) + phone.charAt(3) + phone.charAt(4) + phone.charAt(5) + phone.charAt(6) + phone.charAt(7) + phone.charAt(8) + phone.charAt(9) + phone.charAt(10);
+                        } else if (phone.length() == 13) {
+                            acc_phone = "" + phone.charAt(3) + phone.charAt(4) + phone.charAt(5) + phone.charAt(6) + phone.charAt(7) + phone.charAt(8) + phone.charAt(9) + phone.charAt(10) + phone.charAt(11) + phone.charAt(12);
                         }
                         selectTypeForFriend(acc_phone);
                     }
@@ -333,6 +332,8 @@ public class MainActivity_Contacts extends AppCompatActivity {
         }
     }
 
+    String reg_id = "";
+
     private void selectTypeForFriend(final String phone) {
         String methodsToTakeSource[] = {"Share your location", "Get his location"};
 
@@ -350,17 +351,19 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         switch (which) {
                             case 0:
                                 ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                                params.add(new BasicNameValuePair(Config.phone_number,phone));
+                                params.add(new BasicNameValuePair(Config.phone_number, phone));
 //                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
                                 ServerRequest sr = new ServerRequest(MainActivity_Contacts.this);
-                                Log.d("here", ""+phone);
+                                Log.d("here", "" + phone);
                                 //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                                JSONObject jsonObject=sr.getJSON(Config.ip + "/getGcm", params);
-                                if(jsonObject!=null){
+                                JSONObject jsonObject = sr.getJSON(Config.ip + "/getGcm", params);
+                                Log.d("TAgs", "" + jsonObject);
+                                if (jsonObject != null) {
                                     try {
-                                        String reg_id=jsonObject.getString(Config.gcmId);
-                                        App gcmApp=new App();
-                                        gcmApp.sendNotification(reg_id,pref.getString(Config.user_name, "")+"shared his location with you");
+
+                                        reg_id = jsonObject.getString(Config.gcmId);
+                                        Log.d("temp", reg_id);
+                                        new Async_Task().execute();
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -377,6 +380,16 @@ public class MainActivity_Contacts extends AppCompatActivity {
                 .positiveText("Choose")
                 .show();
 
+    }
+
+    class Async_Task extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            App gcmApp = new App();
+            gcmApp.sendNotification(reg_id, pref.getString(Config.user_name, "") + " shared his location with you", "TRAVEY speaking..");
+            return null;
+        }
     }
 }
 
