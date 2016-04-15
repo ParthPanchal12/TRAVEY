@@ -63,7 +63,7 @@ public class GcmMessageIntentService extends IntentService {
                                 .setContentTitle(message)
                                 .setSound(sound)
                                 .setContentIntent(pendingIntent)
-                                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
+                                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.ic_launcher))
                                 .setContentText(message_message);
 
                 mNotificationId++;
