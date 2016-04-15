@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +63,7 @@ public class GcmMessageIntentService extends IntentService {
                                 .setContentTitle(message)
                                 .setSound(sound)
                                 .setContentIntent(pendingIntent)
+                                .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher))
                                 .setContentText(message_message);
 
                 mNotificationId++;
