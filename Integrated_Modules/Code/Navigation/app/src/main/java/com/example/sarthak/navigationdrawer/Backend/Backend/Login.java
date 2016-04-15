@@ -271,7 +271,13 @@ public class Login extends Fragment {
     private int PERMISSION_CHECK_TELEPHONE = 12;
     private int PERMISSION_CHECK_STORAGE = 12;
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (pDialog != null) {
+            pDialog.dismiss();
+        }
+    }
 }
 
 

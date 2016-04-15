@@ -1,8 +1,11 @@
 package com.example.sarthak.navigationdrawer.Backend.Backend;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -62,9 +65,61 @@ public class LoginRegister extends AppCompatActivity {
                             Config.ip = te.trim();
                             dialog.dismiss();
                         }
-
+                        enablePermissions();
                     }
                 }).show();
+
     }
 
+    int PERMISSION_CHECK_1 = 1;
+    int PERMISSION_CHECK_2 = 2;
+    int PERMISSION_CHECK_3 = 3;
+    int PERMISSION_CHECK_4 = 4;
+    int PERMISSION_CHECK_5 = 5;
+
+    private void enablePermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(LoginRegister.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Toast.makeText(LoginRegister.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                ActivityCompat.requestPermissions(LoginRegister.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CHECK_1);
+            }
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(LoginRegister.this, Manifest.permission.READ_CONTACTS)) {
+                Toast.makeText(LoginRegister.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                ActivityCompat.requestPermissions(LoginRegister.this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_CHECK_2);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(LoginRegister.this, Manifest.permission.RECEIVE_SMS)) {
+                Toast.makeText(LoginRegister.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                ActivityCompat.requestPermissions(LoginRegister.this, new String[]{Manifest.permission.RECEIVE_SMS}, PERMISSION_CHECK_3);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(LoginRegister.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(LoginRegister.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                ActivityCompat.requestPermissions(LoginRegister.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_CHECK_4);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(LoginRegister.this, Manifest.permission.CALL_PHONE)) {
+                Toast.makeText(LoginRegister.this, "Error while requesting permissions", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                ActivityCompat.requestPermissions(LoginRegister.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSION_CHECK_5);
+            }
+        }
+    }
 }

@@ -145,6 +145,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String sourceName = "";
     private String destName = "";
     ServerRequest sr;
+    String allowed = "1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -391,8 +392,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        ArrayList<NameValuePair> params_check = new ArrayList<>()
-        JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",)
+
+
 
 
         /*Add history*/
@@ -413,7 +414,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Accident";
-                getDialogReportAdd();
+                ArrayList<NameValuePair> params_check = new ArrayList<>();
+                params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                try {
+                    allowed = json_check_allowed_to_post.getString("res");
+                    Log.d("allowed",allowed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(allowed.equals("1"))
+                    getDialogReportAdd();
+                else
+                    Toast.makeText(MapsActivity.this, "You are not allowed to post due to too many downvotes on your report", Toast.LENGTH_LONG).show();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_roadblock = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_roadblock);
@@ -422,7 +435,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Roadblock";
-                getDialogReportAdd();
+                ArrayList<NameValuePair> params_check = new ArrayList<>();
+                params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                try {
+                    allowed = json_check_allowed_to_post.getString("res");
+                    Log.d("allowed",allowed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(allowed.equals("1"))
+                    getDialogReportAdd();
+                else
+                    Toast.makeText(MapsActivity.this, "You are not allowed to post due to too many downvotes on your report", Toast.LENGTH_LONG).show();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_event = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_event);
@@ -431,7 +456,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Event";
-                getDialogReportAdd();
+                ArrayList<NameValuePair> params_check = new ArrayList<>();
+                params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                try {
+                    allowed = json_check_allowed_to_post.getString("res");
+                    Log.d("allowed",allowed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(allowed.equals("1"))
+                    getDialogReportAdd();
+                else
+                    Toast.makeText(MapsActivity.this, "You are not allowed to post due to too many downvotes on your report", Toast.LENGTH_LONG).show();
             }
         });
         com.getbase.floatingactionbutton.FloatingActionButton fab_traffic = (com.getbase.floatingactionbutton.FloatingActionButton) findViewById(R.id.fab_report_traffic);
@@ -440,7 +477,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 fab_menu_report_panel.collapse();
                 typeOfReport = "Traffic";
-                getDialogReportAdd();
+                ArrayList<NameValuePair> params_check = new ArrayList<>();
+                params_check.add(new BasicNameValuePair(Config.phone_number, phone_number));
+                JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",params_check);
+                try {
+                    allowed = json_check_allowed_to_post.getString("res");
+                    Log.d("allowed",allowed);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if(allowed.equals("1"))
+                    getDialogReportAdd();
+                else
+                    Toast.makeText(MapsActivity.this, "You are not allowed to post due to too many downvotes on your report", Toast.LENGTH_LONG).show();
             }
         });
         startService(new Intent(this, LocationService.class));//Start the location refresh service
@@ -669,10 +718,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (json != null) {
             try {
                 String jsonstr = json.getString("response");
-                JSONArray users = json.getJSONArray("usersNearby");
-                Toast.makeText(getApplicationContext(),jsonstr,Toast.LENGTH_LONG).show();
+                //JSONArray users = json.getJSONArray("usersNearby");
+                //Toast.makeText(getApplicationContext(),jsonstr,Toast.LENGTH_LONG).show();
                 //Log.d("wtf",users);
-                snedAlertReportAddedToNearBy(users);
+                //snedAlertReportAddedToNearBy(users);
 
                 Log.d("Hello", jsonstr);
             } catch (JSONException e) {
@@ -689,7 +738,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.user_name));
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.gcmId));
-                //gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId),typeOfReport+" added in your near by");
+
+                gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId), typeOfReport + " added in your near by", "Reports By TRAVEY");
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }

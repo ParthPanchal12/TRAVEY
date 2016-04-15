@@ -2,7 +2,6 @@ package com.example.sarthak.navigationdrawer.Backend.Backend;
 
 
 import android.content.Context;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -198,24 +197,16 @@ public class ServerRequest {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressBar = new SweetAlertDialog(_context, SweetAlertDialog.PROGRESS_TYPE);
-            progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-            progressBar.setTitleText("");
-            progressBar.setCancelable(false);
-            progressBar.show();
+
         }
 
         @Override
         protected JSONObject doInBackground(Params... args) {
-            JSONObject json = null;
-            try {
-                ServerRequest request = new ServerRequest(_context);
-                json = request.getJSONFromUrl(args[0].url, args[0].params);
-            } catch (JsonIOException e) {
-                Toast.makeText(_context, "Could not complete your request", Toast.LENGTH_SHORT).show();
-            } catch (RuntimeException e) {
-                Toast.makeText(_context, "Could not complete your request", Toast.LENGTH_SHORT).show();
-            }
+            ServerRequest request = new ServerRequest(_context);
+
+            Log.d("ip",Config.ip);
+            JSONObject json = request.getJSONFromUrl(args[0].url, args[0].params);
+
 
             return json;
         }
@@ -224,8 +215,8 @@ public class ServerRequest {
         protected void onPostExecute(JSONObject json) {
 
             super.onPostExecute(json);
-            progressBar.hide();
         }
+
 
     }
 
