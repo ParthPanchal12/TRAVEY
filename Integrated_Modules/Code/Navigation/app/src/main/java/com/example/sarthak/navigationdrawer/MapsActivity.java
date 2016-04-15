@@ -144,6 +144,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FloatingActionButton fab_addHistory;
     private String sourceName = "";
     private String destName = "";
+    ServerRequest sr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +165,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
         final SharedPreferences.Editor edit = pref.edit();
         phone_number = pref.getString(Config.phone_number, "");
+        sr = new ServerRequest(MapsActivity.this);
 
 
         //Setting up drawer
@@ -389,6 +391,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        ArrayList<NameValuePair> params_check = new ArrayList<>()
+        JSONObject json_check_allowed_to_post = sr.getJSON(Config.ip+"/checkAllowedToPost",)
 
 
         /*Add history*/
@@ -685,7 +689,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.user_name));
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.gcmId));
-                gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId),typeOfReport+" added in your near by");
+                //gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId),typeOfReport+" added in your near by");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
