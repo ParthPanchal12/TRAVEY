@@ -359,7 +359,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                                 if(jsonObject!=null){
                                     try {
                                         String reg_id=jsonObject.getString(Config.gcmId);
-                                       App gcmApp=new App();
+                                        App gcmApp=new App();
                                         gcmApp.sendNotification(reg_id,pref.getString(Config.user_name, "")+"shared his location with you");
                                     } catch (JSONException e) {
                                         e.printStackTrace();

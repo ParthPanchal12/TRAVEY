@@ -87,7 +87,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_profile_page);
-
+        sr = new ServerRequest(getApplicationContext());
 
         /*Customising Toolbar*/
         toolbar = (Toolbar) findViewById(R.id.toolbar_ProfilePage);
@@ -102,7 +102,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         progressBar.setTitleText("Getting your information");
         progressBar.setCancelable(false);
 
-        new Task_async().execute();
+        //new Task_async().execute();
 
         /*Setting the profile pic*/
         profilePictureImageView = (ImageView) findViewById(R.id.imageView_UserImage);
@@ -115,6 +115,23 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         email = pref.getString(Config.email, "");
         shared_location = pref.getString("shared_location", "");
 
+        params_editEmail = new ArrayList<NameValuePair>();
+        params_editSharedLocation = new ArrayList<NameValuePair>();
+
+        params_editEmail.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editEmail.add(new BasicNameValuePair(Config.email, email));
+
+        params_editSharedLocation.add(new BasicNameValuePair(Config.phone_number, phone_number));
+        params_editSharedLocation.add(new BasicNameValuePair(Config.sharedLocation, "0"));
+
+
+        JSONObject json = sr.getJSON(Config.ip + "/getRating", params_editEmail);
+        try {
+            Rating = json.getString("rating");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         //Toast.makeText(MainActivity_ProfilePage.this, shared_location, Toast.LENGTH_SHORT).show();
         Log.d("shared",shared_location);
         if(shared_location.equals("1"))
@@ -123,10 +140,6 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             shared_location = "Not Shared";
 
         collapsingToolbar.setTitle(nameOfUser);
-
-
-
-
 
 
         /*If clicked on Profile Pic then show the photo*/
@@ -141,12 +154,11 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             }
         });
 
-
-
         userInfoDescription[1] = email;
         userInfoDescription[0] = phone_number;
         userInfoDescription[2] = Rating;
         userInfoDescription[3] = shared_location;
+
 
         //params_editUserName.
         /*sr = new ServerRequest(MainActivity_ProfilePage.this);
@@ -321,19 +333,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
             }
         });
-
-        /*floatingActionButtonChangePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                *//*Close the open FAB*//*
-                animateFAB();
-
-
-            }
-        });*/
-
     }
-
 
     /*To add*/
     private void savePhotoToDatabase(String photo) {
@@ -382,7 +382,6 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
             isFabOpen = true;
         }
     }
-
 
     //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {

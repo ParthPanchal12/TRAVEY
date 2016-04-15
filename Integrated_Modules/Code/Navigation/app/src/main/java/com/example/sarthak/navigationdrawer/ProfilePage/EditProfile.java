@@ -131,6 +131,7 @@ public class EditProfile extends AppCompatActivity {
         }
         Toast.makeText(EditProfile.this, jsonstr, Toast.LENGTH_SHORT).show();
     }
+
     private String getKey(){
         Log.d("title_needed",title_toolbar);
         if(title_toolbar.equals("Name")){

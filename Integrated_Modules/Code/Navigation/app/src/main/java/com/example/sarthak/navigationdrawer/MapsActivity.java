@@ -45,6 +45,7 @@ import com.example.sarthak.navigationdrawer.Backend.Backend.Reports;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.ContactDisplay.MainActivity_Contacts;
 import com.example.sarthak.navigationdrawer.FriendsNearMe.FriendsNearMe;
+import com.example.sarthak.navigationdrawer.GCM.App;
 import com.example.sarthak.navigationdrawer.History.MainActivity_History;
 import com.example.sarthak.navigationdrawer.LeaderBoard.MainActivity_Leaderboard;
 import com.example.sarthak.navigationdrawer.ProfilePage.MainActivity_ProfilePage;
@@ -549,7 +550,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
     private void getDialogReportAdd() {
 
 
@@ -664,9 +664,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (json != null) {
             try {
                 String jsonstr = json.getString("response");
-                //String sue = json.getString("use");
-
-                //Toast.makeText(getContext(),jsonstr+ "     " + sue ,Toast.LENGTH_LONG).show();
+                JSONArray users = json.getJSONArray("usersNearby");
+                Toast.makeText(getApplicationContext(),jsonstr,Toast.LENGTH_LONG).show();
+                //Log.d("wtf",users);
+                snedAlertReportAddedToNearBy(users);
 
                 Log.d("Hello", jsonstr);
             } catch (JSONException e) {
@@ -675,6 +676,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
 
+    }
+
+    private void snedAlertReportAddedToNearBy(JSONArray json){
+        for(int i=0; i<json.length(); i++){
+            App gcmApp = new App();
+            try {
+                Log.d("doesitneeded",json.getJSONObject(i).getString(Config.user_name));
+                Log.d("doesitneeded",json.getJSONObject(i).getString(Config.gcmId));
+                gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId),typeOfReport+" added in your near by");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     private String getFormattedDate(String monthString, int day, int year, int hours, int minutes, int seconds) {
