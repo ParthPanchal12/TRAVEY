@@ -685,7 +685,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             try {
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.user_name));
                 Log.d("doesitneeded",json.getJSONObject(i).getString(Config.gcmId));
-                gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId),typeOfReport+" added in your near by");
+                gcmApp.sendNotification(json.getJSONObject(i).getString(Config.gcmId), typeOfReport + " added in your near by", "Reports By TRAVEY");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
