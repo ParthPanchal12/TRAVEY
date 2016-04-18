@@ -5,7 +5,7 @@ package com.example.sarthak.navigationdrawer.Backend.Backend;
  */
 public class Config {
     //public static String ip = "https://morning-dawn-65556.herokuapp.com";
-    public static String ip = "http://192.168.110.1:8080";
+    public static String ip = "http://192.168.5.1:8080";
     public static String phone_number = "phone_number";
     public static String name = "name";
     public static String start_time = "start_time";

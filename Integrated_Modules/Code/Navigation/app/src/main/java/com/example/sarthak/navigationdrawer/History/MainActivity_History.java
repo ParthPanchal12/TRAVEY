@@ -1,5 +1,7 @@
 package com.example.sarthak.navigationdrawer.History;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +30,9 @@ public class MainActivity_History extends AppCompatActivity {
     private RecycleViewAdapter adapter;
     private RecyclerView recyclerView;
     private ArrayList<History> histories;
+    ServerRequest sr;
+    SharedPreferences pref;
+    String phone_number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,9 @@ public class MainActivity_History extends AppCompatActivity {
             }
         });
 
+        sr = new ServerRequest(MainActivity_History.this);
+        pref = this.getSharedPreferences("AppPref", Context.MODE_PRIVATE);
+        phone_number = pref.getString(Config.phone_number,"");
 
         histories = new ArrayList<>();
         getHistory();
@@ -61,7 +69,7 @@ public class MainActivity_History extends AppCompatActivity {
     private void getHistory() {
 
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        params.add(new BasicNameValuePair(Config.phone_number, phone_number));
         ServerRequest sr = new ServerRequest(MainActivity_History.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);

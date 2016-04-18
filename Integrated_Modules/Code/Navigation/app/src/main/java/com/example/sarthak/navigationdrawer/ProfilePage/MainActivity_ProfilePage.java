@@ -242,7 +242,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                                                 params = new ArrayList<NameValuePair>();
                                                 params.add(new BasicNameValuePair("oldpass", oldpasstxt));
                                                 params.add(new BasicNameValuePair("newpass", newpasstxt));
-                                                params.add(new BasicNameValuePair("id", token));
+                                                params.add(new BasicNameValuePair("id", phone_number));
                                                 ServerRequest sr = new ServerRequest(getApplicationContext());
 
                                                 JSONObject json = sr.getJSON(Config.ip+"/api/chgpass",params);
@@ -339,7 +339,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     private void savePhotoToDatabase(String photo) {
         ArrayList<NameValuePair> parameters = new ArrayList<>();
         parameters.add(new BasicNameValuePair(Config.photo, photo));
-        parameters.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        parameters.add(new BasicNameValuePair(Config.phone_number, phone_number));
 
         ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
         Log.d("here", "params sent");

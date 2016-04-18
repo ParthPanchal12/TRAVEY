@@ -146,6 +146,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String destName = "";
     ServerRequest sr;
     String allowed = "1";
+    int up,down;
+    int touch_up_down = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -518,7 +520,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("history_string",s);
 
         ServerRequest sr = new ServerRequest(MapsActivity.this);
+        Log.d("do somethind", "hii1");
         JSONObject jsonObject = sr.getJSON(Config.ip + "/historyAdd", params);
+        Log.d("do somethind", "hii2");
         if (jsonObject != null) {
             try {
                 String temp = jsonObject.getString("response");
@@ -550,8 +554,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("JsonAllReports", "" + json);
                 for (int i = 0; i < json.length(); i++) {
                     Gson gson = new Gson();
-                    report = gson.fromJson(json.getString(i), new TypeToken<Reports>() {
-                    }.getType());
+                    report = gson.fromJson(json.getString(i), new TypeToken<Reports>(){}.getType());
                     reports.add(report);
 
                     double[] ar = report.getLocation();
@@ -587,7 +590,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 LatLng loc1 = new LatLng(loc[0], loc[1]);
                                 if (loc1.latitude == marker.getPosition().latitude && loc1.longitude == marker.getPosition().longitude) {
 
-                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), (reports.get(j).getUpvotes()), reports.get(j).getDownvotes(), reports.get(j).get_id(), j, reports.get(j).getEnd_time());
+                                    getDetailsForReport(reports.get(j).getDetail(), reports.get(j).getTag(), reports.get(j).getUpvotes(), reports.get(j).getDownvotes(), reports.get(j).get_id(), j, reports.get(j).getEnd_time());
                                     Log.d("checkVote", "After one iteration" + reports.size());
                                     break;
                                 }
@@ -766,13 +769,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-    private void getDetailsForReport(String detail, String title, int upvote, int downvote, final String id, final int pos, String durationTime) {
-        CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
+    private void getDetailsForReport(String detail, String title, int upvote, final int downvote, final String id, final int pos, String durationTime) {
+        //CharSequence methodsToTakeSource[] = new CharSequence[]{"" + detail, "Upvotes : " + upvote, "Downvotes : " + downvote};
 
 
         ServerRequest serverRequest = new ServerRequest(MapsActivity.this);
         ArrayList<NameValuePair> params = new ArrayList<>();
-        String up = "", down = "";
         SweetAlertDialog progressBar = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         progressBar.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         progressBar.setTitleText("Getting your contacts");
@@ -782,7 +784,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         JSONObject jsonObject = serverRequest.getJSON(Config.ip + "/getUpvotes", params);
         if (jsonObject != null) {
             try {
-                up = jsonObject.getString("upvotes");
+                up = jsonObject.getInt("upvotes");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -790,13 +792,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         jsonObject = serverRequest.getJSON(Config.ip + "/getDownvotes", params);
         if (jsonObject != null) {
             try {
-                down = jsonObject.getString("downvotes");
+                down = jsonObject.getInt("downvotes");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
         progressBar.hide();
-        MaterialDialog dialog = new MaterialDialog.Builder(this)
+        final MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .customView(R.layout.custom_layout_for_reports_description, true)
                 .show();
 
@@ -808,10 +810,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         description_report.setText(detail);
         TextView duration = (TextView) dialog.getCustomView().findViewById(R.id.duration_report_display);
         duration.setText("End Time:" + durationTime);
-        TextView upvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_upvotesTotal);
-        TextView downvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_downvotesTotal);
-        upvoteText.setText(up);
-        downvoteText.setText(down);
+        final TextView upvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_upvotesTotal);
+        final TextView downvoteText = (TextView) dialog.getCustomView().findViewById(R.id.tv_downvotesTotal);
+        Log.d("up_down " ,up+"  "+down);
+        upvoteText.setText(String.valueOf(up));
+        downvoteText.setText(String.valueOf(down));
+
+
 
         upvoteImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -821,27 +826,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 params1.add(new BasicNameValuePair(Config.phone_number, phone_number));
                 ServerRequest sr1 = new ServerRequest(MapsActivity.this);
                 Log.d("here", "params sent" + id);
-                //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                 JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
                 if (json1 != null) {
                     try {
-                        String rsp = json1.getString("response");
-                        if (rsp.equals("Can only upvote once")) {
-                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        Boolean rsp = json1.getBoolean("res");
+                        Toast.makeText(MapsActivity.this, "got resp upvoted"+rsp, Toast.LENGTH_SHORT).show();
+                        Log.d("rsp", String.valueOf(rsp));
+                        if (!rsp) {
+                            Toast.makeText(getApplicationContext(), "Can upvote only once", Toast.LENGTH_SHORT).show();
                         } else {
-                            Log.d("here", "json received");
-                            Toast.makeText(MapsActivity.this, "Upvoted!", Toast.LENGTH_SHORT).show();
+                            Log.d("here", "jso received");
+                            if(touch_up_down == 1){
+                                //downvoteText.setText(String.valueOf(down-1));
+                            }
+                            touch_up_down = 1;
+                            //upvoteText.setText(String.valueOf(up+1));
+                            Toast.makeText(getApplicationContext(), "Upvoted!", Toast.LENGTH_SHORT).show();
                             Reports rep = reports.get(pos);
                             rep.setUpvotes(rep.getUpvotes() + 1);
                             reports.set(pos, rep);
+                            dialog.hide();
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
                 }
-
             }
         });
         downvoteImage.setOnClickListener(new View.OnClickListener() {
@@ -856,16 +866,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
                 if (json2 != null) {
                     try {
-                        String rsp = json2.getString("response");
-                        if (rsp.equals("Can only downvote once")) {
-                            Toast.makeText(MapsActivity.this, rsp, Toast.LENGTH_SHORT).show();
+                        Boolean rsp = json2.getBoolean("res");
+                        Toast.makeText(MapsActivity.this, "got resp upvoted"+rsp, Toast.LENGTH_SHORT).show();
+                        Log.d("rsp", String.valueOf(rsp));
+                        if (!rsp) {
+                            Toast.makeText(getApplicationContext(), "Can downvote only once", Toast.LENGTH_SHORT).show();
                         } else {
-                            Log.d("here", "json received");
-                            Toast.makeText(MapsActivity.this, "Downvoted!", Toast.LENGTH_SHORT).show();
+                            Log.d("here", "jso received");
+                            if(touch_up_down == 1){
+                                //upvoteText.setText(String.valueOf(up-1));
+                            }
+                            touch_up_down = 1;
+                            //downvoteText.setText(String.valueOf(down+1));
+                            Toast.makeText(getApplicationContext(), "Downvoted!", Toast.LENGTH_SHORT).show();
                             Reports rep1 = reports.get(pos);
                             rep1.setDownvotes(rep1.getDownvotes() + 1);
                             reports.set(pos, rep1);
-
+                            dialog.hide();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1183,8 +1200,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
 
 //        switch (requestCode) {
 //            case PERMISSION_CHECK: {
@@ -1326,7 +1342,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 jObject = new JSONObject(jsonData[0]);
                 DirectionsJSONParser parser = new DirectionsJSONParser();
 
-// Starts parsing data
+                // Starts parsing data
                 routes = parser.parse(jObject);
             } catch (Exception e) {
                 e.printStackTrace();

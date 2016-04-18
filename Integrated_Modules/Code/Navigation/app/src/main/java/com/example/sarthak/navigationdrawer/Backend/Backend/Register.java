@@ -40,9 +40,9 @@ public class Register extends Fragment {
         Intent verification = new Intent(getContext(), VerificationActivity.class);
         verification.putExtra(INTENT_PHONENUMBER, phoneNumber);
         verification.putExtra(INTENT_COUNTRY_CODE, "91");
-        verification.putExtra("email",email_txt);
-        verification.putExtra("user_name",user_name_txt);
-        verification.putExtra("from","register");
+        verification.putExtra("email", email_txt);
+        verification.putExtra("user_name", user_name_txt);
+        verification.putExtra("from", "register");
         startActivity(verification);
         Log.d("start", "Activity started");
     }
@@ -68,33 +68,33 @@ public class Register extends Fragment {
 
         register.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                user_name_txt = user_name.getText().toString();
-                phone_number_txt = phone_number.getText().toString();
-                email_txt = email.getText().toString();
-                password_txt = password.getText().toString();
-                confirm_password_txt = confirm_password.getText().toString();
+                                        @Override
+                                        public void onClick(View v) {
+                                            user_name_txt = user_name.getText().toString();
+                                            phone_number_txt = phone_number.getText().toString();
+                                            email_txt = email.getText().toString();
+                                            password_txt = password.getText().toString();
+                                            confirm_password_txt = confirm_password.getText().toString();
 
-                if (user_name_txt.isEmpty() || phone_number_txt.isEmpty() || email_txt.isEmpty() || password_txt.isEmpty() || confirm_password_txt.isEmpty()) {
-                    Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
-                } else {
+                                            if (user_name_txt.isEmpty() || phone_number_txt.isEmpty() || email_txt.isEmpty() || password_txt.isEmpty() || confirm_password_txt.isEmpty()) {
+                                                Toast.makeText(getContext(), "Fill all details", Toast.LENGTH_SHORT).show();
+                                            } else {
                     /*params_user.add(new BasicNameValuePair(Config.ip,user_name_txt));
                     JSONObject j_user = sr.getJSON(Config.ip+"/checkUserExists",params_user);
                     if(){}else{}*/
-                    if (phone_number_txt == null || (phone_number_txt.length() != 10 && phone_number_txt.length() != 11 && phone_number_txt.length() != 13)) {
-                        Toast.makeText(getContext(), "Please Enter a valid phone number"+ phone_number_txt, Toast.LENGTH_SHORT).show();
-                    } else {
+                                                if (phone_number_txt == null || (phone_number_txt.length() != 10 && phone_number_txt.length() != 11 && phone_number_txt.length() != 13)) {
+                                                    Toast.makeText(getContext(), "Please Enter a valid phone number" + phone_number_txt, Toast.LENGTH_SHORT).show();
+                                                } else {
 
-                            if (!(email_txt.indexOf("@") < 1 || email_txt.lastIndexOf(".") < email_txt.indexOf("@") + 2 || email_txt.lastIndexOf(".") + 2 >= email_txt.length())) {
+                                                    if (!(email_txt.indexOf("@") < 1 || email_txt.lastIndexOf(".") < email_txt.indexOf("@") + 2 || email_txt.lastIndexOf(".") + 2 >= email_txt.length())) {
 
-                                if(password_txt.length()<6){
-                                    Toast.makeText(getContext(), "password length should equal or greater then 6", Toast.LENGTH_SHORT).show();
-                                }else{
-                                    if (password_txt.equals(confirm_password_txt)) {
+                                                        if (password_txt.length() < 6) {
+                                                            Toast.makeText(getContext(), "password length should equal or greater then 6", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            if (password_txt.equals(confirm_password_txt)) {
 
-                                        Log.d("here", "register is clicked");
-                                        Toast.makeText(getContext(), "Register clicked !", Toast.LENGTH_LONG).show();
+                                                                Log.d("here", "register is clicked");
+                                                                Toast.makeText(getContext(), "Register clicked !", Toast.LENGTH_LONG).show();
 
                                         /*Users user = new Users();
                                         History h = new History();
@@ -118,59 +118,54 @@ public class Register extends Fragment {
                                         Gson gson = new Gson();
                                         String s = gson.toJson(history);*/
 
-                                        params = new ArrayList<NameValuePair>();
-                                        params.add(new BasicNameValuePair(Config.user_name, user_name_txt));
-                                        params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
-                                        params.add(new BasicNameValuePair(Config.email, email_txt));
-                                        params.add(new BasicNameValuePair(Config.password, password_txt));
+                                                                params = new ArrayList<NameValuePair>();
+                                                                params.add(new BasicNameValuePair(Config.user_name, user_name_txt));
+                                                                params.add(new BasicNameValuePair(Config.phone_number, phone_number_txt));
+                                                                params.add(new BasicNameValuePair(Config.email, email_txt));
+                                                                params.add(new BasicNameValuePair(Config.password, password_txt));
                                         /*params.add(new BasicNameValuePair(Config.history, s));
                                         params.add(new BasicNameValuePair(Config.latitude, lat));
                                         params.add(new BasicNameValuePair(Config.longitude, long_));*/
 
-                                        Log.d(Config.user_name, user_name_txt);
-                                        Log.d(Config.phone_number, phone_number_txt);
-                                        Log.d(Config.email, email_txt);
-                                        Log.d(Config.password, password_txt);
+                                                                Log.d(Config.user_name, user_name_txt);
+                                                                Log.d(Config.phone_number, phone_number_txt);
+                                                                Log.d(Config.email, email_txt);
+                                                                Log.d(Config.password, password_txt);
 
-                                        //Log.d("history", s);
-                                        Log.d("here", "params sent");
+                                                                //Log.d("history", s);
+                                                                Log.d("here", "params sent");
 
-                                        Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
-                                        if (isInternetPresent) {
-                                            //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
-                                            JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
-                                            Log.d("here", "json received");
-                                            if (json != null) {
-                                                try {
-                                                    String jsonstr = json.getString("response");
-                                                    if (jsonstr.equals("yes")) {
-                                                        openActivity(getE164Number());
+                                                                JSONObject json = sr.getJSON(Config.ip + "/ckeckExistNumber", params);
+                                                                Log.d("here", "json received");
+                                                                if (json != null) {
+                                                                    try {
+                                                                        String jsonstr = json.getString("response");
+                                                                        if (jsonstr.equals("yes")) {
+                                                                            openActivity(getE164Number());
+                                                                        } else {
+                                                                            Toast.makeText(getContext(), "Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                        Log.d("Hello", jsonstr);
+                                                                    } catch (JSONException e) {
+                                                                        e.printStackTrace();
+                                                                    }
+                                                                }
+
+                                                            } else {
+                                                                Toast.makeText(getContext(), "Password does not match !", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+
                                                     } else {
-                                                        Toast.makeText(getContext(), "Phone number already existed!", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(getContext(), "Email id not valid !", Toast.LENGTH_LONG).show();
                                                     }
-                                                    Log.d("Hello", jsonstr);
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
                                                 }
                                             }
-                                        } else {
-                                            Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
                                         }
 
-
-                                    } else {
-                                        Toast.makeText(getContext(), "Password does not match !", Toast.LENGTH_LONG).show();
                                     }
-                                }
 
-                            } else {
-                                Toast.makeText(getContext(), "Email id not valid !", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }
-                }
-
-        });
+        );
 
         return view;
     }
