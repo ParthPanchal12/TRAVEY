@@ -843,6 +843,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 ServerRequest sr1 = new ServerRequest(MapsActivity.this);
                 Log.d("here", "params sent" + id);
                 JSONObject json1 = sr1.getJSON(Config.ip + "/reportUpVote", params1);
+                Log.d("hee", "params received"+json1.toString() + id);
                 if (json1 != null) {
                     try {
                         Boolean rsp = json1.getBoolean("res");
@@ -881,6 +882,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Log.d("here", "params sent");
                 //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
                 JSONObject json2 = sr2.getJSON(Config.ip + "/reportDownVote", params2);
+                Log.d("hee", "params received"+json2.toString() + id);
                 if (json2 != null) {
                     try {
                         Boolean rsp = json2.getBoolean("res");

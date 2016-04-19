@@ -105,7 +105,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                     @Override
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
-                        Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
                         String phone = adapter.friends.get(position).getPhone();
                         acc_phone = "";
                         if (phone.length() == 11) {
@@ -389,7 +389,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             App gcmApp = new App();
-            gcmApp.sendNotification(reg_id, pref.getString(Config.user_name, "") + " shared his location with you", "TRAVEY speaking..");
+            gcmApp.sendNotification(reg_id, pref.getString(Config.user_name, "") + " shared location with you", "TRAVEY speaking..");
             return null;
         }
     }

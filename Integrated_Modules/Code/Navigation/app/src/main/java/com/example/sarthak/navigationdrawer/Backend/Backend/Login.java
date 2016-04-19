@@ -98,8 +98,8 @@ public class Login extends Fragment {
                             params.add(new BasicNameValuePair(Config.gcmId, regId));
                         }
 
-                        Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
-                        if (isInternetPresent) {
+                        //Boolean isInternetPresent = sr.isConnectingToInternet(); // true or false
+                        //if (isInternetPresent) {
                             //ServerRequest sr = new ServerRequest();
                             JSONObject json = sr.getJSON(Config.ip + "/login", params);
                             if (json != null) {
@@ -146,9 +146,9 @@ public class Login extends Fragment {
                                     e.printStackTrace();
                                 }
                             }
-                        } else {
-                            Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
-                        }
+                        //} else {
+                          //  Toast.makeText(getContext(), "No Internet connection !", Toast.LENGTH_LONG).show();
+                        //}
 
                     }
                 }

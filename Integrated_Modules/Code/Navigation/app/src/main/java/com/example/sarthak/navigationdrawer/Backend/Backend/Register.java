@@ -94,7 +94,7 @@ public class Register extends Fragment {
                                                             if (password_txt.equals(confirm_password_txt)) {
 
                                                                 Log.d("here", "register is clicked");
-                                                                Toast.makeText(getContext(), "Register clicked !", Toast.LENGTH_LONG).show();
+                                                                //Toast.makeText(getContext(), "Register clicked !", Toast.LENGTH_LONG).show();
 
                                         /*Users user = new Users();
                                         History h = new History();
