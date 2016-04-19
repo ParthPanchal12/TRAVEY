@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,11 +50,12 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     private GoogleMap mMap;
     private LatLng friendPosition;
     private LatLng myPosition;
-    private Location myLastKnownLocation;
+    private LatLng myLastKnownLocation;
     private LocationManager locationManager;
     private double latitude;
     private double longitude;
     private String number = "";
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
 
 
        /**/
+        preferences = getSharedPreferences("AppPref", MODE_PRIVATE);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -114,7 +117,9 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
             return;
         }
         mMap.setMyLocationEnabled(true);
-        myPosition = new LatLng(23.187699, 72.6275614);
+
+        // myPosition = new LatLng(23.187699, 72.6275614);
+        canGetMyLocation();
         //disabled my location button
         Toast.makeText(DisplayFriendsOnMap.this, "" + myPosition, Toast.LENGTH_SHORT).show();
         if (getLocationOfFriend()) {
@@ -176,12 +181,32 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     }
 
     private boolean canGetMyLocation() {
+        ArrayList<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair(Config.phone_number, preferences.getString(Config.phone_number, "")));
+        ServerRequest sr = new ServerRequest(DisplayFriendsOnMap.this);
+        Log.d("here", "params sent");
+        //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+        JSONArray json = sr.getJSONArray(Config.ip + "/getMyLocation", params);
+        Log.d("here", "json received1" + json);
+        if (json != null) {
+            try {
+                Log.d("JsonFriend", "" + json);
+                latitude = json.getDouble(0);
+                longitude = json.getDouble(1);
+                myPosition = new LatLng(latitude, longitude);
+                Log.d("LatFriendLongFriend", "" + latitude + "," + longitude + ":" + myPosition.latitude + "," + myPosition.longitude);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else return false;
+
         return (myLastKnownLocation != null);
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        myLastKnownLocation = location;
         myPosition = new LatLng(location.getLatitude(), location.getLongitude());
 
 

@@ -336,7 +336,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     String reg_id = "";
 
     private void selectTypeForFriend(final String phone) {
-        String methodsToTakeSource[] = {"Share your location", "Get his location"};
+        String methodsToTakeSource[] = {"Share your location", "Get location"};
 
 
         new MaterialDialog.Builder(MainActivity_Contacts.this)
