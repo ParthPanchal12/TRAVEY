@@ -121,7 +121,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
         // myPosition = new LatLng(23.187699, 72.6275614);
         canGetMyLocation();
         //disabled my location button
-        Toast.makeText(DisplayFriendsOnMap.this, "" + myPosition, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(DisplayFriendsOnMap.this, "" + myPosition, Toast.LENGTH_SHORT).show();
         if (getLocationOfFriend()) {
             displayFriend();
         }
