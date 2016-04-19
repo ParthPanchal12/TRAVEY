@@ -7,23 +7,15 @@ import java.util.ArrayList;
 /**
  * Created by sarthak on 7/4/16.
  */
-public class User {
+public class User implements Comparable {
+    public ArrayList<History> history;
     private String user_name;
     private int upvotes;
     private int downvotes;
-    public ArrayList<History> history;
     private String phone_number;
     private double location[]=new double[2];
     private double lat;
     private double longitude=72.6275615;
-
-    public String getPhone_number() {
-        return phone_number;
-    }
-
-    public void setPhone_number(String phone_number) {
-        this.phone_number = phone_number;
-    }
 
     public User() {
     }
@@ -38,6 +30,14 @@ public class User {
         this.user_name = name;
         this.upvotes = upvote;
         this.downvotes = downvote;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
     }
 
     public double getLatitude() {
@@ -83,5 +83,18 @@ public class User {
     public void getCoordinates(){
         this.lat=location[0];
         this.longitude=location[1];
+    }
+
+    @Override
+    public int compareTo(Object s) {
+        User o = (User) s;
+        if (o.getUpvote() > this.getUpvote()) {
+            return -1;
+        }
+        if (o.getUpvote() == this.getUpvote() && o.getDownvote() < this.getDownvote()) {
+            return -1;
+        }
+
+        return 1;
     }
 }

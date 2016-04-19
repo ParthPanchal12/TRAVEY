@@ -1,28 +1,26 @@
 package com.example.sarthak.navigationdrawer.LeaderBoard;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MainActivity_Leaderboard extends AppCompatActivity {
     private RecycleViewAdapter adapter;
@@ -49,6 +47,7 @@ public class MainActivity_Leaderboard extends AppCompatActivity {
         users = new ArrayList<>();
         getUsers();
 
+        Collections.sort(users);
         adapter = new RecycleViewAdapter(MainActivity_Leaderboard.this, users);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_leaderboard);
         recyclerView.setAdapter(adapter);
