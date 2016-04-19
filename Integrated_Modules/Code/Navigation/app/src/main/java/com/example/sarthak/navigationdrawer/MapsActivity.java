@@ -905,7 +905,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         e.printStackTrace();
                     }
                 }
-
+                dialog.hide();
             }
         });
 
