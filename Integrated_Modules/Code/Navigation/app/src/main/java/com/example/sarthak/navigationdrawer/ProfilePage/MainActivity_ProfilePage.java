@@ -1,10 +1,8 @@
 package com.example.sarthak.navigationdrawer.ProfilePage;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -22,7 +20,6 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -44,7 +41,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -383,11 +379,11 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         }
     }
 
-    //    @Override
+//        @Override
 //    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //        // When an Image is picked
-//        if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
 //                && null != data) {
 //            /*Extract path from the image selected*/
 //            Uri selectedImageUri = data.getData();
@@ -515,26 +511,10 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 // Log.d(TAG, String.valueOf(bitmap));
 
-                String ss = bitmapToBase64(bitmap);
 
-                profilePictureImageView.setImageBitmap(base64ToBitmap(ss));
+                profilePictureImageView.setImageBitmap(bitmap);
                 String phone_number = pref.getString("phone_number", "");
-                ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("phone_number", phone_number));
-                params.add(new BasicNameValuePair("image", ss));
-                ServerRequest sr = new ServerRequest(MainActivity_ProfilePage.this);
-                JSONObject json = sr.getJSON(Config.ip + "/editProfile/image", params);
-                //   JSONObject json = sr.getJSON("http://192.168.56.1:8080/api/resetpass/chg", params);
 
-                if (json != null) {
-                    try {
-
-                        String jsonstr = json.getString("response");
-                        Toast.makeText(MainActivity_ProfilePage.this, "" + jsonstr, Toast.LENGTH_SHORT).show();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -542,17 +522,7 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
         }
     }
 
-    private String bitmapToBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
 
-    private Bitmap base64ToBitmap(String b64) {
-        byte[] imageAsBytes = Base64.decode(b64.getBytes(), Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-    }
 
     /*initialise the profile attributes*/
     private void initialiseProfile() {
@@ -563,18 +533,22 @@ public class MainActivity_ProfilePage extends AppCompatActivity {
     }
 
     /*To get path of image from gallery*/
-    public String getPath(Uri uri) {
-        String res = null;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            ;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            res = cursor.getString(column_index);
-        }
-        cursor.close();
-        return res;
-    }
+//    public String getPath(Uri uri) {
+//        if(pref.getString("ImagePath"))
+//        String res = null;
+//        String[] proj = {MediaStore.Images.Media.DATA};
+//        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+//        if (cursor.moveToFirst()) {
+//            ;
+//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+//            res = cursor.getString(column_index);
+//        }
+//        cursor.close();
+//        SharedPreferences.Editor editor=pref.edit();
+//        editor.putString("ImagePath",res);
+//        editor.commit();
+//        return res;
+//    }
 
     /*Color toolbars*/
     private void colorToolbars() {

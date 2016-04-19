@@ -24,7 +24,6 @@ import com.example.sarthak.navigationdrawer.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -36,7 +35,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -55,10 +53,12 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     private LocationManager locationManager;
     private double latitude;
     private double longitude;
+    private String number = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        number = getIntent().getExtras().getString("number");
         setContentView(R.layout.activity_main_display_friends_on_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_friends_on_Map);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
@@ -114,9 +114,9 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
             return;
         }
         mMap.setMyLocationEnabled(true);
-        myPosition=new LatLng(23.187699,72.6275614);
+        myPosition = new LatLng(23.187699, 72.6275614);
         //disabled my location button
-        Toast.makeText(DisplayFriendsOnMap.this, ""+myPosition, Toast.LENGTH_SHORT).show();
+        Toast.makeText(DisplayFriendsOnMap.this, "" + myPosition, Toast.LENGTH_SHORT).show();
         if (getLocationOfFriend()) {
             displayFriend();
         }
@@ -143,7 +143,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
 
     private boolean getLocationOfFriend() {
         ArrayList<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair(Config.phone_number, "8758964908"));
+        params.add(new BasicNameValuePair(Config.phone_number, number));
         ServerRequest sr = new ServerRequest(DisplayFriendsOnMap.this);
         Log.d("here", "params sent");
         //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
@@ -154,8 +154,11 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
                 Log.d("JsonFriend", "" + json);
                 latitude = json.getDouble(0);
                 longitude = json.getDouble(1);
+                if (latitude == 0 || longitude == 0) {
+                    return false;
+                }
                 friendPosition = new LatLng(latitude, longitude);
-                Log.d("LatFriendLongFriend", "" + latitude + "," + longitude+":"+myPosition.latitude+","+myPosition.longitude);
+                Log.d("LatFriendLongFriend", "" + latitude + "," + longitude + ":" + myPosition.latitude + "," + myPosition.longitude);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -179,7 +182,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     @Override
     public void onLocationChanged(Location location) {
         myLastKnownLocation = location;
-        myPosition= new LatLng(location.getLatitude(), location.getLongitude());
+        myPosition = new LatLng(location.getLatitude(), location.getLongitude());
 
 
         //locationManager.removeUpdates(this);

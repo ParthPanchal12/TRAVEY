@@ -89,12 +89,12 @@ public class User implements Comparable {
     public int compareTo(Object s) {
         User o = (User) s;
         if (o.getUpvote() > this.getUpvote()) {
-            return -1;
+            return 1;
         }
         if (o.getUpvote() == this.getUpvote() && o.getDownvote() < this.getDownvote()) {
-            return -1;
+            return 1;
         }
 
-        return 1;
+        return -1;
     }
 }

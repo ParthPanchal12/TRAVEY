@@ -59,6 +59,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     SharedPreferences pref;
     SharedPreferences.Editor edit;
     private SweetAlertDialog progressBar;
+    private String acc_phone;
     private ArrayList<Friends> friendsFromSharedPref;
 
     @Override
@@ -106,7 +107,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         // TODO Handle item click
                         Toast.makeText(MainActivity_Contacts.this, "Clicked on" + adapter.friends.get(position).getName(), Toast.LENGTH_SHORT).show();
                         String phone = adapter.friends.get(position).getPhone();
-                        String acc_phone = "";
+                        acc_phone = "";
                         if (phone.length() == 11) {
                             acc_phone = "" + phone.charAt(1) + phone.charAt(2) + phone.charAt(3) + phone.charAt(4) + phone.charAt(5) + phone.charAt(6) + phone.charAt(7) + phone.charAt(8) + phone.charAt(9) + phone.charAt(10);
                         } else if (phone.length() == 13) {
@@ -371,6 +372,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                                 break;
                             case 1:
                                 Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
+                                intent.putExtra("number", acc_phone);
                                 startActivity(intent);
                                 break;
                         }
