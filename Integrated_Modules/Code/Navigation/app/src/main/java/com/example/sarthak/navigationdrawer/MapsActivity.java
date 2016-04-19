@@ -698,16 +698,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String monthString = getMonthFormatted(month);
         int seconds = 0;
         String finalStartDate = getFormattedDate(monthString, day, year, hours, minutes, seconds);
-        int dayNew = 0, hourNew = 0, minuteNew = 0;
+        int dayNew = day, hourNew = 0, minuteNew = 0;
         if (minutes + this.minutes >= 60) {
             minuteNew += (minutes + this.minutes % 60);
             hourNew++;
+        } else{
+            minuteNew = minutes + this.minutes;
         }
         if (hourNew + hours + this.hours >= 24) {
             hourNew += (hours + this.hours) % 24;
             dayNew++;
+        }else{
+            hourNew = hours + this.hours;
         }
-        dayNew += day;
+        //dayNew += day;
+        Log.d("newday", String.valueOf(dayNew));
         String finalEndDate = getFormattedDate(monthString, dayNew, year, hourNew, minuteNew, seconds);
         Log.d("enddate", finalEndDate);
         parametersDatabase.add(new BasicNameValuePair(Config.detail, descriptionReport));
