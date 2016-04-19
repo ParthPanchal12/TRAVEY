@@ -211,7 +211,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
-                drawerLayout.closeDrawers();
                 if (menuItem.getTitle().equals("Profile")) {
 
                     Intent intent = new Intent(MapsActivity.this, MainActivity_ProfilePage.class);
@@ -253,6 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     Toast.makeText(MapsActivity.this, menuItem.getTitle(), Toast.LENGTH_SHORT).show();
                 }
+                drawerLayout.closeDrawers();
                 return true;
             }
         });
@@ -563,19 +563,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (report.getTag().equals("Traffic")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.traffic)));
                     } else if (report.getTag().equals("Roadblock")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.construction)));
                     } else if (report.getTag().equals("Accident")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.accident)));
                     } else if (report.getTag().equals("Event")) {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.event)));
                     } else {
                         mMap.addMarker(new MarkerOptions()
                                 .position(place).flat(true)
