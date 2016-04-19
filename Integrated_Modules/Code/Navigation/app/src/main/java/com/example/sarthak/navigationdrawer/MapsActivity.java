@@ -174,6 +174,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Setting up drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_MapsActivity_Main);
 
+
+
         /*Creating instance of place Picker*/
         mGoogleApiClient = new GoogleApiClient
                 .Builder(MapsActivity.this)
@@ -322,7 +324,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     builder.include(destinationMarker.getPosition());
                     LatLngBounds bounds = builder.build();
                     // Getting URL to the Google Directions API
+                    mMap.clear();
                     String url = getDirectionsUrl(sourceLatLng, destinationLatLng);
+                    sourceMarker = mMap.addMarker(new MarkerOptions().position(sourceLatLng).draggable(true));
+                    destinationMarker = mMap.addMarker(new MarkerOptions().position(destinationLatLng).draggable(true));
+                    addLabelsForAllReports();
                     DownloadTask downloadTask = new DownloadTask();
                     // Start downloading json data from Google Directions API
                     downloadTask.execute(url);
@@ -372,10 +378,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     int padding = 310; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     // Getting URL to the Google Directions API
+                    mMap.clear();
                     String url = getDirectionsUrl(sourceLatLng, destinationLatLng);
                     DownloadTask downloadTask = new DownloadTask();
                     // Start downloading json data from Google Directions API
                     downloadTask.execute(url);
+                    sourceMarker = mMap.addMarker(new MarkerOptions().position(sourceLatLng).draggable(true));
+                    destinationMarker = mMap.addMarker(new MarkerOptions().position(destinationLatLng).draggable(true));
+                    addLabelsForAllReports();
                     fab_addHistory.setVisibility(View.VISIBLE);
                     mMap.animateCamera(cu);
                     cardView_Destination.setVisibility(View.GONE);
@@ -502,6 +512,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     }
+
 
     private void addHistory() {
         ArrayList<NameValuePair> params = new ArrayList<>();
@@ -850,13 +861,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Reports rep = reports.get(pos);
                             rep.setUpvotes(rep.getUpvotes() + 1);
                             reports.set(pos, rep);
-                            dialog.hide();
+
 
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
+                dialog.hide();
             }
         });
         downvoteImage.setOnClickListener(new View.OnClickListener() {

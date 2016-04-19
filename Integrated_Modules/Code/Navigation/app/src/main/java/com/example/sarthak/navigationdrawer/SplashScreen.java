@@ -38,7 +38,6 @@ public class SplashScreen extends AppCompatActivity {
         if (isInternetPresent) {
 
             if (regId == null || regId.isEmpty()) {
-                Toast.makeText(SplashScreen.this, "Could not create Registration id for GCM", Toast.LENGTH_SHORT).show();
             }
 
             if (token != null && token != "") {
