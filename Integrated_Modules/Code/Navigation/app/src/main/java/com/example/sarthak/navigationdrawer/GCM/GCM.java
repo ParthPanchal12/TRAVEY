@@ -51,7 +51,7 @@ public class GCM {
             Log.i(TAG, "App version changed.");
             return "";
         }
-        Toast.makeText(context, regId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "GCM generated successfully", Toast.LENGTH_SHORT).show();
         return regId;
     }
 
