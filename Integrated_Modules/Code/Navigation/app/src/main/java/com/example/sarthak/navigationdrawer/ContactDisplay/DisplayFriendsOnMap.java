@@ -60,11 +60,12 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     private String number = "";
     private SharedPreferences preferences;
     private String reg_id;
-
+    private String name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         number = getIntent().getExtras().getString("number");
+        name = getIntent().getExtras().getString("name");
         setContentView(R.layout.activity_main_display_friends_on_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_friends_on_Map);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
@@ -128,6 +129,8 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
         //Toast.makeText(DisplayFriendsOnMap.this, "" + myPosition, Toast.LENGTH_SHORT).show();
         if (getLocationOfFriend()) {
             displayFriend();
+        } else {
+            Toast.makeText(DisplayFriendsOnMap.this, name + " has not shared his location", Toast.LENGTH_SHORT).show();
         }
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
     }
@@ -165,7 +168,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
                 longitude = json.getDouble(1);
                 if (latitude == 0 || longitude == 0) {
                     ArrayList<NameValuePair> paramws = new ArrayList<NameValuePair>();
-                    params.add(new BasicNameValuePair(Config.phone_number, number));
+                    paramws.add(new BasicNameValuePair(Config.phone_number, number));
 //                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
                     ServerRequest sr1 = new ServerRequest(DisplayFriendsOnMap.this);
                     Log.d("here", "" + number);

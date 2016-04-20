@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
@@ -60,6 +59,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
     SharedPreferences.Editor edit;
     private SweetAlertDialog progressBar;
     private String acc_phone;
+    private String acc_name;
     private ArrayList<Friends> friendsFromSharedPref;
 
     @Override
@@ -113,6 +113,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                         } else if (phone.length() == 13) {
                             acc_phone = "" + phone.charAt(3) + phone.charAt(4) + phone.charAt(5) + phone.charAt(6) + phone.charAt(7) + phone.charAt(8) + phone.charAt(9) + phone.charAt(10) + phone.charAt(11) + phone.charAt(12);
                         }
+                        acc_name = adapter.friends.get(position).getName();
                         selectTypeForFriend(acc_phone);
                     }
                 })
@@ -373,6 +374,7 @@ public class MainActivity_Contacts extends AppCompatActivity {
                             case 1:
                                 Intent intent = new Intent(MainActivity_Contacts.this, DisplayFriendsOnMap.class);
                                 intent.putExtra("number", acc_phone);
+                                intent.putExtra("name", acc_name);
                                 startActivity(intent);
                                 break;
                         }
