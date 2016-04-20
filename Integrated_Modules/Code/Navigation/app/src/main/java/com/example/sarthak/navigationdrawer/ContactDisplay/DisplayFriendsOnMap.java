@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.sarthak.navigationdrawer.Backend.Backend.Config;
 import com.example.sarthak.navigationdrawer.Backend.Backend.ServerRequest;
+import com.example.sarthak.navigationdrawer.GCM.App;
 import com.example.sarthak.navigationdrawer.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,6 +38,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -56,6 +59,7 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
     private double longitude;
     private String number = "";
     private SharedPreferences preferences;
+    private String reg_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +164,23 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
                 latitude = json.getDouble(0);
                 longitude = json.getDouble(1);
                 if (latitude == 0 || longitude == 0) {
+                    ArrayList<NameValuePair> paramws = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair(Config.phone_number, number));
+//                                params.add(new BasicNameValuePair(Config.user_name, pref.getString(Config.user_name, "")));
+                    ServerRequest sr1 = new ServerRequest(DisplayFriendsOnMap.this);
+                    Log.d("here", "" + number);
+                    //JSONObject json = sr.getJSON("http://127.0.0.1:8080/register",params);
+                    JSONObject jsonObject = sr1.getJSON(Config.ip + "/getGcm", paramws);
+                    Log.d("TAgs", "" + jsonObject);
+                    if (jsonObject != null) {
+                        try {
+                            reg_id = jsonObject.getString(Config.gcmId);
+                            Log.d("temp", reg_id);
+                            new Async_Task().execute();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     return false;
                 }
                 friendPosition = new LatLng(latitude, longitude);
@@ -271,6 +292,16 @@ public class DisplayFriendsOnMap extends AppCompatActivity implements OnMapReady
             return true;
         } else {
             return false;
+        }
+    }
+
+    class Async_Task extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            App gcmApp = new App();
+            gcmApp.sendNotification(reg_id, preferences.getString(Config.user_name, "").trim() + " wants to see your location but you have not shared your location..\nPlease share your location", "TRAVEY speaking..");
+            return null;
         }
     }
 }
